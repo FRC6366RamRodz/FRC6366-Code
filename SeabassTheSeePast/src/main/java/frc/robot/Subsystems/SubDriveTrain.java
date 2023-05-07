@@ -8,6 +8,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -21,8 +23,8 @@ public class SubDriveTrain {//initialization variables should be descriptive all
     private static TalonSRX RIGHT_FRONT_MOTOR;
     private static VictorSPX LEFT_REAR_MOTOR;
     private static VictorSPX RIGHT_REAR_MOTOR;
-    private static TalonSRX FRONT_DROP_MOTOR;
-    private static TalonSRX REAR_DROP_MOTOR;
+    private static CANSparkMax FRONT_DROP_MOTOR;
+    private static CANSparkMax REAR_DROP_MOTOR;
     private static Solenoid FRONT_DROP_SOLENOID;
     private static Solenoid REAR_DROP_SOLENOID;
 
@@ -40,8 +42,8 @@ public class SubDriveTrain {//initialization variables should be descriptive all
         LEFT_REAR_MOTOR = new VictorSPX(leftRearMotor);
         RIGHT_FRONT_MOTOR = new TalonSRX(rightFrontMotor);
         RIGHT_REAR_MOTOR = new VictorSPX(rightRearMotor);
-        FRONT_DROP_MOTOR = new TalonSRX(frontDropMotor);
-        REAR_DROP_MOTOR = new TalonSRX(rearDropMotor);
+        FRONT_DROP_MOTOR = new CANSparkMax(frontDropMotor, MotorType.kBrushless);
+        REAR_DROP_MOTOR = new CANSparkMax(rearDropMotor, MotorType.kBrushless);
 
         FRONT_DROP_SOLENOID = new Solenoid(PneumaticsModuleType.CTREPCM, frontDropSolenoid);
         REAR_DROP_SOLENOID = new Solenoid(PneumaticsModuleType.CTREPCM, rearDropSolenoid);
@@ -63,18 +65,12 @@ public class SubDriveTrain {//initialization variables should be descriptive all
         LEFT_REAR_MOTOR.setNeutralMode(NeutralMode.Brake);
         RIGHT_FRONT_MOTOR.setNeutralMode(NeutralMode.Brake);
         RIGHT_REAR_MOTOR.setNeutralMode(NeutralMode.Brake);
-        FRONT_DROP_MOTOR.setNeutralMode(NeutralMode.Brake);
-        REAR_DROP_MOTOR.setNeutralMode(NeutralMode.Brake);
 
         LEFT_FRONT_MOTOR.configPeakCurrentLimit(Constants.DT_STG.Pk_Crrnt_Lmt);
         RIGHT_FRONT_MOTOR.configPeakCurrentLimit(Constants.DT_STG.Pk_Crrnt_Lmt);
-        FRONT_DROP_MOTOR.configPeakCurrentLimit(Constants.DT_STG.Pk_Crrnt_Lmt);
-        REAR_DROP_MOTOR.configPeakCurrentLimit(Constants.DT_STG.Pk_Crrnt_Lmt);
 
         LEFT_FRONT_MOTOR.configPeakCurrentDuration(DT_STG.Pk_Crrnt_Lmt_Tm);
         RIGHT_FRONT_MOTOR.configPeakCurrentDuration(DT_STG.Pk_Crrnt_Lmt_Tm);
-        FRONT_DROP_MOTOR.configPeakCurrentDuration(DT_STG.Pk_Crrnt_Lmt_Tm);
-        REAR_DROP_MOTOR.configPeakCurrentDuration(DT_STG.Pk_Crrnt_Lmt_Tm);
     }
 
     public void runDriveTrain (double leftY, double rightX, double leftMotor, double rightMotor, double frontDropMotor, double rearDropMotor, boolean frontDrop, boolean rearDrop, boolean limelightButton, boolean slowMode) {
@@ -135,17 +131,17 @@ public class SubDriveTrain {//initialization variables should be descriptive all
 
         //acceleration rates
         if (rearDrop && frontDrop == false) {
-            FRONT_DROP_MOTOR.configOpenloopRamp(Constants.DT_STG.Dt_Tnk_Acc_Rte);
-            REAR_DROP_MOTOR.configOpenloopRamp(Constants.DT_STG.Dt_Tnk_Acc_Rte);
+            FRONT_DROP_MOTOR.setOpenLoopRampRate(Constants.DT_STG.Dt_Tnk_Acc_Rte);
+            REAR_DROP_MOTOR.setOpenLoopRampRate(Constants.DT_STG.Dt_Tnk_Acc_Rte);
         } else {
-            FRONT_DROP_MOTOR.configOpenloopRamp(Constants.DT_STG.Dt_Str_Acc_Rte);
-            REAR_DROP_MOTOR.configOpenloopRamp(Constants.DT_STG.Dt_Str_Acc_Rte);
+            FRONT_DROP_MOTOR.setOpenLoopRampRate(Constants.DT_STG.Dt_Str_Acc_Rte);
+            REAR_DROP_MOTOR.setOpenLoopRampRate(Constants.DT_STG.Dt_Str_Acc_Rte);
         }
 
         LEFT_FRONT_MOTOR.set(ControlMode.PercentOutput, left);
         RIGHT_FRONT_MOTOR.set(ControlMode.PercentOutput, right);
-        FRONT_DROP_MOTOR.set(ControlMode.PercentOutput, dropfm);
-        REAR_DROP_MOTOR.set(ControlMode.PercentOutput, droprm);
+        FRONT_DROP_MOTOR.set(dropfm);
+        REAR_DROP_MOTOR.set(droprm);
 
         FRONT_DROP_SOLENOID.set(frontDrop);
         REAR_DROP_SOLENOID.set(rearDrop);
