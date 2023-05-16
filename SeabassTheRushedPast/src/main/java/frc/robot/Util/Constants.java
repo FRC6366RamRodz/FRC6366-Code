@@ -19,6 +19,22 @@ public class Constants {
         public static final double Drv_Sens = 0.55;
     }
 
+     //Arm Settings
+     public static class AR_SET {
+        public static final double kP = 6e-5; 
+        public static final double kI = 0;
+        public static final double kD = 0; 
+        public static final double kIz = 0; 
+        public static final double kFF = 0.000015; 
+        public static final double kMaxOutput = 1; 
+        public static final double kMinOutput = -1;
+        public static final double maxRPM = 20000;
+        public static final double maxVel = 20000;
+        public static final double maxAcc = 20000;
+        public static final double minVel = 0;
+        public static final double allowedErr = 0.01;
+    }
+
     public static class DT_Map{
         public static final int leftFront = 0;
         public static final int rightFront = 1;
@@ -29,4 +45,22 @@ public class Constants {
         public static final int stingerSolenoid = 5;
         public static final int strafeSolenoid = 6;
     }
+            //arm
+    public static class AR_Map {
+        public static final int armMotor = 7;
+        public static final int elbowMotor = 8;
+        public static final int armBrake = 1;
+        public static final int elbowBrake = 0;
+    }
+
+        //claw
+        public static class CW_Map{
+            public static final int lClawMotor = 9;
+            public static final int rClawMotor = 10; 
+            public static final int clawPnuematic = 2;
+            public static final int wristPnumatic = 3;
+            public static final int clawModePnuematic = 4;
+            public static final int coneLight = 9;
+            public static final int cubeLight = 8;
+        }
 }

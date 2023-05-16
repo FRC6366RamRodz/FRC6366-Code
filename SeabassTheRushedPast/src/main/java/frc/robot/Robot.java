@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Container.RobotContainer;
+import frc.robot.ControllsProcessing.ClawControlls;
 import frc.robot.Util.IO;
 import frc.robot.Util.Constants.DT_STG;
 
@@ -24,6 +25,8 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   //toggles
     boolean STRAFE, STINGER; //toggle varriable remember their last state and maintain that state unless changed, shoule be all caps no _
+    
+  boolean coneMode, CubeMode, Tank, strafe, stinger;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -84,7 +87,84 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+     //variables
+     double ArmPosition1, elbowPosition1, elbowPosition2, ArmPositionA; //1 = clean input //2 = 1 stage of proccesing //3 = this controll is overcomplicated
+     boolean Home;
+     ArmPositionA = RobotContainer.ARM.getArmEncoder();
+     //Toggles
+     if(IO.getLeftBumperPressedOp()) {
+       coneMode = !coneMode;
+       CubeMode = false;
+     }
+     if (IO.getRightBumperPressedOp()) {
+       CubeMode = !CubeMode;
+       coneMode = false;
+     }
+     //extras
+     if (IO.getPovOp() == 270) {
+       Home = true;
+     } else {
+       Home = false;
+     }
+     if (IO.getAButtonOp() == true) {
+       ArmPosition1 = 26;
+       elbowPosition1 = 0;
 
+     } else if (IO.getXButtonOp()==true) {
+       ArmPosition1 = 45;
+       elbowPosition1 = 4;
+
+     } else if (IO.getXButton() == true) {
+       ArmPosition1 = 5;
+       elbowPosition1 = 8;
+
+     } else if(IO.getBbuttonOp() == true) {
+       ArmPosition1 = 52.5;
+       elbowPosition1 = 13;
+
+     } else if (Home == true) {
+       ArmPosition1 = -30;
+       elbowPosition1 = -10;
+
+     } else {
+     ArmPosition1 = 0;
+     elbowPosition1 = 0;
+
+     }
+
+     if (ArmPositionA > ArmPosition1-1.4) {
+       elbowPosition2 = elbowPosition1;
+     } else {
+       elbowPosition2 = 0;
+     }
+     //set controlls
+     RobotContainer.ARM.runArmSmartMotion(ArmPosition1, elbowPosition2,Home);
+ 
+     //claw Controlls
+     //variables
+     double clawMotor;
+     boolean Cone, Cube, clawMode;
+     //extra 
+     if (IO.getPovOp() == 0) {
+       Cone = true;
+     } else {
+       Cone = false;
+     }
+     if (IO.getPOVButton() == 180) {
+       Cube = true;
+     } else {
+       Cube = false;
+     }
+     if (coneMode == true) {
+       clawMode = true;
+     } else if (CubeMode == true) {
+       clawMode = false;
+     } else {
+       clawMode = false;
+     }
+     clawMotor = ClawControlls.clawMotor(IO.getLeftTriggerSTG1Op(), IO.getLeftTriggerSTG2Op(), coneMode);
+     RobotContainer.CLAW.runClaw(clawMotor, -clawMotor, IO.getLeftYUpButtonOp(), Cone, Cube, clawMode);
+ 
     //drive controlls 
     double leftMotor, rightMotor, frontDropMotor, rearDropMotor, forward, sideways, rotate, sens, fward, acro, maxMagleft, maxMagRight,maxMagFront, maxMagRear;
     boolean frontDrop, rearDrop;
