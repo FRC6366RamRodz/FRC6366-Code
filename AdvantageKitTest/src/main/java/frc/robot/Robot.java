@@ -12,6 +12,10 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import frc.robot.Container.RobotContainer;
+import frc.robot.Util.IO;
+
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -76,6 +80,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+      RobotContainer.Drive.periodicDrive();
   }
 
   /** This function is called once when autonomous is enabled. */
@@ -83,6 +88,7 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autoSelected = chooser.get();
     System.out.println("Auto selected: " + autoSelected);
+    RobotContainer.Drive.stop();
   }
 
   /** This function is called periodically during autonomous. */
@@ -102,11 +108,13 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    RobotContainer.Drive.stop();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    RobotContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
   }
 
   /** This function is called once when the robot is disabled. */
