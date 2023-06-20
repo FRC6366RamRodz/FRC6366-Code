@@ -29,7 +29,7 @@ public class IO {
     }
 
     public static double getLeftY() {
-        return joyDeadband(driver.getLeftX());
+        return joyDeadband(driver.getLeftY());
     }
 
     public static double getLeftX() {

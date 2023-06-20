@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,7 +23,9 @@ public class Robot extends TimedRobot {
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
+  private static final int PH_CAN_ID = 1;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  PneumaticHub m_ph = new PneumaticHub(PH_CAN_ID);
   //toggles
     boolean STRAFE, STINGER; //toggle varriable remember their last state and maintain that state unless changed, shoule be all caps no _
     
@@ -47,7 +50,22 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    m_ph.enableCompressorAnalog(90,115);
+    SmartDashboard.putBoolean("resetEncoders", false);
+    SmartDashboard.putNumber("armENCODER", RobotContainer.ARM.getArmEncoder());
+    SmartDashboard.putNumber("elbowENCODER", RobotContainer.ARM.getElbowEnocoder());
+    SmartDashboard.putNumber("leftDriveTemp", RobotContainer.DriveTrain.getLeftDriveTemp());
+    SmartDashboard.putNumber("rightDriveTemp", RobotContainer.DriveTrain.getRightDriveTemp());
+    SmartDashboard.putNumber("rightDriveEncoder", RobotContainer.DriveTrain.getRightDriveEncoder());
+    SmartDashboard.putNumber("leftEncoder", RobotContainer.DriveTrain.getLeftDriveEncoder());
+    SmartDashboard.putNumber("stingerEncoder", RobotContainer.DriveTrain.getStingerEncoder());
+    SmartDashboard.putNumber("strafeEncoder", RobotContainer.DriveTrain.getStrafeEncoder());
+    SmartDashboard.putNumber("leftEncoderSpeed", RobotContainer.DriveTrain.getLeftDriveSpeed());
+    SmartDashboard.putNumber("RightEncoderSpeed", RobotContainer.DriveTrain.getRightDriveSpeed());
+    SmartDashboard.putNumber("Arm Current", RobotContainer.ARM.getArmCurrent());
+    SmartDashboard.putNumber("elbow current", RobotContainer.ARM.getElbowCurrent());
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -180,15 +198,16 @@ public class Robot extends TimedRobot {
     
     forward = IO.getLeftY();
     sideways = IO.getLeftX();
-    rotate = IO.getRightX();
+    rotate = -IO.getRightX();
 
     if (forward == 0) {
-      sens = 0.8;
+      fward = 0.8;
     }else {
-    sens = DT_STG.Drv_Sens;
+      fward = Math.abs(forward);;
     }
 
-    fward = Math.abs(forward);
+    sens = DT_STG.Drv_Sens;
+    
 
     if (IO.getLeftTrigger()) {
       acro = 1;
@@ -198,8 +217,8 @@ public class Robot extends TimedRobot {
 
     if (STINGER) {
 
-      leftMotor = -forward*acro + (rotate+(sideways*0.2)) * sens;
-      rightMotor = -forward*acro - (rotate+(sideways*0.2)) * sens;
+      leftMotor = forward*acro + (rotate+(sideways*0.2)) * sens;
+      rightMotor = forward*acro - (rotate+(sideways*0.2)) * sens;
       rearDropMotor = (rotate+(sideways))*sens;
       frontDropMotor = 0;
 
@@ -245,7 +264,7 @@ public class Robot extends TimedRobot {
       rearDropMotor /= maxMagRear;
     }
 
-    RobotContainer.DriveTrain.runDriveTrain(IO.getLeftY(), IO.getLeftX(), leftMotor, rightMotor, frontDropMotor, rearDropMotor, frontDrop, rearDrop, IO.getYButton(), IO.getLeftTrigger());
+    RobotContainer.DriveTrain.runDriveTrain(IO.getLeftY(), -IO.getRightX(), leftMotor, rightMotor, frontDropMotor, rearDropMotor, frontDrop, rearDrop, IO.getYButton(), IO.getLeftTrigger());
 
   }
 
