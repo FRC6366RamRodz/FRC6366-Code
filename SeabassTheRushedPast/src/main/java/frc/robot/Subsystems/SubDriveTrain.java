@@ -45,8 +45,8 @@ public class SubDriveTrain {//initialization variables should be descriptive all
         FRONT_DROP_MOTOR = new CANSparkMax(frontDropMotor, MotorType.kBrushless);
         REAR_DROP_MOTOR = new CANSparkMax(rearDropMotor, MotorType.kBrushless);
 
-        FRONT_DROP_SOLENOID = new Solenoid(PneumaticsModuleType.CTREPCM, frontDropSolenoid);
-        REAR_DROP_SOLENOID = new Solenoid(PneumaticsModuleType.CTREPCM, rearDropSolenoid);
+        FRONT_DROP_SOLENOID = new Solenoid(PneumaticsModuleType.REVPH, frontDropSolenoid);
+        REAR_DROP_SOLENOID = new Solenoid(PneumaticsModuleType.REVPH, rearDropSolenoid);
 
         LEFT_REAR_MOTOR.follow(LEFT_FRONT_MOTOR);
         RIGHT_REAR_MOTOR.follow(RIGHT_FRONT_MOTOR);
@@ -54,12 +54,12 @@ public class SubDriveTrain {//initialization variables should be descriptive all
         LEFT_FRONT_MOTOR.configOpenloopRamp(Constants.DT_STG.Dt_Tnk_Acc_Rte);
         RIGHT_FRONT_MOTOR.configOpenloopRamp(Constants.DT_STG.Dt_Tnk_Acc_Rte);
 
-        LEFT_FRONT_MOTOR.setInverted(false);
-        LEFT_REAR_MOTOR.setInverted(false);
+        LEFT_FRONT_MOTOR.setInverted(true);
+        LEFT_REAR_MOTOR.setInverted(true);
         RIGHT_FRONT_MOTOR.setInverted(false);
         RIGHT_FRONT_MOTOR.setInverted(false);
         FRONT_DROP_MOTOR.setInverted(false);
-        REAR_DROP_MOTOR.setInverted(false);
+        REAR_DROP_MOTOR.setInverted(true);
 
         LEFT_FRONT_MOTOR.setNeutralMode(NeutralMode.Brake);
         LEFT_REAR_MOTOR.setNeutralMode(NeutralMode.Brake);
@@ -147,6 +147,37 @@ public class SubDriveTrain {//initialization variables should be descriptive all
         REAR_DROP_SOLENOID.set(rearDrop);
         
 
+    }
+
+    public double getLeftDriveTemp() {
+        return 0;
+    }
+
+    public double getRightDriveTemp() {
+        return 0;
+    }
+
+    public double getRightDriveEncoder() {
+        return 0;
+    }
+
+    public double getLeftDriveEncoder() {
+        return 0;
+    }
+    public double getStingerEncoder() {
+        return 0;
+    }
+
+    public double getStrafeEncoder() {
+        return 0;
+    }
+
+    public double getLeftDriveSpeed() {
+        return 0;
+    }
+
+    public double getRightDriveSpeed() {
+        return 0;
     }
 }
 

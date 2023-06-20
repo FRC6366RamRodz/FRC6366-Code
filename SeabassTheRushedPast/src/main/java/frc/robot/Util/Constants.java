@@ -9,7 +9,7 @@ public class Constants {
 
     public static class DT_STG/*Drive Train Settings */ {//global varriables shoule be cammel case and abbreviations with underscores seperatring words
         public static final double Dt_Tnk_Acc_Rte = 0.3;//drive train tank acceleration rate
-        public static final double Dt_Str_Acc_Rte = 0.1;//drive train strafe acceleration rate
+        public static final double Dt_Str_Acc_Rte = 0.3;//drive train strafe acceleration rate
         public static final int Pk_Crrnt_Lmt = 80; //peak current limit
         public static final int Pk_Crrnt_Lmt_Tm = 250; //peak current limit time in mil sec (1000 = 1 sec)(how long it can go beyond current limit)
         public static final double Slw_Md_Tnk_Spd = 0.3;//(slow mode tank speed)max speed percentage for tank mode in slow mode
@@ -36,14 +36,14 @@ public class Constants {
     }
 
     public static class DT_Map{
-        public static final int leftFront = 0;
-        public static final int rightFront = 1;
-        public static final int leftRear = 0;
-        public static final int rightRear = 1;
+        public static final int leftFront = 1;
+        public static final int rightFront = 0;
+        public static final int leftRear = 1;
+        public static final int rightRear = 0;
         public static final int stinger = 2;
         public static final int strafe = 3;
-        public static final int stingerSolenoid = 5;
-        public static final int strafeSolenoid = 6;
+        public static final int stingerSolenoid = 6;
+        public static final int strafeSolenoid = 5;
     }
             //arm
     public static class AR_Map {
