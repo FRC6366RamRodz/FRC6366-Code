@@ -12,5 +12,5 @@ import frc.robot.Subsystems.SubSwerveTrain;
 /** Add your docs here. */
 public class RobotContainer {
     public static final SubSwerveTrain drivebase = new 
-    SubSwerveTrain(new File(Filesystem.getDeployDirectory(),"swerve/neo"));
+    SubSwerveTrain(new File(Filesystem.getDeployDirectory(),"swerve"));
 }
