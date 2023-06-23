@@ -12,17 +12,27 @@ public class IO {
 
     private static final XboxController driver = new XboxController(0);
 
+    public static double setDeadzone(double input) {
+        double Input = Math.abs(input);
+
+        if (Input < 0.10) {
+            return 0;
+        } else {
+            return input;
+        }
+    }
     public static double getLeftY() {
-        return driver.getLeftY();
+        return setDeadzone(driver.getLeftY());
     }
 
     public static double getLeftX(){
-        return driver.getLeftX();
+        return setDeadzone(driver.getLeftX());
     }
 
     public static double getRightX() {
-        return driver.getRightX();
+        return setDeadzone(driver.getRightX());
     }
+
 
 
 
