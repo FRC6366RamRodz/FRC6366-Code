@@ -26,7 +26,7 @@ public class DriveHWIntr implements DriveIo {
         LEFT_FRONT_MOTOR = new TalonFX(0);
         RIGHT_FRONT_MOTOR = new TalonFX(1);
         LEFT_REAR_MOTOR = new TalonFX(2);
-        RIGHT_REAR_MOTOR = new TalonFX(3);
+        RIGHT_REAR_MOTOR = new TalonFX(4);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.voltageCompSaturation = 12.0;
