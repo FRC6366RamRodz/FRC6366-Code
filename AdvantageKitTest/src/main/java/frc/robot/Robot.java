@@ -12,7 +12,11 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Container.RobotContainer;
+import frc.robot.Subsystems.Drive.Drive;
+import frc.robot.Subsystems.Drive.DriveHWIntr;
+import frc.robot.Subsystems.Drive.DriveIo;
 import frc.robot.Util.IO;
 
 
@@ -81,6 +85,9 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
       RobotContainer.Drive.periodicDrive();
+      SmartDashboard.putNumber("leftY", IO.getLeftY());
+      SmartDashboard.putNumber("RightX", IO.getRightX());
+      SmartDashboard.putNumber("LeftLeader", DriveHWIntr.LeftVolts());
   }
 
   /** This function is called once when autonomous is enabled. */
@@ -114,7 +121,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
+    RobotContainer.Drive.drivePercent(IO.getLeftY(), IO.getRightX());
   }
 
   /** This function is called once when the robot is disabled. */

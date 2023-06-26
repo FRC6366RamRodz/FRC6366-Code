@@ -39,7 +39,7 @@ public class Drive{
     }
 
     public void driveArcade(double xSpeed, double zRotation) {
-        var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation, true);
+        var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation, false);
         io.setVoltage(speeds.left*12.0, speeds.right*12.0);
     }
 
