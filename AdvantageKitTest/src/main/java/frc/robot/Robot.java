@@ -117,7 +117,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.Drive.drivePercent(IO.getLeftY(), IO.getRightX());
+    RobotContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
   }
 
   /** This function is called once when the robot is disabled. */
