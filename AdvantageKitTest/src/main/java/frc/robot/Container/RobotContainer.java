@@ -4,14 +4,8 @@
 
 package frc.robot.Container;
 
-import com.ctre.phoenix.signals.IOutputSignal;
-
-import frc.robot.Robot;
 import frc.robot.Subsystems.Drive.Drive;
-import frc.robot.Subsystems.Drive.DriveHWIntr;
 import frc.robot.Subsystems.Drive.DriveIo;
-import frc.robot.Subsystems.Drive.DriveIo.DriveIOInputs;
-import frc.robot.Util.IO;
 
 /** Add your docs here. */
 public class RobotContainer {

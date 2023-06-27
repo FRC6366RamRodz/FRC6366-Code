@@ -87,7 +87,6 @@ public class Robot extends LoggedRobot {
       RobotContainer.Drive.periodicDrive();
       SmartDashboard.putNumber("leftY", IO.getLeftY());
       SmartDashboard.putNumber("RightX", IO.getRightX());
-      SmartDashboard.putNumber("LeftLeader", DriveHWIntr.LeftVolts());
   }
 
   /** This function is called once when autonomous is enabled. */
