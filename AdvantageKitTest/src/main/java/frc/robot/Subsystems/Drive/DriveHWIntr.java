@@ -39,7 +39,7 @@ public class DriveHWIntr implements DriveIo {
         LEFT_REAR_MOTOR.follow(LEFT_FRONT_MOTOR);
         RIGHT_REAR_MOTOR.follow(RIGHT_FRONT_MOTOR);
 
-        LEFT_FRONT_MOTOR.setInverted(false);
+        LEFT_FRONT_MOTOR.setInverted(true);
         RIGHT_FRONT_MOTOR.setInverted(false);
         LEFT_REAR_MOTOR.setInverted(InvertType.FollowMaster);
         RIGHT_REAR_MOTOR.setInverted(InvertType.FollowMaster);
@@ -47,11 +47,11 @@ public class DriveHWIntr implements DriveIo {
 
     @Override
     public void updateInputs(DriveIOInputs inputs) {
-        inputs.leftPositionRad = Units.rotationsToRadians(LEFT_FRONT_MOTOR.getSelectedSensorPosition()/TICKS_PER_REV/GEAR_RATIO);
-        inputs.rightPostitionRad = Units.rotationsToRadians(RIGHT_FRONT_MOTOR.getSelectedSensorPosition()/TICKS_PER_REV/GEAR_RATIO);
+        inputs.leftPositionRad = Units.rotationsToRadians(-LEFT_FRONT_MOTOR.getSelectedSensorPosition()/TICKS_PER_REV/GEAR_RATIO);
+        inputs.rightPostitionRad = Units.rotationsToRadians(-RIGHT_FRONT_MOTOR.getSelectedSensorPosition()/TICKS_PER_REV/GEAR_RATIO);
 
-        inputs.leftVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(LEFT_FRONT_MOTOR.getSelectedSensorVelocity()*10/TICKS_PER_REV/GEAR_RATIO);
-        inputs.rightVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(RIGHT_FRONT_MOTOR.getSelectedSensorVelocity()*10/TICKS_PER_REV/GEAR_RATIO);
+        inputs.leftVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(-LEFT_FRONT_MOTOR.getSelectedSensorVelocity()*10/TICKS_PER_REV/GEAR_RATIO);
+        inputs.rightVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(-RIGHT_FRONT_MOTOR.getSelectedSensorVelocity()*10/TICKS_PER_REV/GEAR_RATIO);
     }
 
     @Override
