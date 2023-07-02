@@ -8,9 +8,10 @@ import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Subsystems.SubSwerveTrain;
+import frc.robot.Subsystems.SwerveDrive;
 
 /** Add your docs here. */
 public class RobotContainer {
-    public static final SubSwerveTrain drivebase = new 
-    SubSwerveTrain(new File(Filesystem.getDeployDirectory(),"swerve"));
+    public static final SwerveDrive SwerveDrive = new 
+    SwerveDrive(new SubSwerveTrain(new File(Filesystem.getDeployDirectory(), "swerve")));
 }

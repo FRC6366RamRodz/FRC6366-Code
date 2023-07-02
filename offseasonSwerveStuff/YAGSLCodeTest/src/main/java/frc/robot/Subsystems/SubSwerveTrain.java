@@ -16,14 +16,28 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.SwerveDrive;
 
 /** Add your docs here. */
-public class SubSwerveTrain {
-    private SwerveDrive swerveDrive;
+public class SubSwerveTrain implements SwerveDriveIO {
+      /**
+   * Swerve drive object.
+   */
+  private final SwerveDrive       swerveDrive;
+  /**
+   * The auto builder for PathPlanner, there can only ever be one created so we save it just incase we generate multiple
+   * paths with events.
+   */
+  
+
+  /**
+   * Initialize {@link SwerveDrive} with the directory provided.
+   *
+   * @param directory Directory of swerve drive config files.
+   */
 
 
     public SubSwerveTrain(File directory)
     {
       // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
-      SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+      SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
       try
       {
         swerveDrive = new SwerveParser(directory).createSwerveDrive();
@@ -33,13 +47,30 @@ public class SubSwerveTrain {
       }
     }
 
-    public void SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg)
+      /**
+   * Construct the swerve drive.
+   *
+   * @param driveCfg      SwerveDriveConfiguration for the swerve.
+   * @param controllerCfg Swerve Controller.
+   */
+
+    public SubSwerveTrain(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg)
   {
     swerveDrive = new SwerveDrive(driveCfg, controllerCfg);
   }
 
+
+  /**
+   * 
+   * @param translation
+   * @param rotation
+   * @param fieldRelative
+   * @param isOpenLoop
+   */
+  @Override
   public void runSwerve(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
   {
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
   }
+
 }
