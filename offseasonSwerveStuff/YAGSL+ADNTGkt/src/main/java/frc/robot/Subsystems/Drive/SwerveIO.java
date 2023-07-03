@@ -11,8 +11,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 /** Add your docs here. */
 public interface SwerveIO {
     @AutoLog
-    public static class SwerveIOInputs{
-
+    public static class SwerveIOInputs {
+        public double drivePositionRad = 0.0;
     }
 
     public default void updateInputs(SwerveIOInputs inputs) {
