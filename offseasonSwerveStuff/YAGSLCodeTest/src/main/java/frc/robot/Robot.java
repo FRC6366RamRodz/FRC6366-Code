@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    RobotContainer.SwerveDrive.absoluteDrive(IO.getLeftX(), IO.getLeftY(), IO.getRightX(), IO.getRightY(), false);
+    RobotContainer.SwerveDrive.absoluteDrive(IO.getLeftX(), IO.getLeftY(), -IO.getRightX(), -IO.getRightY(), false);
   }
 
   /** This function is called once when the robot is disabled. */

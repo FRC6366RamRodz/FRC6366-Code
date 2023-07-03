@@ -12,6 +12,8 @@ import frc.robot.Subsystems.SwerveDrive;
 
 /** Add your docs here. */
 public class RobotContainer {
+    private static final SubSwerveTrain driveBase = new SubSwerveTrain(new File(Filesystem.getDeployDirectory(), "swerve"));
+
     public static final SwerveDrive SwerveDrive = new 
-    SwerveDrive(new SubSwerveTrain(new File(Filesystem.getDeployDirectory(), "swerve")));
+    SwerveDrive(driveBase, driveBase);
 }

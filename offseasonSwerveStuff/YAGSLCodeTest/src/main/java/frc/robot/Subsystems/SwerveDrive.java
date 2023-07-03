@@ -20,11 +20,8 @@ public class SwerveDrive {
     private SubSwerveTrain swerve;
 
 
-    public SwerveDrive(SwerveDriveIO io) {
+    public SwerveDrive(SwerveDriveIO io, SubSwerveTrain swerve) {
         this.io = io;
-    }
-
-    public SwerveDrive(SubSwerveTrain swerve) {
         this.swerve = swerve;
     }
 
@@ -42,7 +39,7 @@ public class SwerveDrive {
     }
 
     public void absoluteDrive(double vX, double vY, double headingHorizontal, double headingVertical, boolean isOpenLoop) {
-        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(MathUtil.applyDeadband(vX, DT_SET.DedBnd), MathUtil.applyDeadband(vY, DT_SET.DedBnd), MathUtil.applyDeadband(headingHorizontal, DT_SET.DedBnd), headingVertical);
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(MathUtil.applyDeadband(vY, DT_SET.DedBnd), MathUtil.applyDeadband(vX, DT_SET.DedBnd), MathUtil.applyDeadband(headingHorizontal, DT_SET.DedBnd), headingVertical);
 
         Translation2d translation = SwerveController.getTranslation2d(desiredSpeeds);
         translation = SwerveMath.limitVelocity(translation, swerve.getFieldVelocity(), swerve.getPose(), Constants.LOOP_TIME, Constants.ROBOT_MASS, List.of(Constants.CHASSIS), swerve.getSwerveDriveConfig());
