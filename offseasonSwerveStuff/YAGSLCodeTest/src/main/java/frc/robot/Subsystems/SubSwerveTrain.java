@@ -7,7 +7,10 @@ package frc.robot.Subsystems;
 
 import java.io.File;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -37,7 +40,7 @@ public class SubSwerveTrain implements SwerveDriveIO {
     public SubSwerveTrain(File directory)
     {
       // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
-      SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
+      SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
       try
       {
         swerveDrive = new SwerveParser(directory).createSwerveDrive();
@@ -62,7 +65,7 @@ public class SubSwerveTrain implements SwerveDriveIO {
 
   /**
    * 
-   * @param translation
+   * @param translation {@link Translation2d}
    * @param rotation
    * @param fieldRelative
    * @param isOpenLoop
@@ -71,6 +74,43 @@ public class SubSwerveTrain implements SwerveDriveIO {
   public void runSwerve(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
   {
     swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
+  }
+
+  /**
+   * @return
+   */
+  public Rotation2d getHeading() {
+    return swerveDrive.getYaw();
+  }
+
+  /**
+   * @param xInput
+   * @param yInput
+   * @param headingX
+   * @param headingYs
+   * @return {@link ChassisSpeeds}
+   */
+  public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY){
+    xInput = Math.pow(xInput, 3);
+    yInput = Math.pow(yInput, 3);
+    return swerveDrive.swerveController.getTargetSpeeds(xInput, yInput, headingX, headingY, getHeading().getRadians());
+  }
+
+  public ChassisSpeeds getFieldVelocity() {
+    return swerveDrive.getFieldVelocity();
+  }
+
+  public Pose2d getPose() {
+    return swerveDrive.getPose();
+  }
+
+  public SwerveDriveConfiguration getSwerveDriveConfig() {
+    return swerveDrive.swerveDriveConfiguration;
+  }
+
+
+  public void periodic() {
+    swerveDrive.updateOdometry();
   }
 
 }

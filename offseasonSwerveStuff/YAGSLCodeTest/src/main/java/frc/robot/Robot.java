@@ -44,7 +44,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    RobotContainer.SwerveDrive.SwervePeriodic();
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -85,7 +87,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    RobotContainer.SwerveDrive.teleopDrive(IO.getLeftX(), IO.getLeftY(), IO.getRightX(), false, false);
+    RobotContainer.SwerveDrive.absoluteDrive(IO.getLeftX(), IO.getLeftY(), IO.getRightX(), IO.getRightY(), false);
   }
 
   /** This function is called once when the robot is disabled. */

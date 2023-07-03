@@ -12,9 +12,6 @@ public interface SwerveDriveIO {
 
     }
 
-    public default void updateInputs(SwerveDriveIOInputs inputs) {
-    }
-
     public default void runSwerve(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop){
     }
 }
