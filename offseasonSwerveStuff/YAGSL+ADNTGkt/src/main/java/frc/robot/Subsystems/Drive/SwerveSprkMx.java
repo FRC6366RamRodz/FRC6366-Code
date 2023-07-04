@@ -10,6 +10,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.util.Units;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -63,7 +66,20 @@ public class SwerveSprkMx implements SwerveIO {
         return swerveDrive.swerveDriveConfiguration;
     }
 
+    public SwerveDriveKinematics getKinematics() {
+        return swerveDrive.kinematics;
+    }
+
+    public SwerveModulePosition[] swerveModulePosition() {
+        return swerveDrive.getModulePositions();
+    }
+
     public void periodicTask() {
         swerveDrive.updateOdometry();
     }
+
+    @Override
+    public void updateInputs(SwerveIOInputs inputs) {
+    }
+
 }

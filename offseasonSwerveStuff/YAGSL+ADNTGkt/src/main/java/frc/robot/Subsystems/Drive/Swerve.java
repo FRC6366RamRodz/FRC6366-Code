@@ -6,6 +6,8 @@ package frc.robot.Subsystems.Drive;
 
 import java.util.List;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -20,6 +22,7 @@ import swervelib.math.SwerveMath;
 public class Swerve {
     private SwerveIO io;
     private SwerveSprkMx swerve;
+    private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
 
     public Swerve(SwerveIO io, SwerveSprkMx swerve){
         this.io = io;
@@ -28,6 +31,11 @@ public class Swerve {
 
     public void PeriodicSwerve() {
         swerve.periodicTask();
+        Logger.getInstance().recordOutput("Odometry", swerve.getPose());
+
+        io.updateInputs(inputs);
+        Logger.getInstance().processInputs("Drive", inputs);
+
     }
 
     public void absoluteDrive(double Vx, double Vy, double headingHorizontal, double headingVertical, boolean isOpenLoop){

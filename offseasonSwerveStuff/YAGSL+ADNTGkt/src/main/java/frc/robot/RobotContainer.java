@@ -4,5 +4,18 @@
 
 package frc.robot;
 
+import java.io.File;
+
+import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Subsystems.Drive.Swerve;
+import frc.robot.Subsystems.Drive.SwerveSprkMx;
+
 /** Add your docs here. */
-public class RobotContainer {}
+public class RobotContainer {
+    
+    private static final SwerveSprkMx driveBase = new 
+    SwerveSprkMx(new File(Filesystem.getDeployDirectory(), "swerve"));
+
+    public static final Swerve Swerve = new
+    Swerve(driveBase, driveBase);
+}

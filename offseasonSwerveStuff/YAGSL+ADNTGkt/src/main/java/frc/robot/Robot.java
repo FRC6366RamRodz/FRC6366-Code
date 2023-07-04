@@ -24,6 +24,7 @@ public class Robot extends LoggedRobot {
   private static final String customAuto = "My Auto";
   private String autoSelected;
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
+  private RobotContainer m_RobotContainer;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -71,11 +72,14 @@ public class Robot extends LoggedRobot {
     // Initialize auto chooser
     chooser.addDefaultOption("Default Auto", defaultAuto);
     chooser.addOption("My Auto", customAuto);
+
+    m_RobotContainer = new RobotContainer();
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    RobotContainer.Swerve.PeriodicSwerve();
   }
 
   /** This function is called once when autonomous is enabled. */

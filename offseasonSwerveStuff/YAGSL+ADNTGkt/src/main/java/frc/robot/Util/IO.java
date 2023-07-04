@@ -4,5 +4,25 @@
 
 package frc.robot.Util;
 
+import edu.wpi.first.wpilibj.XboxController;
+
 /** Add your docs here. */
-public class IO {}
+public class IO {
+    private static final XboxController driver = new XboxController(0);
+
+    public static double getLeftY() {
+        return driver.getLeftY();
+    }
+
+    public static double getLeftX() {
+        return driver.getLeftX();
+    }
+
+    public static double getRightY() {
+        return driver.getRightY();
+    }
+
+    public static double getRightX() {
+        return driver.getRightX();
+    }
+}
