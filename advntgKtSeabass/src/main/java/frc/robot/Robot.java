@@ -29,6 +29,7 @@ public class Robot extends LoggedRobot {
   private static final String customAuto = "My Auto";
   private String autoSelected;
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
+  private RobotContainer mContainer;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -76,12 +77,14 @@ public class Robot extends LoggedRobot {
     // Initialize auto chooser
     chooser.addDefaultOption("Default Auto", defaultAuto);
     chooser.addOption("My Auto", customAuto);
+
+    mContainer = new RobotContainer();
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-      RobotContainer.Drive.periodicDrive();
+      mContainer.Drive.periodicDrive();
       SmartDashboard.putNumber("leftY", IO.getLeftY());
       SmartDashboard.putNumber("RightX", IO.getRightX());
   }
@@ -91,7 +94,7 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autoSelected = chooser.get();
     System.out.println("Auto selected: " + autoSelected);
-    RobotContainer.Drive.stop();
+    mContainer.Drive.stop();
   }
 
   /** This function is called periodically during autonomous. */
@@ -111,13 +114,13 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    RobotContainer.Drive.stop();
+    mContainer.Drive.stop();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
+    mContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
   }
 
   /** This function is called once when the robot is disabled. */

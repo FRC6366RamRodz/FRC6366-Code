@@ -6,10 +6,31 @@ package frc.robot.Container;
 
 import frc.robot.Subsystems.Drive.Drive;
 import frc.robot.Subsystems.Drive.DriveHWIntr;
+import frc.robot.Subsystems.Drive.DriveIOSim;
+import frc.robot.Subsystems.Drive.DriveIo;
+import frc.robot.Util.Constants;
+
 
 
 /** Add your docs here. */
 public class RobotContainer {
-    public static final Drive Drive = new 
-    Drive(new DriveHWIntr());
+    public final Drive Drive;
+
+    public RobotContainer(){
+        switch (Constants.currentMode) {
+
+            case REAL:
+                Drive = new Drive(new DriveHWIntr());
+            break;
+
+            case SIM:
+                Drive = new Drive(new DriveIOSim());
+            break;
+
+            default:
+                Drive = new Drive(new DriveIo() {});
+            break;
+
+        }
+    }
 }

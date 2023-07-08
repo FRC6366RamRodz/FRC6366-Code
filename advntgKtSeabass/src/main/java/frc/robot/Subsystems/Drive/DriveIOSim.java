@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSiz
 
 /** Add your docs here. */
 public class DriveIOSim implements DriveIo{
-    private DifferentialDrivetrainSim sim = DifferentialDrivetrainSim.createKitbotSim(KitbotMotor.kDoubleFalcon500PerSide, KitbotGearing.k10p71, KitbotWheelSize.kSixInch, null);
+    private DifferentialDrivetrainSim sim = DifferentialDrivetrainSim.createKitbotSim(KitbotMotor.kDoubleNEOPerSide, KitbotGearing.k10p71, KitbotWheelSize.kSixInch, null);
 
     @Override
     public void updateInputs(DriveIOInputs inputs){
