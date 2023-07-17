@@ -62,12 +62,22 @@ public class SwerveSprkMx implements SwerveIO {
         return swerveDrive.getPose();
     }
 
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        swerveDrive.setChassisSpeeds(chassisSpeeds);
+    }
+
+
+
     public SwerveDriveConfiguration getSwerveDriveConfig() {
         return swerveDrive.swerveDriveConfiguration;
     }
 
     public SwerveDriveKinematics getKinematics() {
         return swerveDrive.kinematics;
+    }
+
+    public void resetOdometry(Pose2d initialHolomonicPose) {
+        swerveDrive.resetOdometry(initialHolomonicPose);
     }
 
     public SwerveModulePosition[] swerveModulePosition() {
