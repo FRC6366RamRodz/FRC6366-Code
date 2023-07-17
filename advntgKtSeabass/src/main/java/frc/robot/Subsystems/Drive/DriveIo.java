@@ -14,6 +14,7 @@ public interface DriveIo {
         public double leftVelocityRadPerSec = 0.0;
         public double rightPostitionRad = 0.0;
         public double rightVelocityRadPerSec = 0.0;
+        public double gyroYawRad = 0.0;
     }
 
     public default void updateInputs(DriveIOInputs inputs) {

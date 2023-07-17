@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import frc.robot.Util.Constants;
 
 /** Add your docs here. */
 public class Drive{
@@ -28,7 +29,7 @@ public class Drive{
         io.updateInputs(inputs);
         org.littletonrobotics.junction.Logger.getInstance().processInputs("Drive", inputs);
 
-        odometry.update(new Rotation2d(), getLeftPositionMeters(), getRightPositionMeters());
+        odometry.update(new Rotation2d(inputs.gyroYawRad), -getLeftPositionMeters(), -getRightPositionMeters());
         org.littletonrobotics.junction.Logger.getInstance().recordOutput("Odometry", getPose());
     }
 
@@ -37,7 +38,7 @@ public class Drive{
     }
 
     public void driveArcade(double xSpeed, double zRotation) {
-        var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation, false);
+        var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation*Constants.DT_STG.Drv_Sens, true);
         io.setVoltage(speeds.left*12.0, speeds.right*12.0);
     }
 

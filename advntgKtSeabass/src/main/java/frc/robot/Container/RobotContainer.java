@@ -14,7 +14,7 @@ import frc.robot.Util.Constants;
 
 /** Add your docs here. */
 public class RobotContainer {
-    public final Drive Drive;
+    public static Drive Drive;
 
     public RobotContainer(){
         switch (Constants.currentMode) {

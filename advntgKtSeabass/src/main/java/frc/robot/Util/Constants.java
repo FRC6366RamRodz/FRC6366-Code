@@ -39,8 +39,8 @@ public class Constants {
         public static final int ARM_ANGLE_MOTOR = 7;
     }
     public static class DT_Set{
-        public static final double DT_DEADBAND = 0.1; 
-        public static final double DT_TURN_SENSITIVITY = 0.65;
+        public static final double DT_DEADBAND = 0.15; 
+        public static final double DT_TURN_SENSITIVITY = 0.35;
         public static final double DT_QUICK_TURN = 0.6;
         public static final double DT_MAX_VELOCITY = 18000.0;
         public static final double DT_RAMP_RATE_SECS = 0.5;

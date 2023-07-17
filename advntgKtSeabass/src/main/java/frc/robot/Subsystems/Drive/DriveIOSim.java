@@ -25,6 +25,8 @@ public class DriveIOSim implements DriveIo{
 
         inputs.rightPostitionRad = sim.getRightPositionMeters() / WHEEL_RADIOUS_METERS;
         inputs.rightVelocityRadPerSec = sim.getRightVelocityMetersPerSecond() / WHEEL_RADIOUS_METERS;
+
+        inputs.gyroYawRad = sim.getHeading().getRadians() * -1;
     }
 
     @Override

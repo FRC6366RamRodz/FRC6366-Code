@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Container.RobotContainer;
+import frc.robot.Util.Constants;
 import frc.robot.Util.IO;
 
 
@@ -58,14 +59,26 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
-    if (isReal()) {
-      logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
-      logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    } else {
-      setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    switch (Constants.currentMode) {
+      // Running on a real robot, log to a USB stick
+      case REAL:
+        logger.addDataReceiver(new WPILOGWriter("/media/sda1/"));
+        logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      // Running a physics simulator, log to local folder
+      case SIM:
+        logger.addDataReceiver(new WPILOGWriter(""));
+        logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      // Replaying a log, set up replay source
+      case REPLAY:
+        setUseTiming(false); // Run as fast as possible
+        String logPath = LogFileUtil.findReplayLog();
+        logger.setReplaySource(new WPILOGReader(logPath));
+        logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
     }
 
     // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
@@ -84,7 +97,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-      mContainer.Drive.periodicDrive();
+      RobotContainer.Drive.periodicDrive();
       SmartDashboard.putNumber("leftY", IO.getLeftY());
       SmartDashboard.putNumber("RightX", IO.getRightX());
   }
@@ -94,7 +107,7 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autoSelected = chooser.get();
     System.out.println("Auto selected: " + autoSelected);
-    mContainer.Drive.stop();
+    RobotContainer.Drive.stop();
   }
 
   /** This function is called periodically during autonomous. */
@@ -114,13 +127,13 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    mContainer.Drive.stop();
+    RobotContainer.Drive.stop();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    mContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
+    RobotContainer.Drive.driveArcade(IO.getLeftY(), IO.getRightX());
   }
 
   /** This function is called once when the robot is disabled. */
