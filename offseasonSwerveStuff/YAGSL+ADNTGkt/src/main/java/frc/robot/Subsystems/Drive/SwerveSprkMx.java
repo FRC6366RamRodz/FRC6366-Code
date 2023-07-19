@@ -95,7 +95,7 @@ public class SwerveSprkMx implements SwerveIO {
 
     public void periodicTask() {
         swerveDrive.updateOdometry();
-        swerveDrive.invertOdometry = true;
+        swerveDrive.invertOdometry = false;
     }
 
     @Override
@@ -111,9 +111,9 @@ public class SwerveSprkMx implements SwerveIO {
      * @param path
      * @param constraints {@link PathConstraints} for {@link com.pathplanner.lib.PathPlanner#loadPathGroup}
      * @param eventMap {@link java.util.HashMap}
-     * @param translation
+     * @param translation {@link PIDConstants}
      * @param rotation {@link PIDConstants}
-     * @param useAllianceColor {@link PIDConstants}
+     * @param useAllianceColor 
      * @return
      */
     public Command createPathPlannerCommand(String path, PathConstraints constraints, Map<String, Command> eventMap, PIDConstants translation, PIDConstants rotation, boolean useAllianceColor) {

@@ -89,12 +89,16 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+
+    CommandScheduler.getInstance().run();
+
     RobotContainer.Swerve.PeriodicSwerve();
   }
 
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
+    CommandScheduler.getInstance().enable();
     m_autonomousCommand = m_RobotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -107,18 +111,19 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    CommandScheduler.getInstance().run();
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().disable();
     CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    CommandScheduler.getInstance().disable();
     RobotContainer.Swerve.absoluteDrive(IO.getLeftX(), IO.getLeftY(), IO.getRightX(), IO.getRightY(), false);
   }
 
