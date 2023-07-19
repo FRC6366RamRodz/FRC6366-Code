@@ -47,9 +47,7 @@ public class SwerveSprkMx implements SwerveIO {
         swerveDrive = new SwerveDrive(driveCfg, controllerCfg);
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
-    }
+
 
     //getters
 
@@ -97,10 +95,16 @@ public class SwerveSprkMx implements SwerveIO {
 
     public void periodicTask() {
         swerveDrive.updateOdometry();
+        swerveDrive.invertOdometry = true;
     }
 
     @Override
     public void updateInputs(SwerveIOInputs inputs) {
+    }
+
+    @Override
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        swerveDrive.drive(translation, rotation, fieldRelative, isOpenLoop);
     }
 
     /**

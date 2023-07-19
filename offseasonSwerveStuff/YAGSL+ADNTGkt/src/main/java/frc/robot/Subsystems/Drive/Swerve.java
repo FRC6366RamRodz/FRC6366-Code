@@ -42,8 +42,8 @@ public class Swerve {
         double RobotMass = 40 * 0.453592; //lbs * kg per lbs
         Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(14)), RobotMass);
 
-      double vX = MathUtil.applyDeadband(Vx, Swrv_STG.DED_BND);
-      double vY = MathUtil.applyDeadband(Vy, Swrv_STG.DED_BND);
+      double vX = MathUtil.applyDeadband(Vy, Swrv_STG.DED_BND);
+      double vY = MathUtil.applyDeadband(Vx, Swrv_STG.DED_BND);
       double hdngHorz = MathUtil.applyDeadband(headingHorizontal, Swrv_STG.DED_BND);
       double hdngVert = MathUtil.applyDeadband(headingVertical, Swrv_STG.DED_BND);
 
@@ -52,6 +52,6 @@ public class Swerve {
       Translation2d translation = SwerveController.getTranslation2d(desiredSpeeds);
       translation = SwerveMath.limitVelocity(translation, swerve.getFieldVelocity(), swerve.getPose(), 0.13, RobotMass, List.of(CHASSIS), swerve.getSwerveDriveConfig());
 
-      io.runSwerve(translation, desiredSpeeds.omegaRadiansPerSecond, true, isOpenLoop);
+      io.drive(translation, desiredSpeeds.omegaRadiansPerSecond, true, isOpenLoop);
     }
 }

@@ -15,6 +15,7 @@ import com.pathplanner.lib.server.PathPlannerServer;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Util.IO;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -118,6 +119,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    RobotContainer.Swerve.absoluteDrive(IO.getLeftX(), IO.getLeftY(), IO.getRightX(), IO.getRightY(), false);
   }
 
   /** This function is called once when the robot is disabled. */
