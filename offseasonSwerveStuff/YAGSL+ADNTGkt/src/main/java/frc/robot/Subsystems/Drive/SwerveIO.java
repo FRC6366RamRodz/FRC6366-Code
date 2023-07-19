@@ -7,7 +7,6 @@ package frc.robot.Subsystems.Drive;
 import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /** Add your docs here. */
 public interface SwerveIO {

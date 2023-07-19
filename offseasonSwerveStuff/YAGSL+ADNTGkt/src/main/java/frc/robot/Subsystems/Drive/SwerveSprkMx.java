@@ -5,6 +5,14 @@
 package frc.robot.Subsystems.Drive;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -12,7 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -23,6 +31,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 /** Add your docs here. */
 public class SwerveSprkMx implements SwerveIO {
     private final SwerveDrive swerveDrive;
+    private SwerveAutoBuilder autoBuilder = null;
 
     
     public SwerveSprkMx(File directory) {
@@ -66,7 +75,9 @@ public class SwerveSprkMx implements SwerveIO {
         swerveDrive.setChassisSpeeds(chassisSpeeds);
     }
 
-
+    public void lock(){
+        swerveDrive.lockPose();
+    }
 
     public SwerveDriveConfiguration getSwerveDriveConfig() {
         return swerveDrive.swerveDriveConfiguration;
@@ -92,4 +103,26 @@ public class SwerveSprkMx implements SwerveIO {
     public void updateInputs(SwerveIOInputs inputs) {
     }
 
-}
+    /**
+     * @param path
+     * @param constraints {@link PathConstraints} for {@link com.pathplanner.lib.PathPlanner#loadPathGroup}
+     * @param eventMap {@link java.util.HashMap}
+     * @param translation
+     * @param rotation {@link PIDConstants}
+     * @param useAllianceColor {@link PIDConstants}
+     * @return
+     */
+    public Command createPathPlannerCommand(String path, PathConstraints constraints, Map<String, Command> eventMap, PIDConstants translation, PIDConstants rotation, boolean useAllianceColor) {
+        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(path, constraints);
+
+        if (autoBuilder == null)
+        {
+          autoBuilder = new SwerveAutoBuilder(swerveDrive::getPose, swerveDrive::resetOdometry, translation, rotation, swerveDrive::setChassisSpeeds, eventMap, useAllianceColor, null);
+        }
+    
+        return autoBuilder.fullAuto(pathGroup);
+    }
+
+
+  }
+

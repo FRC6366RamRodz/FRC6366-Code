@@ -7,8 +7,11 @@ package frc.robot;
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drive.Swerve;
 import frc.robot.Subsystems.Drive.SwerveSprkMx;
+import frc.robot.Subsystems.Drive.Auto.Autos;
+
 
 /** Add your docs here. */
 public class RobotContainer {
@@ -18,4 +21,9 @@ public class RobotContainer {
 
     public static final Swerve Swerve = new
     Swerve(driveBase, driveBase);
+
+    public Command getAutonomousCommand(){
+        return Autos.exampleAuto(driveBase);
+    }
+
 }
