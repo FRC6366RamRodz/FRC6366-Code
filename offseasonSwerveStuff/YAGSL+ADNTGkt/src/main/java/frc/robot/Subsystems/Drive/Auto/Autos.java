@@ -43,7 +43,7 @@ public final class Autos {
         } else {
             List<PathPlannerTrajectory> example1 = PathPlanner.loadPathGroup("SamplePath", new PathConstraints(4, 3));
             
-            SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(swerve::getPose, swerve::resetOdometry, new PIDConstants(Auton.yAutoPID.p, Auton.yAutoPID.i, Auton.yAutoPID.d), new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d), swerve::setChassisSpeeds, null, false);  
+            SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(swerve::getPose, swerve::resetOdometry, new PIDConstants(Auton.yAutoPID.p, Auton.yAutoPID.i, Auton.yAutoPID.d), new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d), swerve::setChassisSpeeds, null, true);  
             
             autoBuilder.fullAuto(example1);
 

@@ -19,10 +19,10 @@ public class IO {
     }
 
     public static double getRightY() {
-        return driver.getRightY();
+        return -driver.getRightY();
     }
 
     public static double getRightX() {
-        return driver.getRightX();
+        return -driver.getRightX();
     }
 }
