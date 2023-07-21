@@ -39,7 +39,7 @@ public class Swerve {
     }
 
     public void absoluteDrive(double Vx, double Vy, double headingHorizontal, double headingVertical, boolean isOpenLoop){
-        double RobotMass = 40 * 0.453592; //lbs * kg per lbs
+        double RobotMass = 53 * 0.453592; //lbs * kg per lbs
         Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.inchesToMeters(14)), RobotMass);
 
       double vX = MathUtil.applyDeadband(Vy, Swrv_STG.DED_BND);
