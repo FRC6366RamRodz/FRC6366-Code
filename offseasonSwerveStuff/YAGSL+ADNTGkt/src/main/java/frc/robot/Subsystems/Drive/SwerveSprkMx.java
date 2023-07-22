@@ -93,10 +93,6 @@ public class SwerveSprkMx implements SwerveIO {
         return swerveDrive.getModulePositions();
     }
 
-    public swervelib.SwerveController SwerveController() {
-        return swerveDrive.getSwerveController();
-    }
-
     public void periodicTask() {
         swerveDrive.updateOdometry();
         swerveDrive.invertOdometry = false;
