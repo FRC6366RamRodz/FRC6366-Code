@@ -13,8 +13,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.pathplanner.lib.server.PathPlannerServer;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Util.IO;
 
 /**
@@ -28,6 +28,7 @@ public class Robot extends LoggedRobot {
   private static final String defaultAuto = "Default";
   private static final String customAuto = "My Auto";
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
+  private        Command m_autonomousCommand;
   private RobotContainer m_RobotContainer;
 
   /**
@@ -89,13 +90,22 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
 
+    CommandScheduler.getInstance().run();
+
     RobotContainer.Swerve.PeriodicSwerve();
   }
 
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
-    RobotContainer.auto.exampleAuto();
+    CommandScheduler.getInstance().enable();
+    m_autonomousCommand = m_RobotContainer.getAutonomousCommand();
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null)
+    {
+      m_autonomousCommand.schedule();
+    }
     }
 
   /** This function is called periodically during autonomous. */
@@ -106,17 +116,15 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().disable();
+    CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-
-    if(IO.getY()) {
-      RobotContainer.auto.driveToAprilTag(0, new Rotation2d(0), new Rotation2d(0), new Translation2d(2, 0));;
-    } else {
+    CommandScheduler.getInstance().disable();
     RobotContainer.Swerve.absoluteDrive(IO.getLeftX(), IO.getLeftY(), IO.getRightX(), IO.getRightY(), false);
-    }
   }
 
   /** This function is called once when the robot is disabled. */
