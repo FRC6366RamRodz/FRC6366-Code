@@ -61,6 +61,10 @@ public class SwerveSprkMx implements SwerveIO {
         return swerveDrive.swerveController.getTargetSpeeds(xinput, yinput, headingX, headingY, getHeading().getRadians());
     }
 
+    public ChassisSpeeds getRobotVelocity() {
+        return swerveDrive.getRobotVelocity();
+    }
+
     public ChassisSpeeds getFieldVelocity() {
         return swerveDrive.getFieldVelocity();
     }
@@ -100,6 +104,7 @@ public class SwerveSprkMx implements SwerveIO {
 
     @Override
     public void updateInputs(SwerveIOInputs inputs) {
+
     }
 
     @Override

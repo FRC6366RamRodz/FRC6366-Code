@@ -8,6 +8,7 @@ import swervelib.parser.PIDFConfig;
 
 /** Add your docs here. */
 public class Constants {
+
     public static class Swrv_STG {
         public static final double DED_BND = 0.15;
     }

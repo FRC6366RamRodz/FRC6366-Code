@@ -25,4 +25,8 @@ public class IO {
     public static double getRightX() {
         return -driver.getRightX();
     }
+
+    public static boolean getY() {
+        return driver.getYButton();
+    }
 }
