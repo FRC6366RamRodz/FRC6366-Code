@@ -13,14 +13,19 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -51,8 +56,17 @@ public class SwerveSprkMx implements SwerveIO {
 
     //getters
 
+    public void postTrajectory(Trajectory trajectory)
+    {
+      swerveDrive.postTrajectory(trajectory);
+    }
+    
     public Rotation2d getHeading() {
         return swerveDrive.getYaw();
+    }
+
+    public ChassisSpeeds getRobotVelocity() {
+        return swerveDrive.getRobotVelocity();
     }
 
     public ChassisSpeeds getTargetSpeeds(double xInput, double yInput, double headingX, double headingY) {
@@ -87,6 +101,10 @@ public class SwerveSprkMx implements SwerveIO {
 
     public void resetOdometry(Pose2d initialHolomonicPose) {
         swerveDrive.resetOdometry(initialHolomonicPose);
+    }
+
+    public void setSwerveModulePositions() {
+        swerveDrive.setModuleStates(null, false);
     }
 
     public SwerveModulePosition[] swerveModulePosition() {
@@ -126,7 +144,5 @@ public class SwerveSprkMx implements SwerveIO {
     
         return autoBuilder.fullAuto(pathGroup);
     }
-
-
   }
 
