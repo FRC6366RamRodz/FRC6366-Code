@@ -76,7 +76,7 @@ public class Arm {
        }
 
         io.setSpeed(Uspeed2, Lspeed2, UsetPoint, LsetPoint);
-        m_lowerArm.setAngle(getLowerCoder());
+        m_lowerArm.setAngle(getLowerCoder()-getUpperCoder());
         m_upperArm.setAngle(getUpperCoder());
     }
 
