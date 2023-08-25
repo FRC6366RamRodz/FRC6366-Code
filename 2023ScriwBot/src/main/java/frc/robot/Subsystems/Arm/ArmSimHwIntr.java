@@ -5,26 +5,32 @@
 package frc.robot.Subsystems.Arm;
 
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Add your docs here. */
 public class ArmSimHwIntr implements ArmIO {
-    private SingleJointedArmSim upperArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 1.0, 0.35, Units.inchesToMeters(25), 0, 90, true); 
-    private SingleJointedArmSim lowerArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 1.0, 0.25, Units.inchesToMeters(10), 0, 75, true); 
+    private SingleJointedArmSim upperArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 10.0, 0.08, Units.inchesToMeters(25), Units.degreesToRadians(-90), Units.degreesToRadians(90), false); 
+    private SingleJointedArmSim lowerArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 5.0, 0.004, Units.inchesToMeters(10), Units.degreesToRadians(-25), Units.degreesToRadians(125), false); 
+
 
     @Override
     public void updateInputs(ArmIoInputs inputs) {
-        inputs.UpperMotorVelocity = upperArmSim.getVelocityRadPerSec();
-        inputs.LowerMotorVelocity = lowerArmSim.getVelocityRadPerSec();
-        inputs.LowerCoderPosition = lowerArmSim.getAngleRads();
-        inputs.UpperCoderPosition = upperArmSim.getAngleRads();
+
+        upperArmSim.update(0.02);
+        lowerArmSim.update(0.02);
+
+        inputs.UpperMotorVelocity = Units.radiansPerSecondToRotationsPerMinute(upperArmSim.getVelocityRadPerSec());
+        inputs.LowerMotorVelocity = Units.radiansPerSecondToRotationsPerMinute(lowerArmSim.getVelocityRadPerSec());
+        inputs.LowerCoderPosition = Units.radiansToDegrees(lowerArmSim.getAngleRads());
+        inputs.UpperCoderPosition = Units.radiansToDegrees(upperArmSim.getAngleRads());
     }
 
     @Override
-    public void setSpeed(double upperSpeed, double lowerSpeed, double UsetPoint, double LsetPoint) {
+    public void setSpeed(double upperSpeed, double lowerSpeed, double UsetPoint, double LsetPoint){
+        upperArmSim.setInput(MathUtil.clamp(upperSpeed*12, -12.0, 12.0));
+        lowerArmSim.setInput(MathUtil.clamp(lowerSpeed*12, -12.0, 12.0));
     }
 }

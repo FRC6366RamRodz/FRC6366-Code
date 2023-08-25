@@ -20,9 +20,9 @@ public class Constants {
       }
 
     public static class AR_SET {
-        public static final double kP = 6e-5; 
+        public static final double kP = 0.001; 
         public static final double kI = 0;
-        public static final double kD = 0; 
+        public static final double kD = 0.0001; 
         public static final double kIz = 0; 
         public static final double kFF = 0.000015; 
         public static final double kMaxOutput = 1; 
