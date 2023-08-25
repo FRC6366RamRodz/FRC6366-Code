@@ -45,19 +45,19 @@ public class Arm {
        double Uspeed, Uspeed2, Lspeed, Lspeed2, UsetPoint, LsetPoint;
 
        if (IO.getOpA()) {
-        LsetPoint = 0;
+        LsetPoint = -30;
         UsetPoint = -80;
        } else if (IO.getOpB()) {
-        LsetPoint = 0;
-        UsetPoint = 0;
-       } else if (IO.getOpX()) {
-        LsetPoint = 0;
+        LsetPoint = 2;
         UsetPoint = -10;
+       } else if (IO.getOpX()) {
+        LsetPoint = 10;
+        UsetPoint = -40;
        } else if (IO.getOpY()) {
         LsetPoint = 0;
-        UsetPoint = -40;
+        UsetPoint = 0;
        } else {
-        LsetPoint = 120;
+        LsetPoint = 25;
         UsetPoint = -90;
        }
 
