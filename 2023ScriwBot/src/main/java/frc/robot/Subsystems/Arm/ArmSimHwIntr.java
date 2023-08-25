@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Add your docs here. */
 public class ArmSimHwIntr implements ArmIO {
-    private SingleJointedArmSim upperArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 10.0, 0.08, Units.inchesToMeters(25), Units.degreesToRadians(-90), Units.degreesToRadians(90), false); 
-    private SingleJointedArmSim lowerArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 5.0, 0.004, Units.inchesToMeters(10), Units.degreesToRadians(-25), Units.degreesToRadians(125), false); 
+    private SingleJointedArmSim upperArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 10.0, 0.08, Units.inchesToMeters(38), Units.degreesToRadians(-90), Units.degreesToRadians(90), false); 
+    private SingleJointedArmSim lowerArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 5.0, 0.004, Units.inchesToMeters(15), Units.degreesToRadians(-35), Units.degreesToRadians(90), false); 
 
 
     @Override
