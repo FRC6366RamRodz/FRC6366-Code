@@ -25,4 +25,24 @@ public class IO {
     public static boolean getOpB() {
         return operator.getBButton();
     }
+
+    public static double joyDeadBand(double stickValue) {
+        if (Math.abs(stickValue) <= 0.15) {
+            return 0;
+        } else {
+            return stickValue;
+        }
+    }
+
+    public static double responseCurve(double inputValue) {
+        return inputValue*inputValue*inputValue;
+    }
+
+    public static double getLeftY() {
+        return joyDeadBand(operator.getLeftY());
+    }
+
+    public static double getRightX() {
+        return responseCurve(joyDeadBand(operator.getRightX()));
+    }
 }

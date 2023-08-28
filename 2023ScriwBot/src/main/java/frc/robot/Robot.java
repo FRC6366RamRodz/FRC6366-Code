@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import frc.robot.Container.RobotContainer;
+import frc.robot.Util.IO;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -80,6 +81,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     RobotContainer.arm.armPeriodic();
+    RobotContainer.drive.periodicDrive();
   }
 
   /** This function is called once when autonomous is enabled. */
@@ -112,6 +114,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     RobotContainer.arm.setPointMode();
+    RobotContainer.drive.driveArcade(IO.getLeftY(), IO.getRightX());
   }
 
   /** This function is called once when the robot is disabled. */

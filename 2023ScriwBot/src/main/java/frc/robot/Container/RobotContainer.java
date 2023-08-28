@@ -6,8 +6,11 @@ package frc.robot.Container;
 
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmSimHwIntr;
+import frc.robot.Subsystems.Drive.Drive;
+import frc.robot.Subsystems.Drive.DriveIOSim;
 
 /** Add your docs here. */
 public class RobotContainer {
     public static final Arm arm = new Arm(new ArmSimHwIntr());
+    public static final Drive drive = new Drive(new DriveIOSim());
 }

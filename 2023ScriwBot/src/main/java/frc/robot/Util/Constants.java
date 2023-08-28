@@ -20,7 +20,7 @@ public class Constants {
       }
 
     public static class AR_SET {
-        public static final double kP = 0.001; 
+        public static final double kP = 0.009; 
         public static final double kI = 0;
         public static final double kD = 0.0001; 
         public static final double kIz = 0; 
@@ -32,5 +32,10 @@ public class Constants {
         public static final double maxAcc = 20000;
         public static final double minVel = 0;
         public static final double allowedErr = 0.01;
+    }
+
+    public static class DT_STG/*Drive Train Settings */ {
+        public static final double DeadBand = 0.05; //sometimes an abbreviation is more problamatic in those cases leave them camel case
+        public static final double Drv_Sens = 0.55;//driver sensitivity
     }
 }
