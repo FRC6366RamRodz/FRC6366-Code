@@ -32,7 +32,7 @@ public class Swerve {
     private SwerveIOInputsAutoLogged inputs = new SwerveIOInputsAutoLogged();
     private static String tableName = "limelight";
     private DoubleArrayEntry botPosEntry;
-    private final IntegerEntry idEntry;
+    private IntegerEntry idEntry;
     private Pose2d botPose2d;
 
     public Swerve(SwerveIO io, SwerveSprkMx swerve){
@@ -40,20 +40,13 @@ public class Swerve {
         this.swerve = swerve;
 
 
-        NetworkTable limelight = NetworkTableInstance.getDefault().getTable(tableName);
-        botPosEntry = limelight.getDoubleArrayTopic("botpose").getEntry(new double[] {});
-        idEntry = limelight.getIntegerTopic("tid").getEntry(0);
+
 
     }
 
     public void PeriodicSwerve() {
-
-        double[] botposeData = botPosEntry.get();
-        if(botposeData.length !=6) {
-            botPose2d = new Pose2d(0, 0, Rotation2d.fromDegrees(0));;
-        } else {
+        double[] botposeData = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
             botPose2d = new Pose2d(botposeData[0], botposeData[1], Rotation2d.fromDegrees(botposeData[5]));
-        }
         
         swerve.periodicTask();
         Logger.getInstance().recordOutput("Odometry", swerve.getPose());
@@ -63,6 +56,8 @@ public class Swerve {
 
         
         Logger.getInstance().recordOutput("LimePose", botPose2d);
+
+        
 
 
 
