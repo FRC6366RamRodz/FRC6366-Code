@@ -5,7 +5,6 @@
 package frc.robot.Subsystems.Swerve;
 
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
 import org.littletonrobotics.junction.Logger;
 

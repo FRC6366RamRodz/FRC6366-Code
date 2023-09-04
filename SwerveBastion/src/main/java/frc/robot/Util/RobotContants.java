@@ -12,4 +12,9 @@ import swervelib.math.Matter;
 public class RobotContants {
     public static final double RobotMass = 125 * 0.453592;
     public static final Matter Chassis = new Matter(new Translation3d(0,0,Units.inchesToMeters(48) ), RobotMass);
+
+    public static final double UpperArmLengthinMeter = Units.inchesToMeters(38);
+    public static final double LowerArmLengthinMeter = Units.inchesToMeters(15);
+    public static final double ArmHightinMeter = Units.inchesToMeters(46);
+    public static final double IntakelengthinMeter = Units.inchesToMeters(10);
 }
