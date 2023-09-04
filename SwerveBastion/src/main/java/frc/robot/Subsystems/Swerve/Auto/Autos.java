@@ -31,15 +31,15 @@ public final class Autos {
             return Commands.sequence(autoBuilder.fullAuto(example1));
     }
 
-    public static CommandBase inMatchAuto(SwerveSparkMax swerve) {
+    public static CommandBase inMatchAuto(SwerveSparkMax swerve, DummySubsystem sub) {
         PathPlannerTrajectory example;
 
         example = PathPlanner.generatePath(
 
-                new PathConstraints(4, 3), new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)), 
+                new PathConstraints(4, 2), new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)), 
                 new PathPoint(new Translation2d(3, 5), Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90)));
 
-                return Commands.sequence(new FollowTrajectory(swerve, example, true));
+                return Commands.sequence(new FollowTrajectory(swerve, example, false, sub));
     }
 
 

@@ -15,8 +15,8 @@ public class ControllConstants {
 
     public static final Pose2d panicPose = new Pose2d(1.84, 0.48, new Rotation2d(0));
 
-    public static final double trimLeftOffset = -0.05;
-    public static final double trimRightOffset = 0.05;
+    public static final double trimLeftOffset = 0.05;
+    public static final double trimRightOffset = -0.05;
 
     public static final double peakSlowMode = 0.5;
 

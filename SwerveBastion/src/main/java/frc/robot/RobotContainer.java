@@ -11,11 +11,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Swerve.Swerve;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
 import frc.robot.Subsystems.Swerve.Auto.Autos;
+import frc.robot.Subsystems.Swerve.Auto.DummySubsystem;
 
 /** Add your docs here. */
 public class RobotContainer {
+
+    //Swerve stuff
     public static final SwerveSparkMax driveBase = new 
     SwerveSparkMax(new File(Filesystem.getDeployDirectory(), "swerve"));
+
+    public static final DummySubsystem sub = new DummySubsystem();
 
     public static final Swerve Swerve = new
     Swerve(driveBase, driveBase);
@@ -25,6 +30,6 @@ public class RobotContainer {
     }
 
     public Command MatchAuto() {
-        return Autos.inMatchAuto(driveBase);
+        return Autos.inMatchAuto(driveBase, sub);
     }
 }

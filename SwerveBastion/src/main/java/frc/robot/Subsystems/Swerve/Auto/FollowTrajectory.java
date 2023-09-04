@@ -14,14 +14,16 @@ import frc.robot.Util.ControllConstants.Auton;
 
 /** Add your docs here. */
 public class FollowTrajectory extends SequentialCommandGroup {
-    public FollowTrajectory(SwerveSparkMax driveBase, PathPlannerTrajectory trajectory, boolean resetOdometry) {
+    public FollowTrajectory(SwerveSparkMax driveBase, PathPlannerTrajectory trajectory, boolean resetOdometry, DummySubsystem sub) {
+
+        addRequirements(sub);
 
         if (resetOdometry) {
             driveBase.resetOdometry(trajectory.getInitialHolonomicPose());
         }
 
         addCommands(
-            new PPSwerveControllerCommand(trajectory, driveBase::getPose2d, Auton.xAutoPID.createPIDController(), Auton.yAutoPID.createPIDController(), Auton.angleAutoPID.createPIDController(), driveBase::setChasisSpeeds, null)
+            new PPSwerveControllerCommand(trajectory, driveBase::getPose2d, Auton.xAutoPID.createPIDController(), Auton.yAutoPID.createPIDController(), Auton.angleAutoPID.createPIDController(), driveBase::setChasisSpeeds, sub)
         );
     }
 }

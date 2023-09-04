@@ -140,16 +140,15 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-
+    m_DriveAuto = m_RobotContainer.MatchAuto();
     //drive Stuff
     double Leftx = IO.getLeftX()*MathUtil.applyDeadband(IO.getRightTrigger(), ControllConstants.DeadBandTriger);
     double Lefty = IO.getLeftY()*MathUtil.applyDeadband(IO.getRightTrigger(), ControllConstants.DeadBandTriger);
-    RobotContainer.Swerve.absoluteDrive(Leftx, Lefty, IO.getRightX(), IO.getRightY(), false, IO.getBackPressed(), IO.getStartPressed(), IO.getPanic(), IO.getYbuttonPressed());
-    if (IO.getRightBumper()) {
-      m_DriveAuto = m_RobotContainer.MatchAuto();
-      m_DriveAuto.schedule();
-    } else {
-      m_DriveAuto.cancel();
+    RobotContainer.Swerve.absoluteDrive(Leftx, Lefty, IO.getRightX(), IO.getRightY(), false, IO.getBackPressed(), IO.getStartPressed(), IO.getPanic(), IO.getYbutton());
+    if (IO.getRightBumperPressed()) {
+      m_DriveAuto.schedule();;
+    } else if(IO.getRightBumperReleased()) {
+      CommandScheduler.getInstance().cancelAll();
     }
   }
 

@@ -47,8 +47,8 @@ public class Swerve {
         } else {
             botPoseData = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpired").getDoubleArray(new double[6]);
         }
+        //botPose2d = new Pose2d(botPoseData[0], botPoseData[1], Rotation2d.fromDegrees(botPoseData[5]));
         botPose2d = new Pose2d(botPoseData[0], botPoseData[1], Rotation2d.fromDegrees(botPoseData[5]));
-
 
         swerve.periodicHardwareSwerve();
         Logger.getInstance().recordOutput("Odometry", swerve.getPose2d());
@@ -63,10 +63,10 @@ public class Swerve {
         if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getBoolean(false) == true) {
             Translation2d OfsetPose = botPose2d.getTranslation().minus(swerve.getPose2d().getTranslation());
             offset = new Transform2d(OfsetPose, swerve.getHeading());
+            swerve.LimeOffsetPose2d(offset);
         } else {
-            offset = new Transform2d(swerve.getPose2d().getTranslation(), swerve.getHeading());
         }
-        swerve.LimeOffsetPose2d(offset);
+       
     }
 
 

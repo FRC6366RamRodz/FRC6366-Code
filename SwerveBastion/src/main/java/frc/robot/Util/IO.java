@@ -49,12 +49,16 @@ public class IO {
         return panic;
     }
 
-    public static boolean getRightBumper() {//autoDrive
-       return driver.getRightBumper();
+    public static boolean getRightBumperPressed() {//autoDrive
+       return driver.getRightBumperPressed();
     }
 
-    public static boolean getYbuttonPressed() {//lockPose
-        return driver.getYButtonPressed();
+    public static boolean getRightBumperReleased() {//deactivate autoDrive
+        return driver.getRightBumperReleased();
+    }
+
+    public static boolean getYbutton() {//lockPose
+        return driver.getYButton();
     }
 
 

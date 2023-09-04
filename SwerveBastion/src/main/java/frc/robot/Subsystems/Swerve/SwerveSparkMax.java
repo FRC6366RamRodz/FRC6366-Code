@@ -31,7 +31,7 @@ public class SwerveSparkMax implements SwerveIO {
 
 //instantiate swerve
     public SwerveSparkMax(File directory) {
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
             SwerveDrive = new SwerveParser(directory).createSwerveDrive();
         } catch (Exception e) {
@@ -51,12 +51,12 @@ public class SwerveSparkMax implements SwerveIO {
         return SwerveDrive.getYaw();
     }
 
-    public Pose2d getPose2d() {
-        return SwerveDrive.getPose();
-    }
-
     public Pose2d LimeOffsetPose2d(Transform2d other) {
         return SwerveDrive.getPose().transformBy(other);
+    }
+
+    public Pose2d getPose2d() {
+        return SwerveDrive.getPose();
     }
 
     public SwerveDriveKinematics getKinematics() {
