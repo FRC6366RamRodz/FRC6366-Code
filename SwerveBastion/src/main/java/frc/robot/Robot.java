@@ -12,8 +12,15 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.pathplanner.lib.server.PathPlannerServer;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Util.ControllConstants;
+import frc.robot.Util.IO;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -27,6 +34,9 @@ public class Robot extends LoggedRobot {
   private static final String customAuto = "My Auto";
   private String autoSelected;
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
+  private RobotContainer m_RobotContainer;
+  private Command m_autonomousCommand;
+  private Command m_DriveAuto;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -34,7 +44,12 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+    
+    PathPlannerServer.startServer(5811);
+
     Logger logger = Logger.getInstance();
+    
+    m_RobotContainer = new RobotContainer();
 
     // Record metadata
     logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -55,14 +70,13 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
+    // Set up data receivers & replay source
     if (isReal()) {
       logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
       logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     } else {
-      setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+      logger.addDataReceiver(new WPILOGWriter(""));
+      logger.addDataReceiver(new NT4Publisher());
     }
 
     // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
@@ -79,38 +93,64 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+
+    //swerve stuff
+    CommandScheduler.getInstance().run();
+    RobotContainer.Swerve.PeriodicSoftwareSwerve();
+    RobotContainer.driveBase.periodicHardwareSwerve();
   
   }
 
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
+
     autoSelected = chooser.get();
-    System.out.println("Auto selected: " + autoSelected);
+
+
+    switch (autoSelected) {
+      case customAuto:
+
+        break;
+      case defaultAuto:
+      default:
+        m_autonomousCommand = m_RobotContainer.getAutonomousCommand("SamplePath");
+        break;
+    }
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null)
+    {
+      m_autonomousCommand.schedule();
+    } 
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    switch (autoSelected) {
-      case customAuto:
-        // Put custom auto code here
-        break;
-      case defaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+
+    //drive Stuff
+    double Leftx = IO.getLeftX()*MathUtil.applyDeadband(IO.getRightTrigger(), ControllConstants.DeadBandTriger);
+    double Lefty = IO.getLeftY()*MathUtil.applyDeadband(IO.getRightTrigger(), ControllConstants.DeadBandTriger);
+    RobotContainer.Swerve.absoluteDrive(Leftx, Lefty, IO.getRightX(), IO.getRightY(), false, IO.getBackPressed(), IO.getStartPressed(), IO.getPanic(), IO.getYbuttonPressed());
+    if (IO.getRightBumper()) {
+      m_DriveAuto = m_RobotContainer.MatchAuto();
+      m_DriveAuto.schedule();
+    } else {
+      m_DriveAuto.cancel();
+    }
   }
 
   /** This function is called once when the robot is disabled. */

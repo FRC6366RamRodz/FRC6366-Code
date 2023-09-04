@@ -5,6 +5,7 @@
 package frc.robot.Subsystems.Swerve;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -69,7 +70,7 @@ public class Swerve {
     }
 
 
-    public void absoluteDrive(double Vx, double Vy, double headingHorizontal, double headingVertical, boolean isOpenLoop, boolean trimLeft, boolean trimRight, boolean Panic) {
+    public void absoluteDrive(double Vx, double Vy, double headingHorizontal, double headingVertical, boolean isOpenLoop, boolean trimLeft, boolean trimRight, boolean Panic, boolean Lock) {
 
         
 
@@ -89,6 +90,10 @@ public class Swerve {
 
         if(Panic){
             swerve.resetOdometry(ControllConstants.panicPose);
+        }
+
+        if(Lock) {
+            swerve.lockPose();
         }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(vX, vY, hdngHorz, hdngVert);

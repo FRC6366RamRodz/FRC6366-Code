@@ -23,9 +23,9 @@ import frc.robot.Util.ControllConstants.Auton;
 
 /** Add your docs here. */
 public final class Autos {
-    public static CommandBase startAuto(SwerveSparkMax swerve) {
+    public static CommandBase startAuto(SwerveSparkMax swerve, String path) {
         boolean onTheFly = false;
-        List<PathPlannerTrajectory> example1 = PathPlanner.loadPathGroup("SamplePath", new PathConstraints(4, 3));
+        List<PathPlannerTrajectory> example1 = PathPlanner.loadPathGroup(path, new PathConstraints(4, 3));
             SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(swerve::getPose2d, swerve::resetOdometry, new PIDConstants(Auton.yAutoPID.p, Auton.yAutoPID.i, Auton.yAutoPID.d), new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d), swerve::setChasisSpeeds, null, true);
 
             return Commands.sequence(autoBuilder.fullAuto(example1));
@@ -37,8 +37,7 @@ public final class Autos {
         example = PathPlanner.generatePath(
 
                 new PathConstraints(4, 3), new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)), 
-                new PathPoint(new Translation2d(3, 5), Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90)), 
-                new PathPoint(new Translation2d(5, 5), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)));
+                new PathPoint(new Translation2d(3, 5), Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90)));
 
                 return Commands.sequence(new FollowTrajectory(swerve, example, true));
     }
