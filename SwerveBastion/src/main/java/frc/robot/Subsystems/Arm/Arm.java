@@ -80,24 +80,24 @@ public class Arm {
         }
 
         boolean wristTst;
-        if (IO.getLeftTrigger()) {
+        if (IO.getLeftTrigger()){ //floor intake
             UsetPoint = -74;
             LsetPoint = -8;
             wristTst = true;
         } else if (HighPos) {
-            UsetPoint = -7.5;
-            LsetPoint = 8;
+            UsetPoint = -7;
+            LsetPoint = 20;
             wristTst = true;
         } else if (MidPos) {
-            UsetPoint = 0;
-            LsetPoint = 0;
+            UsetPoint = -47;
+            LsetPoint = 52;
             wristTst = true;
         } else if (snglSttn) {
-            UsetPoint = -80;
-            LsetPoint = 30;
+            UsetPoint = -50;
+            LsetPoint = 50;
             wristTst = true;
         } else if (dbleSttn) {
-            UsetPoint = 0;
+            UsetPoint = -10;
             LsetPoint = 0;
             wristTst = true;
         } else {
