@@ -24,7 +24,8 @@ public class Arm {
     private MechanismLigament2d m_upperArm = root.append(new MechanismLigament2d("Upperarm", Units.inchesToMeters(38), -90, 9 , new Color8Bit(Color.kSilver)));
     private MechanismLigament2d m_lowerArm = m_upperArm.append(new MechanismLigament2d("lowerArm", Units.inchesToMeters(15), 120, 8, new Color8Bit(Color.kSilver)));
     private MechanismLigament2d m_intake = m_lowerArm.append(new MechanismLigament2d("intake", Units.inchesToMeters(10), 0, 2 , new Color8Bit(Color.kBlack)));
-    private boolean HighPos, MidPos, snglSttn, dbleSttn, clawMode;
+    private boolean HighPos=false, snglSttn, dbleSttn, clawMode=false;
+    private boolean MidPos=false;
     private double offset=0;
     private Timer upDebounce;
     private Timer downDebounce;
@@ -42,9 +43,8 @@ public class Arm {
         UarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
         LarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
 
-        HighPos = false;
-        MidPos = false;
-        clawMode = false;
+        upDebounce = new Timer();
+        downDebounce = new Timer();
     }
 
     public void armPeriodic() {
@@ -55,7 +55,7 @@ public class Arm {
     }
 
     public void SetPointMode() {
-        double UsetPoint, LsetPoint, setArm, setElbow, ArmVolt, elbowVolt, ArmVolt2, elbowVolt2, setArm2=0;
+        double UsetPoint, LsetPoint, setArm, setElbow, ArmVolt, elbowVolt, ArmVolt2, elbowVolt2, setArm2;
         boolean wristFlag;
 
 
@@ -72,7 +72,7 @@ public class Arm {
             MidPos = false;
         }
 
-        if (IO.getRightTriggerOP()>0.1 && IO.getRightTriggerOP() <0.95) {
+        if (IO.getRightTriggerOP()>0.15 && IO.getRightTriggerOP() <0.95) {
             snglSttn = true;
             dbleSttn = false;
         } else if (IO.getRightTriggerOP() > 0.95) {
@@ -83,25 +83,31 @@ public class Arm {
             dbleSttn = false;
         }
 
-        
+        boolean wristTst;
         if (IO.getLeftTrigger()) {
             UsetPoint = -74;
             LsetPoint = -8;
+            wristTst = true;
         } else if (HighPos) {
             UsetPoint = -7.5;
             LsetPoint = 8;
+            wristTst = true;
         } else if (MidPos) {
-            UsetPoint = -43;
-            LsetPoint = 46;
+            UsetPoint = 0;
+            LsetPoint = 0;
+            wristTst = true;
         } else if (snglSttn) {
             UsetPoint = -80;
             LsetPoint = 30;
+            wristTst = true;
         } else if (dbleSttn) {
             UsetPoint = 0;
             LsetPoint = 0;
+            wristTst = true;
         } else {
             UsetPoint = -90;
-            LsetPoint = 71;
+            LsetPoint = 19;
+            wristTst = false;
         }
 
         if (IO.GetBackOP()){
@@ -110,22 +116,36 @@ public class Arm {
             setArm = UsetPoint;
         }
 
-        if (getUpperCoder() >= setArm2-0.15 && getUpperCoder() <= setArm2+0.15) {
+        if (IO.GetDpadUpOP() && upDebounce.get() < 0.02) {
+            offset = offset + 1;
+        } else if (IO.GetDpadDownOP() && downDebounce.get() < 0.02){
+            offset = offset -1;
+        } else if (IO.GetStartOP()) {
+            offset = 0;
+        }
+
+
+        double score;
+        if (IO.getLeftBumper()) {
+            score = 5;
+        } else {
+            score = 0;
+        }
+
+        setArm2 = setArm+offset-score;
+
+        if ((getUpperCoder() >= setArm2-10 && getUpperCoder() <= setArm2+10) == false) {
 
             if (getUpperCoder() < -20) {
                 setElbow = 90-Math.abs(getUpperCoder())+19;
-                wristFlag = false;
             } else {
                 setElbow = LsetPoint;   
-                wristFlag = true;
             }
 
         } else if(IO.GetBackOP()) {
             setElbow = getLowerCoder();
-            wristFlag = false;
         } else {
             setElbow = LsetPoint;
-            wristFlag = true;
         }
 
         if (IO.GetDpadUpOP() == true) {
@@ -141,26 +161,8 @@ public class Arm {
             downDebounce.stop();
             downDebounce.reset();
         }
-
-        if (IO.GetDpadUpOP() && upDebounce.get() < 0.1) {
-            offset = offset + 2;
-        } else if (IO.GetDpadDownOP() && downDebounce.get() < 0.1){
-            offset = offset -2;
-        } else if (IO.GetStartOP()) {
-            offset = 0;
-        }
-
-
-        double score;
-        if (IO.getLeftBumper()) {
-            score = 5;
-        } else {
-            score = 0;
-        }
-
-        setArm2 = setArm+offset-score;
         
-        ArmVolt = UarmPID.calculate(getUpperCoder(), setArm2+offset-score);
+        ArmVolt = UarmPID.calculate(getUpperCoder(), setArm2);
         if (Math.abs(ArmVolt)>1) {
           ArmVolt2 = Math.abs(ArmVolt)/ArmVolt;
         } else {
@@ -169,7 +171,7 @@ public class Arm {
 
         elbowVolt = LarmPID.calculate(getLowerCoder(), setElbow);
         if (Math.abs(elbowVolt)>1) {
-            elbowVolt2 = Math.abs(ArmVolt)/ArmVolt;
+            elbowVolt2 = Math.abs(elbowVolt)/elbowVolt;
         } else {
             elbowVolt2 = elbowVolt;
         }
@@ -189,16 +191,21 @@ public class Arm {
             Lbrake = true;
         }
 
+        if (getUpperCoder() >= setArm2-5 && getUpperCoder() <= setArm2+5) {
+            wristFlag = true;
+        } else {
+            wristFlag = false;
+        }
+        
+
 
 //Claw
         if (IO.getRightYOP()>0) {
             clawMode = !clawMode;
         }
 
-        boolean wrist, wrist2;
-        if (IO.getLeftY()>0) {
-            wrist = true;
-        } else if (wristFlag){
+        boolean wrist;
+        if ((wristFlag && wristTst) || IO.getLeftYOP()>0.5) {
             wrist = true;
         } else {
             wrist = false;
@@ -228,16 +235,17 @@ public class Arm {
             }
         } else if (intakeIn || IO.getLeftTrigger()) {
             IntakeSet = -0.2;
-            claw2=wrist;
+            claw2=clawMode;
         } else {
             IntakeSet = 0;
-            claw2=wrist;
+            claw2=clawMode;
         }
 
         io.setSpeed(ArmVolt2, elbowVolt2, wrist, Lbrake, Ubrake, claw2, IntakeSet);
 
         m_lowerArm.setAngle(getLowerCoder()-getUpperCoder());
         m_upperArm.setAngle(getUpperCoder());
+        m_intake.setAngle(getIntake());
 
     }
 
@@ -247,5 +255,9 @@ public class Arm {
 
     public double getUpperCoder() {
         return inputs.UpperCoderPosition;
+    }
+
+    public double getIntake() {
+        return inputs.IntakePosition;
     }
 }

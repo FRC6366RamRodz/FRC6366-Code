@@ -14,6 +14,7 @@ public interface ArmIO {
             public double LowerCoderPosition = 0.0;
             public boolean BrakeU = false;
             public boolean BrakeL = false;
+            public double IntakePosition = 0.0;
     }
 
     public default void updateInputs(ArmIOInputs inputs) {

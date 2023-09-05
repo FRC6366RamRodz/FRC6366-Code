@@ -53,6 +53,14 @@ public class ArmSparkMax implements ArmIO {
         inputs.UpperCoderPosition = UpperCoder.getAbsolutePosition()-ARM.ArmUOffset;
         inputs.BrakeL = ArmBrakeL.get();
         inputs.BrakeU = ArmBrakeU.get();
+
+        double wristset;
+        if(Wrist.get()) {
+            wristset = 90;
+        } else {
+            wristset = 10;
+        }
+        inputs.IntakePosition = wristset;
     }
 
 
