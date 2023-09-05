@@ -60,16 +60,12 @@ public class Arm {
 
 
 //Arm
-        if (IO.getLeftBumperPressedOP()) {
-            HighPos = !HighPos;
-        } else if (IO.getRightBumperPressedOP()) {
-            HighPos = false;
-        }
-
         if (IO.getRightBumperPressedOP()) {
             MidPos = !MidPos;
+            HighPos = false;
         } else if (IO.getLeftBumperPressedOP()) {
             MidPos = false;
+            HighPos = !HighPos;
         }
 
         if (IO.getRightTriggerOP()>0.15 && IO.getRightTriggerOP() <0.95) {
