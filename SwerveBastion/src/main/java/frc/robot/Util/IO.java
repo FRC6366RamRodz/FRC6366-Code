@@ -4,6 +4,7 @@
 
 package frc.robot.Util;
 
+import edu.wpi.first.cscore.CameraServerJNI.TelemetryKind;
 import edu.wpi.first.wpilibj.XboxController;
 
 /** Add your docs here. */
@@ -60,6 +61,102 @@ public class IO {
     public static boolean getYbutton() {//lockPose
         return driver.getYButton();
     }
+
+    public static boolean getLeftTrigger() {
+        if (driver.getLeftTriggerAxis() > 0.15) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean getLeftBumper() {
+        return driver.getLeftBumper();
+    }
+
+    //Operator
+    private static final XboxController operator = new XboxController(1); //reference 360 for controll names
+
+    public static double getLeftYOP() {
+        return operator.getLeftY();
+    }
+
+    public static double getLeftTriggerOP() {
+        return operator.getLeftTriggerAxis();
+    }
+
+    public static double getRightTriggerOP() {
+        return operator.getRightTriggerAxis();
+    }
+
+    public static boolean getLeftBumperPressedOP() {
+        return operator.getLeftBumperPressed();
+    }
+
+    public static boolean getRightBumperPressedOP() {
+        return operator.getRightBumperPressed();
+    }
+
+    public static boolean GetDpadUpOP() {
+        if (operator.getPOV() == 0.0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean GetDpadDownOP() {
+        if(operator.getPOV() == 180) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean GetDpadLeftOP() {
+        if(operator.getPOV() == 270) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean GetDpadRightOP() {
+        if(operator.getPOV() == 90) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean GetBackOP() {
+        return operator.getBackButton();
+    }
+
+    public static boolean GetYbuttonOP() {
+        return operator.getYButton();
+    }
+
+    public static boolean GetXbuttonOP() {
+        return operator.getXButton();
+    }
+
+    public static boolean GetBbuttonOP() {
+        return operator.getBButton();
+    }
+
+    public static boolean GetAbuttonOP() {
+        return operator.getAButton();
+    }
+
+    public static boolean GetStartOP() {
+        return operator.getStartButton();
+    }
+
+    public static double getRightYOP() {
+        return operator.getRightY();
+    }
+
 
 
 }

@@ -8,6 +8,8 @@ import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Subsystems.Arm.Arm;
+import frc.robot.Subsystems.Arm.ArmSim;
 import frc.robot.Subsystems.Swerve.Swerve;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
 import frc.robot.Subsystems.Swerve.Auto.Autos;
@@ -32,4 +34,6 @@ public class RobotContainer {
     public Command MatchAuto() {
         return Autos.inMatchAuto(driveBase, sub);
     }
+
+    public static final Arm arm = new Arm(new ArmSim());
 }

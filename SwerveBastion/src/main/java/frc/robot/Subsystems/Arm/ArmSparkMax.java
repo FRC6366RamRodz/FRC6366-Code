@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import frc.robot.Util.ControllConstants.ARM;
 
 /** Add your docs here. */
 public class ArmSparkMax implements ArmIO {
@@ -48,8 +49,8 @@ public class ArmSparkMax implements ArmIO {
 
     @Override
     public void updateInputs(ArmIOInputs inputs) {
-        inputs.LowerCoderPosition = LowerCoder.getAbsolutePosition();
-        inputs.UpperCoderPosition = UpperCoder.getAbsolutePosition();
+        inputs.LowerCoderPosition = LowerCoder.getAbsolutePosition()-ARM.ArmLOffset;
+        inputs.UpperCoderPosition = UpperCoder.getAbsolutePosition()-ARM.ArmUOffset;
         inputs.BrakeL = ArmBrakeL.get();
         inputs.BrakeU = ArmBrakeU.get();
     }

@@ -43,5 +43,7 @@ public class ControllConstants {
         public static final double maxAcc = 20000;
         public static final double minVel = 0;
         public static final double allowedErr = 0.01;
+        public static final double ArmUOffset = 0;
+        public static final double ArmLOffset = 0;
     }
 }

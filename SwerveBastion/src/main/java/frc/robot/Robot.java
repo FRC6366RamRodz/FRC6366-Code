@@ -94,6 +94,9 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     RobotContainer.Swerve.PeriodicSoftwareSwerve();
     RobotContainer.driveBase.periodicHardwareSwerve();
+
+    //armStuff
+    RobotContainer.arm.armPeriodic();
   
   }
 
@@ -146,11 +149,15 @@ public class Robot extends LoggedRobot {
     } else if(IO.getRightBumperReleased()) {
       CommandScheduler.getInstance().cancelAll();
     }
+
+    //ARM   
+    RobotContainer.arm.SetPointMode();
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
   }
 
   /** This function is called periodically when disabled. */
