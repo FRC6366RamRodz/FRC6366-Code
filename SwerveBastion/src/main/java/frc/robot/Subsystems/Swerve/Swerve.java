@@ -59,10 +59,8 @@ public class Swerve {
 
 
         Transform2d offset;
-        if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getBoolean(false) == true) {
-            Translation2d OfsetPose = botPose2d.getTranslation().minus(swerve.getPose2d().getTranslation());
-            offset = new Transform2d(OfsetPose, swerve.getHeading());
-            swerve.LimeOffsetPose2d(offset);
+        if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0)) == 1) {
+            swerve.resetOdometry(botPose2d);
         } else {
         }
        
