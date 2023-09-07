@@ -13,6 +13,7 @@ import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -31,13 +32,13 @@ public final class Autos {
             return Commands.sequence(autoBuilder.fullAuto(example1));
     }
 
-    public static CommandBase inMatchAuto(SwerveSparkMax swerve, DummySubsystem sub) {
+    public static CommandBase inMatchAuto(SwerveSparkMax swerve, DummySubsystem sub, Pose2d inmtchPose) {
         PathPlannerTrajectory example;
 
         example = PathPlanner.generatePath(
 
-                new PathConstraints(4, 2), new PathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0), Rotation2d.fromDegrees(0)), 
-                new PathPoint(new Translation2d(3, 5), Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(90)));
+                new PathConstraints(4, 2), new PathPoint(new Translation2d(swerve.getPose2d().getX(), swerve.getPose2d().getY()), swerve.getHeading(), swerve.getPose2d().getRotation()), 
+                new PathPoint(new Translation2d(inmtchPose.getX(), inmtchPose.getY()), inmtchPose.getRotation(), inmtchPose.getRotation()));
 
                 return Commands.sequence(new FollowTrajectory(swerve, example, false, sub));
     }
