@@ -106,6 +106,10 @@ public class SwerveSparkMax implements SwerveIO {
         SwerveDrive.postTrajectory(trajectory);
     }
 
+    public void zeroGyro() {
+        SwerveDrive.zeroGyro();
+    }
+
 
 //controlls loops
     public void periodicHardwareSwerve() {

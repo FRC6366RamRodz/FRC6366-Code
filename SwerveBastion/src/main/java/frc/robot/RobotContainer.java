@@ -39,4 +39,6 @@ public class RobotContainer {
     public Command MatchAuto() {
         return Autos.inMatchAuto(driveBase, sub, RobotContainer.inmtchato.autoSelect());
     }
+
+    public static final Autos inmtchAuto = new Autos(driveBase);
 }

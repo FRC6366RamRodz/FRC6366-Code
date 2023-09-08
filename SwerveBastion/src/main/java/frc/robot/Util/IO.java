@@ -51,7 +51,7 @@ public class IO {
     }
 
     public static boolean getRightBumperPressed() {//autoDrive
-       return driver.getRightBumperPressed();
+       return driver.getRightBumper();
     }
 
     public static boolean getRightBumperReleased() {//deactivate autoDrive
@@ -72,6 +72,14 @@ public class IO {
 
     public static boolean getLeftBumper() {
         return driver.getLeftBumper();
+    }
+
+    public static boolean getXAbutton() {
+        if (driver.getAButton() && driver.getXButton()){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     //Operator

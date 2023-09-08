@@ -18,6 +18,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Util.ControllConstants;
+import frc.robot.Util.IO;
 import frc.robot.Util.RobotContants;
 import swervelib.SwerveController;
 import swervelib.math.SwerveMath;
@@ -91,6 +92,10 @@ public class Swerve {
 
         if(Lock) {
             swerve.lockPose();
+        }
+
+        if(IO.getXAbutton()) {
+            swerve.zeroGyro();
         }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(vX, vY, hdngHorz, hdngVert);

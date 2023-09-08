@@ -4,6 +4,8 @@
 
 package frc.robot.Subsystems.Swerve.inMatchAuto;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,34 +35,34 @@ public class InMatchAuto {
             if (IO.GetBbuttonOP()) {
             
                 if(IO.GetDpadLeftOP()) {
-                    return autoPose = new Pose2d(1.85, 0.5, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 0.5, new Rotation2d(180));
                 } else if (IO.GetDpadRightOP()) {
-                    return autoPose = new Pose2d(1.85, 1.63, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 2.1, new Rotation2d(180));
                 } else {
-                    return autoPose = new Pose2d(1.85, 1.06, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 1.00, new Rotation2d(180));
                 }
                 
             } else if (IO.GetAbuttonOP()) {
 
                 if(IO.GetDpadLeftOP()) {
-                    return autoPose = new Pose2d(1.85, 2.18, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 2.1, new Rotation2d(180));
                 } else if (IO.GetDpadRightOP()) {
-                    return autoPose = new Pose2d(1.85, 3.30, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 3.2, new Rotation2d(180));
                 } else {
-                    return autoPose = new Pose2d(1.85, 2.75, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 2.7, new Rotation2d(180));
                 }
 
             } else if (IO.GetXbuttonOP()) {
 
                 if(IO.GetDpadLeftOP()) {
-                    return autoPose = new Pose2d(1.85, 3.87, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 3.8, new Rotation2d(180));
                 } else if (IO.GetDpadRightOP()) {
-                    return autoPose = new Pose2d(1.85, 4.98, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 4.9, new Rotation2d(180));
                 } else {
-                    return autoPose = new Pose2d(1.85, 4.42, new Rotation2d(180));
+                    return autoPose = new Pose2d(1.9, 4.4, new Rotation2d(180));
                 }
 
-            } else if (IO.getYbutton()) {
+            } else if (IO.GetYbuttonOP()) {
 
                 if(IO.GetDpadLeftOP()) {
                     return autoPose = new Pose2d(14.95, 6.21, new Rotation2d(0));
@@ -107,7 +109,7 @@ public class InMatchAuto {
                     return autoPose = new Pose2d(14.68, 4.42, new Rotation2d(180));
                 }
 
-            } else if (IO.getYbutton()) {
+            } else if (IO.GetYbuttonOP()) {
 
                 if(IO.GetDpadLeftOP()) {
                     return autoPose = new Pose2d(1.6, 6.21, new Rotation2d(0));
@@ -124,5 +126,5 @@ public class InMatchAuto {
 
         }
 
-    }
+    } 
 }
