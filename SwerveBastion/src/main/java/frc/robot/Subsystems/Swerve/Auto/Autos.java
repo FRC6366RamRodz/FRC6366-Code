@@ -57,7 +57,7 @@ public final class Autos {
     }
 
 
-    private final ProfiledPIDController driveController = new ProfiledPIDController(5, 3, 0.5, new TrapezoidProfile.Constraints(4, 3), 0.02);
+    private final ProfiledPIDController driveController = new ProfiledPIDController(50, 0, 0, new TrapezoidProfile.Constraints(4, 3), 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(1.8, 0, 0.01, new TrapezoidProfile.Constraints(Units.degreesToRadians(180), Units.degreesToRadians(180)), 0.02);
     private double driveErrorAbs;
     private double thetaErrorAbs;
@@ -78,11 +78,11 @@ public final class Autos {
         double ffScalar = MathUtil.clamp((currentDistance - 0.2) / (0.8 - 0.2), 0, 1.0);
         driveErrorAbs = currentDistance;
 
-        double driveVelocityScalar = driveController.getSetpoint().velocity * 1 + driveController.calculate(driveErrorAbs, 0.0);
+        double driveVelocityScalar = driveController.getSetpoint().velocity * ffScalar + driveController.calculate(driveErrorAbs, 0.0);
         if (driveController.atGoal()) driveVelocityScalar = 0.0;
         lastSetpointTranslation = new Pose2d(targetpose.getTranslation(), currentPose.getTranslation().minus(targetpose.getTranslation()).getAngle()).transformBy(GeomUtil.translationToTransform(driveController.getSetpoint().position, 0.0)).getTranslation();
 
-        double thetaVelocity = thetaController.getSetpoint().velocity * 1 + thetaController.calculate(currentPose.getRotation().getRadians(), targetpose.getRotation().getRadians());
+        double thetaVelocity = thetaController.getSetpoint().velocity * ffScalar + thetaController.calculate(currentPose.getRotation().getRadians(), targetpose.getRotation().getRadians());
         thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetpose.getRotation()).getRadians());
         if (thetaController.atGoal()) thetaVelocity = 0.0;
 
