@@ -82,6 +82,10 @@ public class IO {
         }
     }
 
+    public static boolean getR3() {
+        return driver.getRightStickButton();
+    }
+
     //Operator
     private static final XboxController operator = new XboxController(1); //reference 360 for controll names
 

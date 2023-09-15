@@ -103,6 +103,11 @@ public class Swerve {
         Translation2d translation = SwerveController.getTranslation2d(desiredSpeeds);
         translation = SwerveMath.limitVelocity(translation, swerve.getFieldVelocity(), swerve.getPose2d(), 0.13, RobotContants.RobotMass, List.of(RobotContants.Chassis), swerve.getSwerveDriveConfig());
 
-        io.run(translation, desiredSpeeds.omegaRadiansPerSecond, true, isOpenLoop);
+        if (IO.getR3()) {
+            io.run(translation, hdngHorz*5, true, isOpenLoop);
+        } else {
+            io.run(translation, desiredSpeeds.omegaRadiansPerSecond, true, isOpenLoop);
+        }
+
     }
 }
