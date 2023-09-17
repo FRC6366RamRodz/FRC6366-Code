@@ -11,6 +11,11 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import frc.robot.Util.Constants.DT_PIDF;
+
 /** Add your docs here. */
 public class TSSHardware implements TssIO {
     private static TalonFX LF_MOTOR;
@@ -19,6 +24,8 @@ public class TSSHardware implements TssIO {
     private static TalonFX RR_MOTOR;
     private static CANSparkMax STF_MOTOR;
     private static CANSparkMax STR_MOTOR;
+    private static Solenoid stinger;
+    private static Solenoid Strafe;
 
     public TSSHardware() {
         LF_MOTOR = new TalonFX(0);
@@ -32,9 +39,59 @@ public class TSSHardware implements TssIO {
         config.voltageCompSaturation = 12.0;
         config.statorCurrLimit.enable = true;
         config.statorCurrLimit.currentLimit = 40;
+        config.nominalOutputForward = 0;
+        config.nominalOutputReverse = 0;
+        config.peakOutputForward = 1;
+        config.peakOutputReverse = -1;
+        config.motionAcceleration = 6000.0;
+        config.motionCruiseVelocity = 6000.0;
 
         LF_MOTOR.configAllSettings(config);
         RF_MOTOR.configAllSettings(config);
+
+        LF_MOTOR.config_kP(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_PG,
+            DT_PIDF.DT_TimeoutMs
+        );
+        LF_MOTOR.config_kI(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_IG,
+            DT_PIDF.DT_TimeoutMs
+        );
+        LF_MOTOR.config_kD(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_DG,
+            DT_PIDF.DT_TimeoutMs
+        );
+        LF_MOTOR.config_kF(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_F,
+            DT_PIDF.DT_TimeoutMs
+        );
+
+        RF_MOTOR.config_kP(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_PG,
+            DT_PIDF.DT_TimeoutMs
+        );
+        RF_MOTOR.config_kI(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_IG,
+            DT_PIDF.DT_TimeoutMs
+        );
+        RF_MOTOR.config_kD(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_DG,
+            DT_PIDF.DT_TimeoutMs
+        );
+        RF_MOTOR.config_kF(
+            DT_PIDF.DT_PIDLoopIdx,
+            DT_PIDF.DT_Left_F,
+            DT_PIDF.DT_TimeoutMs
+        );
+
+        
 
         LR_MOTOR.follow(LF_MOTOR);
         RR_MOTOR.follow(RF_MOTOR);
@@ -52,6 +109,9 @@ public class TSSHardware implements TssIO {
 
         STF_MOTOR.burnFlash();
         STR_MOTOR.burnFlash();
+
+        Strafe = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+        stinger = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
     }
 
     @Override
@@ -60,10 +120,16 @@ public class TSSHardware implements TssIO {
     }
 
     @Override
-    public void drive(double Left, double Right, double stingFront, double stingRear) {
+    public void drive(double Left, double Right, double stingFront, double stingRear, boolean Strafe, boolean Sringer) {
         LF_MOTOR.set(ControlMode.PercentOutput, Left/12);
         RF_MOTOR.set(ControlMode.PercentOutput, Right/12);
         STF_MOTOR.set(stingFront);
         STR_MOTOR.set(stingRear);
+    }
+
+    @Override
+    public void autonomous(double left, double right) {
+        LF_MOTOR.set(ControlMode.MotionMagic, left);
+        RF_MOTOR.set(ControlMode.MotionMagic, right);
     }
 }

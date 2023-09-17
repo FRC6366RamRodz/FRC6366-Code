@@ -12,6 +12,9 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.hal.CTREPCMJNI;
+import frc.robot.Util.IO;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -24,6 +27,7 @@ public class Robot extends LoggedRobot {
   private static final String customAuto = "My Auto";
   private String autoSelected;
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
+  private boolean tank, strafe, stinger, slow;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -71,11 +75,17 @@ public class Robot extends LoggedRobot {
     // Initialize auto chooser
     chooser.addDefaultOption("Default Auto", defaultAuto);
     chooser.addOption("My Auto", customAuto);
+
+    tank = false;
+    stinger = false;
+    strafe = false;
+    slow = false;
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    RobotContainer.TSS.periodicDrive();
   }
 
   /** This function is called once when autonomous is enabled. */
@@ -83,6 +93,11 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autoSelected = chooser.get();
     System.out.println("Auto selected: " + autoSelected);
+
+    tank = false;
+    stinger = false;
+    strafe = false;
+    slow = false;
   }
 
   /** This function is called periodically during autonomous. */
@@ -90,11 +105,11 @@ public class Robot extends LoggedRobot {
   public void autonomousPeriodic() {
     switch (autoSelected) {
       case customAuto:
-        // Put custom auto code here
+        RobotContainer.TSS.auto();
         break;
       case defaultAuto:
       default:
-        // Put default auto code here
+        RobotContainer.TSS.auto();
         break;
     }
   }
@@ -102,16 +117,45 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    tank = false;
+    stinger = false;
+    strafe = false;
+    slow = false;
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    if (IO.getRightBumperPressed()) {
+      tank = false;
+      stinger = !stinger;
+      strafe = false;
+    } else if (IO.getLeftBumperPressed()) {
+      tank = false;
+      stinger = false;
+      strafe = !strafe;
+    } else if (IO.getAbuttonPressed()) {
+      tank = !tank;
+      stinger = false;
+      strafe = false;
+    }
+
+    if (IO.getXButtonPressed()) {
+      slow = !slow;
+    }
+
+
+
+    RobotContainer.TSS.TSSLogic(stinger, strafe, tank, slow);
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    tank = false;
+    stinger = false;
+    strafe = false;
+    slow = false;
   }
 
   /** This function is called periodically when disabled. */
