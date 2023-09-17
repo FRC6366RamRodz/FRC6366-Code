@@ -125,6 +125,8 @@ public class TSSHardware implements TssIO {
         RF_MOTOR.set(ControlMode.PercentOutput, Right/12);
         STF_MOTOR.set(stingFront);
         STR_MOTOR.set(stingRear);
+        stinger.set(Sringer);
+        TSSHardware.Strafe.set(Strafe);
     }
 
     @Override
