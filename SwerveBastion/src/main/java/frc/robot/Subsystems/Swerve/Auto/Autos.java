@@ -61,8 +61,8 @@ public final class Autos {
                 return Commands.sequence(new FollowTrajectory(swerve, example, false, sub));
     }
 
-
-    private final PIDController driveController = new PIDController(5, 0.0, 0.02);
+    private final ProfiledPIDController driveController = new ProfiledPIDController(4, 0.0, 0.0, new TrapezoidProfile.Constraints(Units.feetToMeters(12), Units.feetToMeters(12)), 0.02);
+    //private final PIDController driveController = new PIDController(5, 0.0, 0.02);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(1.8, 0, 0.01, new TrapezoidProfile.Constraints(Units.degreesToRadians(180), Units.degreesToRadians(180)), 0.02);
     private double driveErrorAbs;
     private double thetaErrorAbs;
@@ -82,12 +82,14 @@ public final class Autos {
         double ffScalar = MathUtil.clamp((currentDistance - 0.2) / (0.8-0.2), 0, 1.0);
         driveErrorAbs = currentDistance;
 
-        double driveVelocityScalar = driveController.getSetpoint() * 1 + driveController.calculate(driveErrorAbs, 0.0);
+        double driveVelocityScalar = driveController.getSetpoint().velocity * ffScalar + driveController.calculate(driveErrorAbs, 0.0);
+        //double driveVelocityScalar = driveController.getSetpoint() * 1 + driveController.calculate(driveErrorAbs, 0.0);
         if (driveController.atSetpoint()) driveVelocityScalar = 0.0;
-        lastSetpointTranslation = new Pose2d(targetpose.getTranslation(), currentPose.getTranslation().minus(targetpose.getTranslation()).getAngle()).transformBy(GeomUtil.translationToTransform(driveController.getSetpoint(), 0.0)).getTranslation();
+        lastSetpointTranslation = new Pose2d(targetpose.getTranslation(), currentPose.getTranslation().minus(targetpose.getTranslation()).getAngle()).transformBy(GeomUtil.translationToTransform(driveController.getSetpoint().position, 0.0)).getTranslation();
+//        lastSetpointTranslation = new Pose2d(targetpose.getTranslation(), currentPose.getTranslation().minus(targetpose.getTranslation()).getAngle()).transformBy(GeomUtil.translationToTransform(driveController.getSetpoint(), 0.0)).getTranslation();
 
-        double thetaVelocity = thetaController.getSetpoint().velocity * 1 + thetaController.calculate(currentPose.getRotation().getRadians(), targetpose.getRotation().getRadians());
-        thetaErrorAbs = Math.abs(currentPose.getRotation().minus(targetpose.getRotation()).getRadians());
+        double thetaVelocity = thetaController.getSetpoint().velocity * 1 + thetaController.calculate(swerve.getHeading().getRadians(), targetpose.getRotation().getRadians());
+        thetaErrorAbs = Math.abs(swerve.getHeading().minus(targetpose.getRotation()).getRadians());
         if (thetaController.atGoal()) thetaVelocity = 0.0;
 
         var driveVelocity = new Pose2d(new Translation2d(), currentPose.getTranslation().minus(targetpose.getTranslation()).getAngle()).transformBy(GeomUtil.translationToTransform(driveVelocityScalar, 0.0)).getTranslation();
