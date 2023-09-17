@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.pathplanner.lib.server.PathPlannerServer;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.PneumaticHub;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Util.ControllConstants;
@@ -33,6 +34,7 @@ public class Robot extends LoggedRobot {
   private RobotContainer m_RobotContainer;
   private Command m_autonomousCommand;
   private Command m_DriveAuto;
+  PneumaticHub m_ph = new PneumaticHub(1);
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -89,7 +91,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-
+    //Compressor
+    m_ph.enableCompressorAnalog(90,115);
     //swerve stuff
     CommandScheduler.getInstance().run();
     RobotContainer.Swerve.PeriodicSoftwareSwerve();
