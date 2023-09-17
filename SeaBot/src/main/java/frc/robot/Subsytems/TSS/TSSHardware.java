@@ -133,5 +133,7 @@ public class TSSHardware implements TssIO {
     public void autonomous(double left, double right) {
         LF_MOTOR.set(ControlMode.MotionMagic, left);
         RF_MOTOR.set(ControlMode.MotionMagic, right);
+        stinger.set(false);
+        TSSHardware.Strafe.set(false);
     }
 }
