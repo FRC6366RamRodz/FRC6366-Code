@@ -6,8 +6,6 @@ package frc.robot.Subsystems.Arm;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.SparkMaxLimitSwitch;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;

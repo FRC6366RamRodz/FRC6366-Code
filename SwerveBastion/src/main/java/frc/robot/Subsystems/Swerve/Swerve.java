@@ -11,7 +11,6 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -59,9 +58,12 @@ public class Swerve {
         Logger.getInstance().recordOutput("LimeLight Pose", botPose2d);
 
 
-        Transform2d offset;
+       double x = (botPose2d.getX() + swerve.getPose2d().getX())/2;
+       double y = (botPose2d.getY() + swerve.getPose2d().getY())/2;
+
+        Pose2d pose2dd = new Pose2d(x, y, swerve.getHeading());
         if ((NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0)) == 1) {
-            swerve.resetOdometry(botPose2d);
+            swerve.resetOdometry(pose2dd);
         } else {
         }
        
