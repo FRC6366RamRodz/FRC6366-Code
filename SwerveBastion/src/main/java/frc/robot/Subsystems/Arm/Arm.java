@@ -6,6 +6,7 @@ package frc.robot.Subsystems.Arm;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -52,6 +53,27 @@ public class Arm {
         Logger.getInstance().processInputs("Arm", inputs);
 
         Logger.getInstance().recordOutput("Arm2d", arm);     
+    }
+
+    public void AutoMode(double Uarm, double Larm, double IntakeSpeed, boolean intakeMode, boolean elbow) {
+
+        double UpArm = MathUtil.clamp(UarmPID.calculate(Uarm), -1, 1);
+        double LoArm = MathUtil.clamp(LarmPID.calculate(Larm), -1, 1);
+
+        boolean Ubrake, Lbrake;
+        if (getUpperCoder() >= Uarm-0.15 && getUpperCoder() <= Uarm+0.15) {
+            Ubrake = false;
+        } else {
+            Ubrake = true;
+        }
+
+        if (getLowerCoder() >= Larm-0.15 && getLowerCoder() <= Larm+0.15) {
+            Lbrake = false;
+        } else {
+            Lbrake = true;
+        }
+
+        io.setSpeed(UpArm, LoArm, elbow, Lbrake, Ubrake, intakeMode, IntakeSpeed);
     }
 
     public void SetPointMode() {
@@ -187,6 +209,8 @@ public class Arm {
             Lbrake = true;
         }
 
+
+//wristFlag
         if (getUpperCoder() >= setArm2-5 && getUpperCoder() <= setArm2+5) {
             wristFlag = true;
         } else {

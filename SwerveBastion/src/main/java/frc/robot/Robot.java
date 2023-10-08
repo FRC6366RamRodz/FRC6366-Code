@@ -35,6 +35,7 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private Command m_DriveAuto;
   PneumaticHub m_ph = new PneumaticHub(1);
+  private String autoName;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -116,21 +117,29 @@ public class Robot extends LoggedRobot {
         break;
       case defaultAuto:
       default:
-        m_autonomousCommand = m_RobotContainer.getAutonomousCommand("SamplePath");
+          autoName = new String("SamplePath");
         break;
     }
 
+    m_autonomousCommand = m_RobotContainer.getAutonomousCommand(autoName);
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.schedule();
     } 
+
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-
+    String currentCommand = RobotContainer.inmtchAuto.autoMarkers(autoName);
+  
+    if(currentCommand == "IntakeDown") {
+        
+        RobotContainer.arm.SetPointMode();
+    }
   }
 
   /** This function is called once when teleop is enabled. */
