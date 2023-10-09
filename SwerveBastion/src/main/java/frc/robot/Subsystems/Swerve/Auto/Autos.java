@@ -5,28 +5,23 @@
 package frc.robot.Subsystems.Swerve.Auto;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
+import com.pathplanner.lib.PathPlannerTrajectory.EventMarker;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.RobotContainer;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
 import frc.robot.Util.GeomUtil;
 import frc.robot.Util.RobotContants;
@@ -43,18 +38,18 @@ public final class Autos {
     }
 
     public static CommandBase startAuto(SwerveSparkMax swerve, String path) {
-        boolean onTheFly = false;
+    
         List<PathPlannerTrajectory> example1 = PathPlanner.loadPathGroup(path, new PathConstraints(4, 3));
             SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(swerve::getPose2d, swerve::resetOdometry, new PIDConstants(Auton.yAutoPID.p, Auton.yAutoPID.i, Auton.yAutoPID.d), new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d), swerve::setChasisSpeeds, null, true);
 
             
-            return Commands.sequence(autoBuilder.fullAuto(example1));
-
+            return Commands.sequence(autoBuilder.followPathGroupWithEvents(example1));
+           
         
     }
 
     public String autoMarkers(String path) {
-        PathPlannerTrajectory example1 = PathPlanner.loadPath(path, null);
+        PathPlannerTrajectory example1 = PathPlanner.loadPath(path, new PathConstraints(4, 3));;
         return example1.getMarkers().toString();
     }
 
