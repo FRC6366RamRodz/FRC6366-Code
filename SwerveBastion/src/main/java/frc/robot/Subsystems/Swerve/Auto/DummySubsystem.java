@@ -7,4 +7,5 @@ package frc.robot.Subsystems.Swerve.Auto;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Add your docs here. */
-public class DummySubsystem extends SubsystemBase{}
+public class DummySubsystem extends SubsystemBase{
+}

@@ -134,7 +134,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    String currentCommand = RobotContainer.inmtchAuto.autoMarkers(autoName);
+      
         /*
        * Position References
        * idle U=-90 L=19
@@ -142,11 +142,6 @@ public class Robot extends LoggedRobot {
        * High U=-7 L=20
        * Intake U=-74 L=-8
        */
-    if(currentCommand == "IntakeDown") {
-        RobotContainer.arm.AutoMode(-74, -8, -0.5, false, true);
-    } else {
-        RobotContainer.arm.AutoMode(-90, 19, 0, false, false);
-    }
   }
 
   /** This function is called once when teleop is enabled. */
