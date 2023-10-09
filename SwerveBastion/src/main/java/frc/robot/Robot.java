@@ -113,7 +113,7 @@ public class Robot extends LoggedRobot {
 
     switch (autoSelected) {
       case customAuto:
-
+        autoName = new String("SamplePath");
         break;
       case defaultAuto:
       default:
@@ -135,10 +135,17 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {
     String currentCommand = RobotContainer.inmtchAuto.autoMarkers(autoName);
-  
+        /*
+       * Position References
+       * idle U=-90 L=19
+       * Mid U=-47 L=52
+       * High U=-7 L=20
+       * Intake U=-74 L=-8
+       */
     if(currentCommand == "IntakeDown") {
-        
-        RobotContainer.arm.SetPointMode();
+        RobotContainer.arm.AutoMode(-74, -8, -0.5, false, true);
+    } else {
+        RobotContainer.arm.AutoMode(-90, 19, 0, false, false);
     }
   }
 

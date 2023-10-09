@@ -55,7 +55,7 @@ public class Arm {
         Logger.getInstance().recordOutput("Arm2d", arm);     
     }
 
-    public void AutoMode(double Uarm, double Larm, double IntakeSpeed, boolean intakeMode, boolean elbow) {
+    public void AutoMode(double Uarm, double Larm, double IntakeSpeed, boolean intakeMode, boolean wrist) {
 
         double UpArm = MathUtil.clamp(UarmPID.calculate(Uarm), -1, 1);
         double LoArm = MathUtil.clamp(LarmPID.calculate(Larm), -1, 1);
@@ -73,7 +73,7 @@ public class Arm {
             Lbrake = true;
         }
 
-        io.setSpeed(UpArm, LoArm, elbow, Lbrake, Ubrake, intakeMode, IntakeSpeed);
+        io.setSpeed(UpArm, LoArm, wrist, Lbrake, Ubrake, intakeMode, IntakeSpeed);
     }
 
     public void SetPointMode() {
