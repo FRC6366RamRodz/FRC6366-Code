@@ -57,8 +57,8 @@ public class Arm {
 
     public void AutoMode(double Uarm, double Larm, double IntakeSpeed, boolean intakeMode, boolean wrist) {
 
-        double UpArm = MathUtil.clamp(UarmPID.calculate(Uarm), -1, 1);
-        double LoArm = MathUtil.clamp(LarmPID.calculate(Larm), -1, 1);
+        double UpArm = MathUtil.clamp(UarmPID.calculate(getUpperCoder() ,Uarm), -1, 1);
+        double LoArm = MathUtil.clamp(LarmPID.calculate(getLowerCoder(), Larm), -1, 1);
 
         boolean Ubrake, Lbrake;
         if (getUpperCoder() >= Uarm-0.15 && getUpperCoder() <= Uarm+0.15) {
@@ -74,6 +74,9 @@ public class Arm {
         }
 
         io.setSpeed(UpArm, LoArm, wrist, Lbrake, Ubrake, intakeMode, IntakeSpeed);
+        m_lowerArm.setAngle(getLowerCoder()-getUpperCoder());
+        m_upperArm.setAngle(getUpperCoder());
+        m_intake.setAngle(getIntake());
     }
 
     public void SetPointMode() {

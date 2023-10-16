@@ -85,4 +85,12 @@ public class ArmSparkMax implements ArmIO {
         LowerArm.set(lowerSpeed);
     }
 
+    public double getUArm() {
+        return UpperArm.get();
+    }
+
+    public double getLarm() {
+        return LowerArm.get();
+    }
+
 }
