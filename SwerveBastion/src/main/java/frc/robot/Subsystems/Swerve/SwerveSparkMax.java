@@ -30,7 +30,7 @@ public class SwerveSparkMax implements SwerveIO {
 
 //instantiate swerve
     public SwerveSparkMax(File directory) {
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.LOW;
         try {
             SwerveDrive = new SwerveParser(directory).createSwerveDrive();
         } catch (Exception e) {

@@ -33,7 +33,7 @@ public class ArmSparkMax implements ArmIO {
         LowerArm = new CANSparkMax(6, MotorType.kBrushless);
 
         UpperArm.setInverted(false);
-        LowerArm.setInverted(false);
+        LowerArm.setInverted(true);
 
         UpperCoder = new CANCoder(5);
         LowerCoder = new CANCoder(6);
@@ -41,10 +41,10 @@ public class ArmSparkMax implements ArmIO {
         UpperArm.burnFlash();
         LowerArm.burnFlash();
 
-        ArmBrakeL = new Solenoid(PneumaticsModuleType.REVPH, 1);
-        ArmBrakeU = new Solenoid(PneumaticsModuleType.REVPH, 2);
+        ArmBrakeL = new Solenoid(PneumaticsModuleType.REVPH, 0);
+        ArmBrakeU = new Solenoid(PneumaticsModuleType.REVPH, 1);
         Wrist = new Solenoid(PneumaticsModuleType.REVPH, 3);
-        ClawMode = new Solenoid(PneumaticsModuleType.REVPH, 4);
+        ClawMode = new Solenoid(PneumaticsModuleType.REVPH, 2);
 
         LeftIntake = new CANSparkMax(7, MotorType.kBrushless);
         RightIntake = new CANSparkMax(8, MotorType.kBrushless);

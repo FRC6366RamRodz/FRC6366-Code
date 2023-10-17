@@ -31,9 +31,9 @@ public class ControllConstants {
     }
 
     public static class ARM {
-        public static final double kP = 0.009; 
+        public static final double kP = 0.002; 
         public static final double kI = 0;
-        public static final double kD = 0.0001; 
+        public static final double kD = 0; 
         public static final double kIz = 0; 
         public static final double kFF = 0.000015; 
         public static final double kMaxOutput = 1; 
@@ -43,7 +43,7 @@ public class ControllConstants {
         public static final double maxAcc = 20000;
         public static final double minVel = 0;
         public static final double allowedErr = 0.01;
-        public static final double ArmUOffset = 0;
-        public static final double ArmLOffset = 0;
+        public static final double ArmUOffset = 63.369;
+        public static final double ArmLOffset = 303.75;
     }
 }

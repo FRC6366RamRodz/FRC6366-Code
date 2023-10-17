@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmSim;
+import frc.robot.Subsystems.Arm.ArmSparkMax;
 import frc.robot.Subsystems.Swerve.Swerve;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
 import frc.robot.Subsystems.Swerve.Auto.Autos;
@@ -32,7 +33,7 @@ public class RobotContainer {
         return Autos.startAuto(driveBase, path);
     }
     
-    public static final Arm arm = new Arm(new ArmSim());
+    public static final Arm arm = new Arm(new ArmSparkMax());
 
     public static final InMatchAuto inmtchato = new InMatchAuto();
 

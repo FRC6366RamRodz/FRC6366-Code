@@ -41,8 +41,8 @@ public class Arm {
     public Arm(ArmIO io) {
         this.io = io; 
 
-        UarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
-        LarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
+        UarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD, 0.02);
+        LarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD, 0.02);
 
         upDebounce = new Timer();
         downDebounce = new Timer();
@@ -127,12 +127,12 @@ public class Arm {
             wristTst = true;
         } else {
             UsetPoint = -90;
-            LsetPoint = 19;
+            LsetPoint = 90;
             wristTst = false;
         }
 
         if (IO.GetBackOP()){
-            setArm = getUpperCoder();
+            setArm = UsetPoint; //getUpperCoder();
         } else {
             setArm = UsetPoint;
         }
@@ -153,14 +153,14 @@ public class Arm {
             score = 0;
         }
 
-        setArm2 = setArm+offset-score;
+        setArm2 = setArm;//+offset-score;
 
-        if ((getUpperCoder() >= setArm2-10 && getUpperCoder() <= setArm2+10) == false) {
+        if (getUpperCoder()<-20) {
 
-            if (getUpperCoder() < -20) {
-                setElbow = 90-Math.abs(getUpperCoder())+19;
+            if ((getUpperCoder() >= setArm2-10 && getUpperCoder() <= setArm2+10) == true) {
+                setElbow = LsetPoint;
             } else {
-                setElbow = LsetPoint;   
+                setElbow = -90;   
             }
 
         } else if(IO.GetBackOP()) {
@@ -183,19 +183,13 @@ public class Arm {
             downDebounce.reset();
         }
         
+        UarmPID.setSetpoint(setArm2);
         ArmVolt = UarmPID.calculate(getUpperCoder(), setArm2);
-        if (Math.abs(ArmVolt)>1) {
-          ArmVolt2 = Math.abs(ArmVolt)/ArmVolt;
-        } else {
-            ArmVolt2 = ArmVolt;
-        }
+        ArmVolt2 = MathUtil.clamp(ArmVolt, -1, 1);
 
-        elbowVolt = LarmPID.calculate(getLowerCoder(), setElbow);
-        if (Math.abs(elbowVolt)>1) {
-            elbowVolt2 = Math.abs(elbowVolt)/elbowVolt;
-        } else {
-            elbowVolt2 = elbowVolt;
-        }
+        LarmPID.setSetpoint(setElbow);
+        elbowVolt = LarmPID.calculate(getLowerCoder());
+        elbowVolt2 = MathUtil.clamp(elbowVolt, -1, 1);
 
         
 //Brakes
