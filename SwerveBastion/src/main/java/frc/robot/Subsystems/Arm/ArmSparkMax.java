@@ -33,10 +33,12 @@ public class ArmSparkMax implements ArmIO {
         LowerArm = new CANSparkMax(6, MotorType.kBrushless);
 
         UpperArm.setInverted(false);
-        LowerArm.setInverted(true);
+        LowerArm.setInverted(false);
 
         UpperCoder = new CANCoder(5);
         LowerCoder = new CANCoder(6);
+        UpperCoder.configMagnetOffset(118.03);
+        LowerCoder.configMagnetOffset(-122.87);
 
         UpperArm.burnFlash();
         LowerArm.burnFlash();
@@ -57,8 +59,8 @@ public class ArmSparkMax implements ArmIO {
 
     @Override
     public void updateInputs(ArmIOInputs inputs) {
-        inputs.LowerCoderPosition = LowerCoder.getAbsolutePosition()-ARM.ArmLOffset;
-        inputs.UpperCoderPosition = UpperCoder.getAbsolutePosition()-ARM.ArmUOffset;
+        inputs.LowerCoderPosition = LowerCoder.getAbsolutePosition();
+        inputs.UpperCoderPosition = UpperCoder.getAbsolutePosition();
         inputs.BrakeL = ArmBrakeL.get();
         inputs.BrakeU = ArmBrakeU.get();
 
@@ -78,7 +80,7 @@ public class ArmSparkMax implements ArmIO {
         ArmBrakeU.set(Ubrake);
         Wrist.set(Intake);
         ClawMode.set(IntakeMode);
-        LeftIntake.set(IntakeSpeed);
+        LeftIntake.set(-IntakeSpeed);
         RightIntake.set(-IntakeSpeed);
 
         UpperArm.set(upperSpeed);
