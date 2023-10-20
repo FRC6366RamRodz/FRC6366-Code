@@ -33,7 +33,7 @@ public class RobotContainer {
         return Autos.startAuto(driveBase, path);
     }
     
-    public static final Arm arm = new Arm(new ArmSparkMax());
+    public static final Arm arm = new Arm(new ArmSim());
 
     public static final InMatchAuto inmtchato = new InMatchAuto();
 
