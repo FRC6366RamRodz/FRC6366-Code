@@ -65,7 +65,6 @@ public class Arm {
 
     public void AutoMode(double Uarm, double Larm, double IntakeSpeed, boolean intakeMode, boolean wrist) {
 
-        System.out.print(Uarm);
         double UpArm = MathUtil.clamp(UarmPID.calculate(getUpperCoder() ,Uarm), -1, 1);
         double LoArm = MathUtil.clamp(LarmPID.calculate(getLowerCoder(), Larm), -1, 1);
 
@@ -132,7 +131,7 @@ public class Arm {
             wristTst = true;
         } else if (dbleSttn) {
             UsetPoint = 175;
-            LsetPoint = 180;
+            LsetPoint = 103.5449;
             wristTst = true;
         } else {
             UsetPoint = 88;

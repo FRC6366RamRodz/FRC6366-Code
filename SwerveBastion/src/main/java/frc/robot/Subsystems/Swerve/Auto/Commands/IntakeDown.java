@@ -5,16 +5,14 @@
 package frc.robot.Subsystems.Swerve.Auto.Commands;
 
 
+
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.Subsystems.Arm.Arm;
-import frc.robot.Subsystems.Arm.ArmSparkMax;
+
 
 public class IntakeDown extends CommandBase {
+  public Timer time = new Timer();
   
   /** Creates a new IntakeDown. */
   public IntakeDown() {
@@ -26,11 +24,28 @@ public class IntakeDown extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize(){ 
+    time.reset();
+    time.stop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    time.start();
+
+    if (time.get()<0.5) {
+      RobotContainer.arm.AutoMode(88, 67, 0, false, true);
+    } else if (time.get()<1) {
+      RobotContainer.arm.AutoMode(88, 67, 0.4, false, true);
+    } else if (time.get()<2.8) {
+      RobotContainer.arm.AutoMode(88, 67, 0, false, false);
+    } else if (time.get()<4) {
+      RobotContainer.arm.AutoMode(99, 120, -0.4, false, false);
+    } else if (time.get()<5) {
+      RobotContainer.arm.AutoMode(178, 156, 0, false, true);
+    } else {
+      RobotContainer.arm.AutoMode(178, 156, 0.3, false, true);
+    }
 
   }
 
