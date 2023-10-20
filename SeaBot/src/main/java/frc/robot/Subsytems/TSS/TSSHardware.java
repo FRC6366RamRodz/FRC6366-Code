@@ -26,6 +26,7 @@ public class TSSHardware implements TssIO {
     private static CANSparkMax STR_MOTOR;
     private static Solenoid stinger;
     private static Solenoid Strafe;
+    private static Solenoid Booper;
 
     public TSSHardware() {
         LF_MOTOR = new TalonFX(0);
@@ -112,6 +113,7 @@ public class TSSHardware implements TssIO {
 
         Strafe = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
         stinger = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
+        Booper = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
     }
 
     @Override
@@ -120,20 +122,22 @@ public class TSSHardware implements TssIO {
     }
 
     @Override
-    public void drive(double Left, double Right, double stingFront, double stingRear, boolean Strafe, boolean Sringer) {
+    public void drive(double Left, double Right, double stingFront, double stingRear, boolean Strafe, boolean Sringer, boolean booper) {
         LF_MOTOR.set(ControlMode.PercentOutput, Left/12);
         RF_MOTOR.set(ControlMode.PercentOutput, Right/12);
         STF_MOTOR.set(stingFront);
         STR_MOTOR.set(stingRear);
         stinger.set(Sringer);
         TSSHardware.Strafe.set(Strafe);
+        Booper.set(booper);
     }
 
     @Override
-    public void autonomous(double left, double right) {
+    public void autonomous(double left, double right, boolean booper) {
         LF_MOTOR.set(ControlMode.MotionMagic, left);
         RF_MOTOR.set(ControlMode.MotionMagic, right);
         stinger.set(false);
         TSSHardware.Strafe.set(false);
+        Booper.set(booper);
     }
 }

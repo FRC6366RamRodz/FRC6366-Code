@@ -18,9 +18,9 @@ public interface TssIO {
     public default void UpdateInputs(TssIOInputs inputs) {
     }
 
-    public default void drive(double Left, double Right, double stingFront, double stingRear, boolean Strafe, boolean Sringer) {
+    public default void drive(double Left, double Right, double stingFront, double stingRear, boolean Strafe, boolean Sringer, boolean booper) {
     }
 
-    public default void autonomous(double left, double right) {
+    public default void autonomous(double left, double right, boolean booper) {
     }
 }

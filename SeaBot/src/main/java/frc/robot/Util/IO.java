@@ -45,4 +45,8 @@ public class IO {
     public static boolean getAbuttonPressed() {
         return driver.getAButtonPressed();
     }
+
+    public static boolean getBbutton() {
+        return driver.getBButton();
+    }
 }

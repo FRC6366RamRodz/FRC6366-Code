@@ -30,7 +30,7 @@ public class TSS {
 
         var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation, false);
 
-        io.drive(speeds.left*12, speeds.right*12, 0, 0, false, false);
+        io.drive(speeds.left*12, speeds.right*12, 0, 0, false, false, IO.getBbutton()/*booper */);
     }
 
     public void Strafe(double Leftx, double Rightx) {
@@ -41,7 +41,7 @@ public class TSS {
         
         var speeds = DifferentialDrive.arcadeDriveIK(xSpeed, zRotation, false);
 
-        io.drive(0, 0, speeds.left, speeds.right, true, true);
+        io.drive(0, 0, speeds.left, speeds.right, true, true, IO.getBbutton()/*booper */);
     }
 
     public void Stigner(double Leftx, double Lefty, double Rightx, double Lefttrig, double Righttrig) {
@@ -57,11 +57,11 @@ public class TSS {
         double Right = (LeftY + (LeftX * counter)) + RightX;
         double Stinger = (LeftX + (-(LeftTrig) + RightTrig));
 
-        io.drive(LEFT, Right, 0, Stinger, false, true);
+        io.drive(LEFT, Right, 0, Stinger, false, true, IO.getBbutton()/*booper */);
     }
 
     public void stop() {
-        io.drive(0, 0, 0, 0, false, false);
+        io.drive(0, 0, 0, 0, false, false, false);
     }
 
     public void TSSLogic(boolean sting, boolean strafe, boolean tank, boolean slow) {
@@ -106,7 +106,7 @@ public class TSS {
     }
 
     public void auto() {
-        io.autonomous(-10, -10);
+        io.autonomous(-10, -10, true);
     }
 
 
