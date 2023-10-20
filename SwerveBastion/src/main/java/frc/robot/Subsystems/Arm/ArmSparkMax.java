@@ -11,6 +11,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.Subsystems.Swerve.Auto.Commands.IntakeDown;
 import frc.robot.Util.ControllConstants.ARM;
 
 /** Add your docs here. */
@@ -27,6 +29,8 @@ public class ArmSparkMax implements ArmIO {
     private final Solenoid ArmBrakeL;
     private SparkMaxLimitSwitch ArmUSwitch;
     private SparkMaxLimitSwitch ArmLSwitch;
+    private SparkMaxLimitSwitch intakeSwitchl;
+    private SparkMaxLimitSwitch intakeSwithc2;
 
     public ArmSparkMax() {
         UpperArm = new CANSparkMax(5, MotorType.kBrushless);
@@ -55,6 +59,10 @@ public class ArmSparkMax implements ArmIO {
         ArmLSwitch = UpperArm.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
         ArmUSwitch.enableLimitSwitch(true);
         ArmLSwitch.enableLimitSwitch(true);
+        intakeSwitchl = LeftIntake.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+        intakeSwithc2 = RightIntake.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+        intakeSwitchl.enableLimitSwitch(true);
+        intakeSwithc2.enableLimitSwitch(true);
     }
 
     @Override

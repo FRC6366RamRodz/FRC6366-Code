@@ -23,10 +23,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
+import frc.robot.Subsystems.Swerve.Auto.Commands.ArmHigh;
 import frc.robot.Subsystems.Swerve.Auto.Commands.IntakeDown;
 import frc.robot.Util.GeomUtil;
 import frc.robot.Util.RobotContants;
@@ -44,11 +46,11 @@ public final class Autos {
 
     public static CommandBase startAuto(SwerveSparkMax swerve, String path) {
         HashMap<String, Command> eventMap = new HashMap<>();
+        eventMap.put("ArmHigh", new ArmHigh());
         eventMap.put("IntakeDown", new IntakeDown());
         List<PathPlannerTrajectory> example1 = PathPlanner.loadPathGroup(path, new PathConstraints(4, 3));
             SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(swerve::getPose2d, swerve::resetOdometry, new PIDConstants(Auton.yAutoPID.p, Auton.yAutoPID.i, Auton.yAutoPID.d), new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d), swerve::setChasisSpeeds, eventMap, true);
 
-            
             return Commands.sequence(autoBuilder.fullAuto(example1));
            
         

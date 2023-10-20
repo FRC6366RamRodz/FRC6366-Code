@@ -33,7 +33,7 @@ public class ControllConstants {
     public static class ARM {
         public static final double kP = 0.01; 
         public static final double kI = 0;
-        public static final double kD = 0.0001; 
+        public static final double kD = 0.0000; 
         public static final double kIz = 0; 
         public static final double kFF = 0.000015; 
         public static final double kMaxOutput = 1; 

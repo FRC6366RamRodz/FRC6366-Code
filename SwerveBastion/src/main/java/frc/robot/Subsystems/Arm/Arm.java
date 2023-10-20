@@ -45,8 +45,8 @@ public class Arm {
     public Arm(ArmIO io) {
         this.io = io; 
 
-        UarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD, 0.02);
-        LarmPID = new PIDController(ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD, 0.02);
+        UarmPID = new PIDController(ControllConstants.ARM.kP+0.005, ControllConstants.ARM.kI+0.00, ControllConstants.ARM.kD);
+        LarmPID = new PIDController(ControllConstants.ARM.kP+0.00, ControllConstants.ARM.kI+0.00, ControllConstants.ARM.kD+0);
 
         upDebounce = new Timer();
         downDebounce = new Timer();
@@ -65,6 +65,7 @@ public class Arm {
 
     public void AutoMode(double Uarm, double Larm, double IntakeSpeed, boolean intakeMode, boolean wrist) {
 
+        System.out.print(Uarm);
         double UpArm = MathUtil.clamp(UarmPID.calculate(getUpperCoder() ,Uarm), -1, 1);
         double LoArm = MathUtil.clamp(LarmPID.calculate(getLowerCoder(), Larm), -1, 1);
 
@@ -82,8 +83,8 @@ public class Arm {
         }
 
         io.setSpeed(UpArm, LoArm, wrist, Lbrake, Ubrake, intakeMode, IntakeSpeed);
-        m_lowerArm.setAngle(getLowerCoder()-getUpperCoder());
-        m_upperArm.setAngle(getUpperCoder());
+        m_lowerArm.setAngle(getLowerCoder()-180);
+        m_upperArm.setAngle(getUpperCoder()-180);
         m_intake.setAngle(getIntake());
     }
 
@@ -115,10 +116,10 @@ public class Arm {
         boolean wristTst;
         if (IO.getLeftTrigger()){ //floor intake
             UsetPoint = 99;
-            LsetPoint = 122;
+            LsetPoint = 120;
             wristTst = true;
         } else if (HighPos) {
-            UsetPoint = 173;
+            UsetPoint = 178;
             LsetPoint = 156;
             wristTst = true;
         } else if (MidPos) {
@@ -130,7 +131,7 @@ public class Arm {
             LsetPoint = 50;
             wristTst = true;
         } else if (dbleSttn) {
-            UsetPoint = 180;
+            UsetPoint = 175;
             LsetPoint = 180;
             wristTst = true;
         } else {
@@ -161,7 +162,7 @@ public class Arm {
             score = 0;
         }
 
-        setArm2 = setArm;//+offset-score;
+        setArm2 = setArm+offset-score;
 
         if (getUpperCoder()<160) {
 
@@ -306,10 +307,10 @@ boolean ccont;
                 IntakeSet = 0.0;
             } else {
                 claw2 = clawMode;
-                IntakeSet = 0.2;
+                IntakeSet = 0.3;
             }
         } else if (intakeIn || IO.getLeftTrigger()) {
-            IntakeSet = -0.2;
+            IntakeSet = -0.3;
             claw2=clawMode;
         } else {
             IntakeSet = 0;
@@ -317,9 +318,8 @@ boolean ccont;
         }
 
         io.setSpeed(ArmVolt2, elbowVolt2, wrist, Lbrake, Ubrake, claw2, IntakeSet);
-
-        m_lowerArm.setAngle(getLowerCoder()-getUpperCoder());
-        m_upperArm.setAngle(getUpperCoder());
+        m_lowerArm.setAngle(getLowerCoder()-180);
+        m_upperArm.setAngle(getUpperCoder()-180);
         m_intake.setAngle(getIntake());
 
     }

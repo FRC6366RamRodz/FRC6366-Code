@@ -12,12 +12,12 @@ import frc.robot.Util.RobotContants;
 
 /** Add your docs here. */
 public class ArmSim implements ArmIO {
-    private SingleJointedArmSim upperArm = new SingleJointedArmSim(DCMotor.getNEO(1), 125.0, 0.08, RobotContants.UpperArmLengthinMeter , Units.degreesToRadians(-90), Units.degreesToRadians(90), false);
-    private SingleJointedArmSim lowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 80.0, 0.004, RobotContants.LowerArmLengthinMeter, Units.degreesToRadians(-120), Units.degreesToRadians(120), false);
+    private SingleJointedArmSim upperArm = new SingleJointedArmSim(DCMotor.getNEO(1), 1535.0, 0.08, RobotContants.UpperArmLengthinMeter , Units.degreesToRadians(87), Units.degreesToRadians(190), false);
+    private SingleJointedArmSim lowArmSim = new SingleJointedArmSim(DCMotor.getNEO(1), 1350.0, 0.004, RobotContants.LowerArmLengthinMeter, Units.degreesToRadians(0), Units.degreesToRadians(360), false);
     private SingleJointedArmSim endaffector = new SingleJointedArmSim(DCMotor.getNeo550(1), 50, 0.008, RobotContants.IntakelengthinMeter, Units.degreesToRadians(10), Units.degreesToRadians(90), false);
     private boolean BrakeU = false;
     private boolean BrakeL = false;
-
+    
     @Override
     public void updateInputs(ArmIOInputs inputs) {
         upperArm.update(0.02);
