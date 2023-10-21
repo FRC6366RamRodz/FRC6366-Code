@@ -45,8 +45,8 @@ public class Arm {
     public Arm(ArmIO io) {
         this.io = io; 
 
-        UarmPID = new PIDController(ControllConstants.ARM.kP+0.005, ControllConstants.ARM.kI+0.00, ControllConstants.ARM.kD);
-        LarmPID = new PIDController(ControllConstants.ARM.kP-0.002, ControllConstants.ARM.kI+0.00, ControllConstants.ARM.kD+0);
+        UarmPID = new PIDController(ControllConstants.ARM.kP+0.000, ControllConstants.ARM.kI+0.00, ControllConstants.ARM.kD);
+        LarmPID = new PIDController(ControllConstants.ARM.kP-0.003, ControllConstants.ARM.kI+0.00, ControllConstants.ARM.kD+0);
 
         upDebounce = new Timer();
         downDebounce = new Timer();

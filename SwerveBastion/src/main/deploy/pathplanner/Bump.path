@@ -2,15 +2,15 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8641032153859183,
-        "y": 4.453475573617814
+        "x": 1.8298457109734734,
+        "y": 1.0962401411982325
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.864103215385918,
-        "y": 4.453475573617814
+        "x": 2.8298457109734727,
+        "y": 1.0962401411982325
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": -180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -26,16 +26,41 @@
     },
     {
       "anchorPoint": {
-        "x": 4.456254382594235,
-        "y": 4.967338139804485
+        "x": 3.3600142413960046,
+        "y": 0.5709584068740785
       },
       "prevControl": {
-        "x": 3.7930572524652315,
-        "y": 4.967338139804485
+        "x": 1.702529244082728,
+        "y": 0.5437865216722183
       },
       "nextControl": {
-        "x": 5.1985003115305375,
-        "y": 4.967338139804485
+        "x": 4.05658349778238,
+        "y": 0.5823775750115614
+      },
+      "holonomicAngle": 90.0,
+      "isReversal": false,
+      "velOverride": 1.0,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.581865232106533,
+        "y": 0.5823775750115614
+      },
+      "prevControl": {
+        "x": 4.102260170332307,
+        "y": 0.5709584068740785
+      },
+      "nextControl": {
+        "x": 5.581581905850664,
+        "y": 0.606180352957853
       },
       "holonomicAngle": 90.0,
       "isReversal": false,
@@ -51,12 +76,12 @@
     },
     {
       "anchorPoint": {
-        "x": 6.180548771353953,
-        "y": 4.579086423130112
+        "x": 6.591638824303289,
+        "y": 0.673730920111413
       },
       "prevControl": {
-        "x": 5.180548771353953,
-        "y": 4.579086423130112
+        "x": 5.803716222817061,
+        "y": 0.6280542475614861
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -72,12 +97,5 @@
       }
     }
   ],
-  "markers": [
-    {
-      "position": 0.0,
-      "names": [
-        "IntakeDown"
-      ]
-    }
-  ]
+  "markers": []
 }

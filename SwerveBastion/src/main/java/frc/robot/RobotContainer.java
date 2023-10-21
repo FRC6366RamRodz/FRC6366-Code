@@ -12,6 +12,7 @@ import frc.robot.Subsystems.Arm.Arm;
 import frc.robot.Subsystems.Arm.ArmSim;
 import frc.robot.Subsystems.Arm.ArmSparkMax;
 import frc.robot.Subsystems.Swerve.Swerve;
+import frc.robot.Subsystems.Swerve.SwerveIO;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
 import frc.robot.Subsystems.Swerve.Auto.Autos;
 import frc.robot.Subsystems.Swerve.Auto.DummySubsystem;
@@ -33,7 +34,7 @@ public class RobotContainer {
         return Autos.startAuto(driveBase, path);
     }
     
-    public static final Arm arm = new Arm(new ArmSim());
+    public static final Arm arm = new Arm(new ArmSparkMax());
 
     public static final InMatchAuto inmtchato = new InMatchAuto();
 

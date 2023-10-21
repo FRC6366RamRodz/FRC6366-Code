@@ -29,6 +29,7 @@ import frc.robot.Util.IO;
 public class Robot extends LoggedRobot {
   private static final String defaultAuto = "Default";
   private static final String customAuto = "My Auto";
+  private static final String Balance = "balance";
   private String autoSelected;
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
   private RobotContainer m_RobotContainer;
@@ -86,7 +87,8 @@ public class Robot extends LoggedRobot {
 
     // Initialize auto chooser
     chooser.addDefaultOption("Default Auto", defaultAuto);
-    chooser.addOption("My Auto", customAuto);
+    chooser.addOption("Bump", customAuto);
+    chooser.addOption("bALANCE", Balance);
   }
 
   /** This function is called periodically during all modes. */
@@ -113,7 +115,10 @@ public class Robot extends LoggedRobot {
 
     switch (autoSelected) {
       case customAuto:
-        autoName = new String("SamplePath");
+        autoName = new String("Bump");
+        break;
+      case Balance:
+      autoName = new String("Balance");
         break;
       case defaultAuto:
       default:

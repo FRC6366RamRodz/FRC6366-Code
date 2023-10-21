@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -13,6 +14,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.hal.CTREPCMJNI;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Util.IO;
 
 /**
@@ -28,7 +32,8 @@ public class Robot extends LoggedRobot {
   private String autoSelected;
   private final LoggedDashboardChooser<String> chooser = new LoggedDashboardChooser<>("Auto Choices");
   private boolean tank, strafe, stinger, slow;
-
+  public Compressor compressoor = new Compressor(PneumaticsModuleType.CTREPCM);
+  public Timer timee = new Timer();
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -86,6 +91,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     RobotContainer.TSS.periodicDrive();
+    compressoor.enableDigital();
   }
 
   /** This function is called once when autonomous is enabled. */
@@ -93,7 +99,8 @@ public class Robot extends LoggedRobot {
   public void autonomousInit() {
     autoSelected = chooser.get();
     System.out.println("Auto selected: " + autoSelected);
-
+    timee.stop();
+    timee.reset();
     tank = false;
     stinger = false;
     strafe = false;
@@ -103,13 +110,23 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    timee.start();
     switch (autoSelected) {
       case customAuto:
-        RobotContainer.TSS.auto();
+        if (timee.get()<4) {
+          RobotContainer.TSS.auto();
+        } else {
+          RobotContainer.TSS.Tank(0, 0);
+        }
+
         break;
       case defaultAuto:
       default:
+      if (timee.get()<4) {
         RobotContainer.TSS.auto();
+      } else {
+        RobotContainer.TSS.Tank(0, 0);
+      }
         break;
     }
   }

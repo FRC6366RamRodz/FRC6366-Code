@@ -5,6 +5,7 @@
 package frc.robot.Subsytems.TSS;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Util.IO;
 
@@ -12,10 +13,12 @@ import frc.robot.Util.IO;
 public class TSS {
     private final TssIO io;
     private final TssIOInputsAutoLogged inputs = new TssIOInputsAutoLogged();
+    private Timer timee = new Timer();
 
 
     public TSS(TssIO io) {
         this.io = io;
+        timee = new Timer();
     }
 
     public void periodicDrive() {
@@ -52,7 +55,7 @@ public class TSS {
         double LeftTrig = Math.pow(MathUtil.applyDeadband(Lefttrig, 0.2), 3);
         double RightTrig = Math.pow(MathUtil.applyDeadband(Righttrig, 0.2), 3);
 
-        double counter = 0.2;
+        double counter = 0.4;
         double LEFT = (LeftY - (LeftX * counter)) + RightX;
         double Right = (LeftY + (LeftX * counter)) + RightX;
         double Stinger = (LeftX + (-(LeftTrig) + RightTrig));
@@ -106,7 +109,8 @@ public class TSS {
     }
 
     public void auto() {
-        io.autonomous(-10, -10, true);
+            io.autonomous(-1, -1, true);    
+        
     }
 
 

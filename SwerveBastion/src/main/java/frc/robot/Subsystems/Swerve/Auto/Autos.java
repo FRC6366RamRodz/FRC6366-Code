@@ -27,7 +27,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Subsystems.Swerve.SwerveIO;
 import frc.robot.Subsystems.Swerve.SwerveSparkMax;
+import frc.robot.Subsystems.Swerve.Auto.Commands.AutoBalance;
 import frc.robot.Subsystems.Swerve.Auto.Commands.IntakeDown;
 import frc.robot.Util.GeomUtil;
 import frc.robot.Util.RobotContants;
@@ -37,15 +39,18 @@ import swervelib.math.SwerveMath;
 
 /** Add your docs here. */
 public final class Autos {
+    private SwerveIO io;
     private SwerveSparkMax swerve;
 
     public Autos(SwerveSparkMax swerve) {
         this.swerve = swerve;
+
     }
 
     public static CommandBase startAuto(SwerveSparkMax swerve, String path) {
         HashMap<String, Command> eventMap = new HashMap<>();
         eventMap.put("IntakeDown", new IntakeDown());
+        eventMap.put("AutoBalance", new AutoBalance(swerve));
         List<PathPlannerTrajectory> example1 = PathPlanner.loadPathGroup(path, new PathConstraints(4, 3));
             SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(swerve::getPose2d, swerve::resetOdometry, new PIDConstants(Auton.yAutoPID.p, Auton.yAutoPID.i, Auton.yAutoPID.d), new PIDConstants(Auton.angleAutoPID.p, Auton.angleAutoPID.i, Auton.angleAutoPID.d), swerve::setChasisSpeeds, eventMap, true);
 
@@ -55,7 +60,7 @@ public final class Autos {
     }
 
     public String autoMarkers(String path) {
-        PathPlannerTrajectory example1 = PathPlanner.loadPath(path, new PathConstraints(4, 3));;
+        PathPlannerTrajectory example1 = PathPlanner.loadPath(path, new PathConstraints(1.5, 3));;
         return example1.getMarkers().toString();
     }
 
@@ -64,7 +69,7 @@ public final class Autos {
 
         example = PathPlanner.generatePath(
 
-                new PathConstraints(4, 2), new PathPoint(swerve.getPose2d().getTranslation(), swerve.getPose2d().getRotation(), swerve.getHeading() ), 
+                new PathConstraints(3.0, 2), new PathPoint(swerve.getPose2d().getTranslation(), swerve.getPose2d().getRotation(), swerve.getHeading() ), 
                 new PathPoint( inmtchPose.getTranslation(), swerve.getHeading(), inmtchPose.getRotation()));
 
 

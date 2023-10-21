@@ -106,14 +106,14 @@ public class TSSHardware implements TssIO {
         STR_MOTOR.restoreFactoryDefaults();
 
         STF_MOTOR.setInverted(false);
-        STR_MOTOR.setInverted(false);
+        STR_MOTOR.setInverted(true);
 
         STF_MOTOR.burnFlash();
         STR_MOTOR.burnFlash();
 
-        Strafe = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+        Strafe = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
         stinger = new Solenoid(PneumaticsModuleType.CTREPCM, 1);
-        Booper = new Solenoid(PneumaticsModuleType.CTREPCM, 2);
+        Booper = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
     }
 
     @Override
