@@ -13,6 +13,9 @@
 
 package frc.robot;
 
+import frc.robot.Util.Constants;
+import frc.robot.Util.IO;
+import frc.robot.Util.RobotContainer;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -28,6 +31,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+  private RobotContainer robotContainer;
+
   private static final String defaultAuto = "Default";
   private static final String customAuto = "My Auto";
   private String autoSelected;
@@ -89,11 +94,15 @@ public class Robot extends LoggedRobot {
     // Initialize auto chooser
     chooser.addDefaultOption("Default Auto", defaultAuto);
     chooser.addOption("My Auto", customAuto);
+
+    robotContainer = new RobotContainer();
   }
 
   /** This function is called periodically during all modes. */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    RobotContainer.drive.DrivePeriodic();
+  }
 
   /** This function is called once when autonomous is enabled. */
   @Override
@@ -122,7 +131,10 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    RobotContainer.drive.driveCurveDrive(
+        IO.getLeftY(), IO.getRightX(), Constants.DT_STG.Driver_Sensitivity);
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
@@ -130,7 +142,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    RobotContainer.drive.stop();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
