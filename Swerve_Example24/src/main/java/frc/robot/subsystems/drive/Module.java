@@ -32,8 +32,9 @@ public class Module {
   private final SimpleMotorFeedforward driveFeedforward;
   private final PIDController driveFeedback;
   private final PIDController turnFeedback;
-  private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
-  private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
+  private Rotation2d angleSetpoint =
+      new Rotation2d(0.0); // Setpoint for closed loop control, null for open loop
+  private Double speedSetpoint = 0.0; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private double lastPositionMeters = 0.0; // Used for delta calculation
 
@@ -144,7 +145,7 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnPosition.plus(turnRelativeOffset);
+      return inputs.turnAbsolutePosition;
     }
   }
 

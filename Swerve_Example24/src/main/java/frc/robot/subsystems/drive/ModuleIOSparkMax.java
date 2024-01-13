@@ -26,7 +26,6 @@ import edu.wpi.first.math.util.Units;
  * Module IO implementation for SparkMax drive motor controller, SparkMax turn motor controller (NEO
  * or NEO 550), Modified to use Cancoders
  *
- *
  * <p>To calibrate the absolute encoder offsets, point the modules straight (such that forward
  * motion on the drive motor will propel the robot forward) and copy the reported values from the
  * absolute encoders using AdvantageScope. These values are logged under
@@ -61,21 +60,21 @@ public class ModuleIOSparkMax implements ModuleIO {
         driveSparkMax = new CANSparkMax(2, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(12, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(2);
-        absoluteEncoderOffset = new Rotation2d(1.947); // MUST BE CALIBRATED AND POSITIVE
-        isDriveInverted = true;
+        absoluteEncoderOffset = new Rotation2d(-1.281); // MUST BE CALIBRATED AND POSITIVE
+        isDriveInverted = false;
         break;
       case 2:
         driveSparkMax = new CANSparkMax(4, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(14, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(3);
-        absoluteEncoderOffset = new Rotation2d(2.321); // MUST BE CALIBRATED AND POSITIVE
-        isDriveInverted = true;
+        absoluteEncoderOffset = new Rotation2d(-0.9); // MUST BE CALIBRATED AND POSITIVE
+        isDriveInverted = false;
         break;
       case 3:
         driveSparkMax = new CANSparkMax(3, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(13, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(4);
-        absoluteEncoderOffset = new Rotation2d(0.403); // MUST BE CALIBRATED AND POSITIVE
+        absoluteEncoderOffset = new Rotation2d(0.465); // MUST BE CALIBRATED AND POSITIVE
         isDriveInverted = false;
         break;
       default:
