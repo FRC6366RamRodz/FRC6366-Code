@@ -6,8 +6,13 @@ package frc.robot.subsystems.Shooter;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+
+
 /** Add your docs here. */
-public class Shooter {
+public class Shooter {  
+    private Pose3d angle = new Pose3d();
   private final ShooterIO io;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
@@ -19,9 +24,15 @@ public class Shooter {
     io.updateInputs(inputs);
 
     Logger.processInputs("Shooter", inputs);
+    Logger.recordOutput("Angle", angle);
   }
 
   public void teleop() {
     io.setMotors(0, 0, 0, 0, 0);
+    angle = new Pose3d(0, 0, 0, new Rotation3d(0,0,0));
+  }
+
+  public double getAnlge() {
+    return inputs.anglePosition;
   }
 }
