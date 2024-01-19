@@ -6,15 +6,15 @@ package frc.robot.Subsytems.Flywheel;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 /** Add your docs here. */
 public class FlywheelNeo implements FlywheelIO {
     private final CANSparkMax FLYWHEEL_MOTOR = new CANSparkMax(5, MotorType.kBrushless);
     private final RelativeEncoder FLYWHEEL_ENCODER = FLYWHEEL_MOTOR.getEncoder();
-    private final SparkMaxPIDController FLYWHEEL_PIDCONTROLLER = FLYWHEEL_MOTOR.getPIDController();
+    private final SparkPIDController FLYWHEEL_PIDCONTROLLER = FLYWHEEL_MOTOR.getPIDController();
 
     public FlywheelNeo() {
         FLYWHEEL_MOTOR.restoreFactoryDefaults(false);

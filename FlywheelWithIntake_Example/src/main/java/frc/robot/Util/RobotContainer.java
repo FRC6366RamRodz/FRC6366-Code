@@ -4,6 +4,7 @@
 
 package frc.robot.Util;
 
+import frc.robot.Constants;
 import frc.robot.Subsytems.Flywheel.Flywheel;
 import frc.robot.Subsytems.Flywheel.FlywheelFalcon;
 import frc.robot.Subsytems.Flywheel.FlywheelIO;

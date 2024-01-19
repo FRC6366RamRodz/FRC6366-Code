@@ -9,15 +9,15 @@ import org.littletonrobotics.junction.Logger;
 /** Add your docs here. */
 public class Intake {
     private final IntakeIO io;
-    private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+    //private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     public Intake(IntakeIO io) {
         this.io = io;
     }
 
     public void IntakePeriodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("Intake", inputs);
+       // io.updateInputs(inputs);
+      //  Logger.processInputs("Intake", inputs);
     }
 
     public void runIntake() {

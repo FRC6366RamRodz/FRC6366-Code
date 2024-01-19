@@ -20,7 +20,6 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import frc.robot.Util.Constants;
 import frc.robot.Util.RobotContainer;
 
 /**
@@ -56,7 +55,6 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("GitDirty", "Unknown");
         break;
     }
-
     // Set up data receivers & replay source
     switch (Constants.currentMode) {
       case REAL:
