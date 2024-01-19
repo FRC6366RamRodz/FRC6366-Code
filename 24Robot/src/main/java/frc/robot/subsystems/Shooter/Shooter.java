@@ -4,5 +4,24 @@
 
 package frc.robot.subsystems.Shooter;
 
+import org.littletonrobotics.junction.Logger;
+
 /** Add your docs here. */
-public class Shooter {}
+public class Shooter {
+  private final ShooterIO io;
+  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+
+  public Shooter(ShooterIO io) {
+    this.io = io;
+  }
+
+  public void ShooterPeriodic() {
+    io.updateInputs(inputs);
+
+    Logger.processInputs("Shooter", inputs);
+  }
+
+  public void teleop() {
+    io.setMotors(0, 0, 0, 0, 0);
+  }
+}

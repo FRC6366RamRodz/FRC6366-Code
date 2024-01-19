@@ -98,6 +98,7 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    RobotContainer.shooter.ShooterPeriodic();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -137,7 +138,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    RobotContainer.shooter.teleop();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
