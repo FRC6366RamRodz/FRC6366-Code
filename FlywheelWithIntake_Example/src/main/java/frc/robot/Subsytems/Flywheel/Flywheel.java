@@ -8,28 +8,28 @@ import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class Flywheel {
-    private final FlywheelIO io;
-   // private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
-    
-    public Flywheel(FlywheelIO io) {
-        this.io = io;
-    }
+  private final FlywheelIO io;
+  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
 
-    public void FlywheelPeriodic() {
-      //  io.updateInputs(inputs);
+  public Flywheel(FlywheelIO io) {
+    this.io = io;
+  }
 
-      //  Logger.processInputs("Flywheel", inputs);
-    }
+  public void FlywheelPeriodic() {
+    io.updateInputs(inputs);
 
-    public void velocitySpinUp() {
-        io.setVelocity(0);
-    }
+    Logger.processInputs("Flywheel", inputs);
+  }
 
-    public void velocityHold() {
-        io.setVelocity(0);
-    }
+  public void velocitySpinUp() {
+    io.setVelocity(0);
+  }
 
-    public void stop() {
-        io.setVelocity(0);
-    }
+  public void velocityHold() {
+    io.setVelocity(0);
+  }
+
+  public void stop() {
+    io.setVelocity(0);
+  }
 }

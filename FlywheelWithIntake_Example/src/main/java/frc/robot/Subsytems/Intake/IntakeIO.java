@@ -8,15 +8,14 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
 public interface IntakeIO {
-    @AutoLog
-    public static class IntakeIOInputs {
-        public boolean extended = false;
+  @AutoLog
+  public static class IntakeIOInputs {
+    public boolean extended = false;
 
-        public double intakeSpeed = 0.0;
-       
-    }
+    public double intakeSpeed = 0.0;
+  }
 
-    public default void updateInputs(IntakeIOInputs inputs) {}
+  public default void updateInputs(IntakeIOInputs inputs) {}
 
-    public default void setIntake(boolean extended, double motorVolts) {}
+  public default void setIntake(boolean extended, double motorVolts) {}
 }

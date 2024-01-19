@@ -13,14 +13,13 @@
 
 package frc.robot;
 
+import frc.robot.Util.RobotContainer;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import frc.robot.Util.RobotContainer;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -30,7 +29,6 @@ import frc.robot.Util.RobotContainer;
  */
 public class Robot extends LoggedRobot {
   RobotContainer robotContainer = new RobotContainer();
-
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -93,13 +91,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when autonomous is enabled. */
   @Override
-  public void autonomousInit() {
-  }
+  public void autonomousInit() {}
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-  }
+  public void autonomousPeriodic() {}
 
   /** This function is called once when teleop is enabled. */
   @Override

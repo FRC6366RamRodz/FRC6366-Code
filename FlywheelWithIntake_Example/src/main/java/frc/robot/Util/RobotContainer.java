@@ -14,36 +14,29 @@ import frc.robot.Subsytems.Intake.IntakeREV;
 
 /** Add your docs here. */
 public class RobotContainer {
-    public static Flywheel flywheel;
-    public static Intake intake;
+  public static Flywheel flywheel;
+  public static Intake intake;
 
+  public RobotContainer() {
 
-    public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        flywheel = new Flywheel(new FlywheelFalcon()); // real hardware file
+        intake = new Intake(new IntakeREV());
 
-         switch(Constants.currentMode) {
-        
-            case REAL:
-        
-                flywheel = new Flywheel(new FlywheelFalcon());//real hardware file
-                intake = new Intake(new IntakeREV());
-        
-            break;
-        
-            case SIM:
-        
-                flywheel = new Flywheel(new frc.robot.Subsytems.Flywheel.FlywheelSim() {});//sim mode
-                intake = new Intake(new IntakeIO() {});
-        
-             break;
-        
-            default:
-        
-                flywheel = new Flywheel(new FlywheelIO() {});//replay mode
-                intake = new Intake(new IntakeIO() {});
-        
-             break;
-        
-        }
-        
+        break;
+
+      case SIM:
+        flywheel = new Flywheel(new frc.robot.Subsytems.Flywheel.FlywheelSim() {}); // sim mode
+        intake = new Intake(new IntakeIO() {});
+
+        break;
+
+      default:
+        flywheel = new Flywheel(new FlywheelIO() {}); // replay mode
+        intake = new Intake(new IntakeIO() {});
+
+        break;
     }
+  }
 }
