@@ -139,7 +139,11 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.teleop();
+    RobotContainer.shooter.teleop(
+        RobotContainer.io.getOpA(),
+        RobotContainer.io.getOpX(),
+        RobotContainer.io.getOPB(),
+        RobotContainer.io.getOpY());
   }
 
   /** This function is called once when test mode is enabled. */

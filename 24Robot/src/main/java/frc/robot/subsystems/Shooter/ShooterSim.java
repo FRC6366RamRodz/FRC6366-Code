@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.Shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -14,20 +15,33 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 public class ShooterSim implements ShooterIO {
   private SingleJointedArmSim ShooterAngle =
       new SingleJointedArmSim(
-          DCMotor.getKrakenX60(1), 100, 0.08, Units.inchesToMeters(23.351), 0, 90, true, 0);
+          DCMotor.getKrakenX60(1),
+          50,
+          0.008,
+          Units.inchesToMeters(1),
+          Units.degreesToRadians(-90),
+          Units.degreesToRadians(90),
+          false,
+          0);
   private FlywheelSim intake = new FlywheelSim(DCMotor.getNEO(1), 1, 0.01);
-  private FlywheelSim feeder = new FlywheelSim(DCMotor.getFalcon500(1), 1, 0.00001);
+  private FlywheelSim feeder = new FlywheelSim(DCMotor.getFalcon500(1), 1, 0.01);
   private FlywheelSim TopShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.01);
   private FlywheelSim BottomShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.01);
 
-  private PIDController angleSet = new PIDController(0.08, 0, 0);
-  private PIDController topShooter = new PIDController(0.07, 0, 0.001);
-  private PIDController bottomShooter = new PIDController(0.07, 0, 0);
-  private PIDController Feeder = new PIDController(0.05, 0, 0);
-  private PIDController Intake = new PIDController(0.07, 0, 0);
+  private PIDController angleSet = new PIDController(0.7, 0, 0);
+  private PIDController topShooter = new PIDController(0.02, 0, 0.0);
+  private PIDController bottomShooter = new PIDController(0.02, 0, 0);
+  private PIDController Feeder = new PIDController(0.08, 0, 0);
+  private PIDController Intake = new PIDController(0.02, 0, 0);
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
+    ShooterAngle.update(0.02);
+    intake.update(0.02);
+    feeder.update(0.02);
+    TopShooter.update(0.02);
+    BottomShooter.update(0.02);
+
     inputs.TopVelocity = TopShooter.getAngularVelocityRPM();
     inputs.BottomVelocity = BottomShooter.getAngularVelocityRPM();
     inputs.anglePosition = Units.radiansToDegrees(ShooterAngle.getAngleRads());
@@ -46,14 +60,14 @@ public class ShooterSim implements ShooterIO {
       double intakeVelocity) {
     double AngleSet =
         angleSet.calculate(Units.radiansToDegrees(ShooterAngle.getAngleRads()), anglePosition);
-    ShooterAngle.setInputVoltage(AngleSet);
-
+    ShooterAngle.setInputVoltage(MathUtil.clamp(AngleSet, -12.0, 12.0));
+ 
     double topVelocity = topShooter.calculate(TopShooter.getAngularVelocityRPM(), TopVelocity);
-    TopShooter.setInputVoltage(topVelocity);
+    TopShooter.setInputVoltage(MathUtil.clamp(topVelocity, -12.0, 12.0));
 
     double bottomVelocity =
-        bottomShooter.calculate(BottomShooter.getAngularVelocityRPM(), BottomVelocity);
-    BottomShooter.setInputVoltage(bottomVelocity);
+        bottomShooter.calculate(BottomShooter.getAngularVelocityRPM(), -BottomVelocity);
+    BottomShooter.setInputVoltage(MathUtil.clamp(bottomVelocity, -12.0, 12.0));
 
     double FeederVelocity =
         Feeder.calculate(feeder.getAngularVelocityRPM(), feeder.getAngularVelocityRPM());

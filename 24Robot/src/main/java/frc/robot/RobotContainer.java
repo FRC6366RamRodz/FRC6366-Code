@@ -33,6 +33,7 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.util.IO;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -45,6 +46,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   public static Shooter shooter;
+  public static IO io;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -54,6 +56,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    io = new IO();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations

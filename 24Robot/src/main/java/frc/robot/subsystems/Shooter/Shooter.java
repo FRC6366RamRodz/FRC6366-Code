@@ -4,17 +4,22 @@
 
 package frc.robot.subsystems.Shooter;
 
-import org.littletonrobotics.junction.Logger;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
-public class Shooter {  
-    private Pose3d angle = new Pose3d();
+public class Shooter {
+  private Pose3d angle = new Pose3d();
   private final ShooterIO io;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+  public double ShootSpeed;
+  public double IntakeSpeed;
+  public double FeedSpeed;
+  public double shooterAngle;
 
   public Shooter(ShooterIO io) {
     this.io = io;
@@ -27,12 +32,44 @@ public class Shooter {
     Logger.recordOutput("Angle", angle);
   }
 
-  public void teleop() {
-    io.setMotors(0, 0, 0, 0, 0);
-    angle = new Pose3d(0, 0, 0, new Rotation3d(0,0,0));
+  public void teleop(boolean intake, boolean shoot, boolean amp, boolean fire) {
+    if (intake) {
+      IntakeSpeed = 1;
+      FeedSpeed = 0.5;
+      shooterAngle = 0;
+    } else if (amp) {
+      IntakeSpeed = 0;
+      FeedSpeed = 0;
+      shooterAngle = 80;
+    } else if (fire && Math.abs(shooterAngle) > Math.abs(getAnlge())-50 && Math.abs(ShootSpeed) > Math.abs(getAvrgShootSpd())) {
+      IntakeSpeed = 0;
+      FeedSpeed = 20;
+    } else {
+      IntakeSpeed = 0;
+      FeedSpeed = 0;
+      shooterAngle = 0;
+    }
+
+    if (shoot) {
+      ShootSpeed = 500;
+    } else if (amp) {
+      ShootSpeed = 200;
+    } else {
+      ShootSpeed = 0;
+    }
+
+    
+    io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed);
+    
+    angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge(), 0));
+    
   }
 
   public double getAnlge() {
-    return inputs.anglePosition;
+    return Units.degreesToRadians(inputs.anglePosition);
+  }
+
+  public double getAvrgShootSpd() {
+    return (Math.abs(inputs.BottomVelocity) + Math.abs(inputs.TopVelocity)) / 2;
   }
 }
