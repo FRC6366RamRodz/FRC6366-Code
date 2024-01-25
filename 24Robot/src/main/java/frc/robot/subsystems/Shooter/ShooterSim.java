@@ -23,16 +23,16 @@ public class ShooterSim implements ShooterIO {
           Units.degreesToRadians(90),
           false,
           0);
-  private FlywheelSim intake = new FlywheelSim(DCMotor.getNEO(1), 1, 0.01);
-  private FlywheelSim feeder = new FlywheelSim(DCMotor.getFalcon500(1), 1, 0.01);
-  private FlywheelSim TopShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.01);
-  private FlywheelSim BottomShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.01);
+  private FlywheelSim intake = new FlywheelSim(DCMotor.getNEO(1), 1, 0.04);
+  private FlywheelSim feeder = new FlywheelSim(DCMotor.getFalcon500(1), 1, 0.04);
+  private FlywheelSim TopShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.04);
+  private FlywheelSim BottomShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.04);
 
-  private PIDController angleSet = new PIDController(0.7, 0, 0);
-  private PIDController topShooter = new PIDController(0.02, 0, 0.0);
-  private PIDController bottomShooter = new PIDController(0.02, 0, 0);
-  private PIDController Feeder = new PIDController(0.08, 0, 0);
-  private PIDController Intake = new PIDController(0.02, 0, 0);
+  private PIDController angleSet = new PIDController(0.7, 0, 0.0001);
+  private PIDController topShooter = new PIDController(0.2, 0, 0.0008);
+  private PIDController bottomShooter = new PIDController(0.2, 0, 0.0008);
+  private PIDController Feeder = new PIDController(0.2, 0, 0.0008);
+  private PIDController Intake = new PIDController(0.2, 0, 0.0008);
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
@@ -61,7 +61,7 @@ public class ShooterSim implements ShooterIO {
     double AngleSet =
         angleSet.calculate(Units.radiansToDegrees(ShooterAngle.getAngleRads()), anglePosition);
     ShooterAngle.setInputVoltage(MathUtil.clamp(AngleSet, -12.0, 12.0));
- 
+
     double topVelocity = topShooter.calculate(TopShooter.getAngularVelocityRPM(), TopVelocity);
     TopShooter.setInputVoltage(MathUtil.clamp(topVelocity, -12.0, 12.0));
 
@@ -70,7 +70,7 @@ public class ShooterSim implements ShooterIO {
     BottomShooter.setInputVoltage(MathUtil.clamp(bottomVelocity, -12.0, 12.0));
 
     double FeederVelocity =
-        Feeder.calculate(feeder.getAngularVelocityRPM(), feeder.getAngularVelocityRPM());
+        Feeder.calculate(feeder.getAngularVelocityRPM(), feederVelocity);
     feeder.setInputVoltage(FeederVelocity);
 
     double IntakeVelocity = Intake.calculate(intake.getAngularVelocityRPM(), intakeVelocity);
