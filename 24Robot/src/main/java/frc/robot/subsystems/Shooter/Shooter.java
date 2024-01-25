@@ -30,27 +30,33 @@ public class Shooter {
     Logger.recordOutput("Angle", angle);
   }
 
-  public void teleop(boolean intake, boolean shoot, boolean amp, boolean fire, boolean mod1, boolean mod2) {
+  public void teleop(
+      boolean intake, boolean shoot, boolean amp, boolean fire, boolean mod1, boolean mod2) {
     if (intake && shooterAngle < 2 && shooterAngle > -2) {
       IntakeSpeed = 1;
       shooterAngle = 0;
-    } else if(shoot && mod1) {
+    } else if (shoot && mod1) {
       IntakeSpeed = 0;
       shooterAngle = 50;
-    } else if(shoot && mod2) {
+    } else if (shoot && mod2) {
       IntakeSpeed = 0;
       shooterAngle = 30;
-    }else if (amp) {
+    } else if (amp) {
       IntakeSpeed = 0;
       shooterAngle = 80;
     } else {
-      IntakeSpeed = 0;;
+      IntakeSpeed = 0;
+      ;
       shooterAngle = 0;
     }
 
     if (intake && shooterAngle < 2 && shooterAngle > -2) {
       FeedSpeed = 2;
-    } else if (fire && shooterAngle < Units.radiansToDegrees(getAnlge())+2 && shooterAngle > Units.radiansToDegrees(getAnlge())-2 && ShootSpeed < getAvrgShootSpd()+10 && ShootSpeed > getAvrgShootSpd()-10) {
+    } else if (fire
+        && shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
+        && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
+        && ShootSpeed < getAvrgShootSpd() + 10
+        && ShootSpeed > getAvrgShootSpd() - 10) {
       FeedSpeed = 20;
     } else {
       FeedSpeed = 0;
@@ -60,7 +66,7 @@ public class Shooter {
       ShootSpeed = 500;
     } else if (shoot && mod1) {
       ShootSpeed = 1000;
-    } else if(shoot && mod2) {
+    } else if (shoot && mod2) {
       ShootSpeed = 800;
     } else if (amp) {
       ShootSpeed = 200;

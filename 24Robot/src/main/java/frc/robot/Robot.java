@@ -143,7 +143,7 @@ public class Robot extends LoggedRobot {
         RobotContainer.io.getOpA(),
         RobotContainer.io.getOpX(),
         RobotContainer.io.getOPB(),
-        RobotContainer.io.getOpY());
+        RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB());
   }
 
   /** This function is called once when test mode is enabled. */

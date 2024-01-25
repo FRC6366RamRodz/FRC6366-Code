@@ -69,8 +69,7 @@ public class ShooterSim implements ShooterIO {
         bottomShooter.calculate(BottomShooter.getAngularVelocityRPM(), -BottomVelocity);
     BottomShooter.setInputVoltage(MathUtil.clamp(bottomVelocity, -12.0, 12.0));
 
-    double FeederVelocity =
-        Feeder.calculate(feeder.getAngularVelocityRPM(), feederVelocity);
+    double FeederVelocity = Feeder.calculate(feeder.getAngularVelocityRPM(), feederVelocity);
     feeder.setInputVoltage(FeederVelocity);
 
     double IntakeVelocity = Intake.calculate(intake.getAngularVelocityRPM(), intakeVelocity);

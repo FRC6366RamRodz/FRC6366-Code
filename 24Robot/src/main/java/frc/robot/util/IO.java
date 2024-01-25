@@ -26,4 +26,12 @@ public class IO {
   public boolean getOPB() {
     return op.getBButton();
   }
+
+  public boolean getOPLB() {
+    return op.getLeftBumper();
+  }
+
+  public boolean getOpRB() {
+    return op.getRightBumper();
+  }
 }
