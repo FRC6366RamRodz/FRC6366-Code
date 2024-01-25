@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -143,7 +144,11 @@ public class Robot extends LoggedRobot {
         RobotContainer.io.getOpA(),
         RobotContainer.io.getOpX(),
         RobotContainer.io.getOPB(),
-        RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB());
+        RobotContainer.io.getOpY(),
+        RobotContainer.io.getOPLB(),
+        RobotContainer.io.getOpRB());
+
+    RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
   }
 
   /** This function is called once when test mode is enabled. */
