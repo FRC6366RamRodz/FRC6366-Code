@@ -18,6 +18,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -30,19 +31,22 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
+import java.util.ArrayList;
+import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(20.375);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(23.5);
+  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.6);
+  private static final double TRACK_WIDTH_X = Units.inchesToMeters(20.5);
+  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(24);
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
-
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
@@ -53,6 +57,11 @@ public class Drive extends SubsystemBase {
 
   private Pose2d poseVision = new Pose2d();
   private double[] botPoseData;
+
+  private frc.robot.util.PoseEstimator poseEstimator =
+      new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+  private static double xyStdDevCoefficient;
+  private static double thetaStdDevCoefficient;
 
   public Drive(
       GyroIO gyroIO,
@@ -88,6 +97,9 @@ public class Drive extends SubsystemBase {
         (targetPose) -> {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+
+    xyStdDevCoefficient = 0.01;
+    thetaStdDevCoefficient = 0.01;
   }
 
   public void periodic() {
@@ -126,23 +138,27 @@ public class Drive extends SubsystemBase {
               twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
       lastGyroRotation = gyroInputs.yawPosition;
     }
+    poseEstimator.addDriveData(Timer.getFPGATimestamp(), twist);
     // Apply the twist (change since last loop cycle) to the current pose
-    pose = pose.exp(twist);
+    botPoseData =
+        NetworkTableInstance.getDefault()
+            .getTable("limelight")
+            .getEntry("botpose_wpiblue")
+            .getDoubleArray(new double[6]);
 
-    if(DriverStation.getAlliance().equals(Alliance.Blue)) {
-      botPoseData = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
-  } else {
-      botPoseData = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpired").getDoubleArray(new double[6]);
-  }
-  
-  poseVision = new Pose2d(botPoseData[0], botPoseData[1], Rotation2d.fromDegrees(botPoseData[5]));
+    poseVision = new Pose2d(botPoseData[0], botPoseData[1], Rotation2d.fromDegrees(botPoseData[5]));
 
+    List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
 
-    if(NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getBoolean(false)){
-      setPose(poseVision);
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) {
+      visionUpdates.add(
+          new TimestampedVisionUpdate(
+              Timer.getFPGATimestamp() - (botPoseData[6] / 1000.0),
+              poseVision,
+              VecBuilder.fill(xyStdDevCoefficient, xyStdDevCoefficient, thetaStdDevCoefficient)));
     }
-    
 
+    // poseEstimator.addVisionData(visionUpdates);
   }
 
   /**
@@ -215,17 +231,22 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return pose;
+    return poseEstimator.getLatestPose();
   }
 
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
-    return pose.getRotation();
+    return poseEstimator.getLatestPose().getRotation();
   }
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    this.pose = pose;
+    poseEstimator.resetPose(pose);
+  }
+
+  /** Adds vision data to the pose esimation. */
+  public void addVisionData(List<TimestampedVisionUpdate> visionData) {
+    poseEstimator.addVisionData(visionData);
   }
 
   /** Returns the maximum linear speed in meters per sec. */

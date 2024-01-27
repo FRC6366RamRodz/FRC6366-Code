@@ -79,8 +79,6 @@ public class Robot extends LoggedRobot {
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
         break;
-
-    
     }
 
     // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.

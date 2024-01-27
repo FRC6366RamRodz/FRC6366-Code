@@ -33,8 +33,8 @@ import edu.wpi.first.math.util.Units;
  */
 public class ModuleIOSparkMax implements ModuleIO {
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private static final double DRIVE_GEAR_RATIO = 6.76;
-  private static final double TURN_GEAR_RATIO = 13.71;
+  private static final double DRIVE_GEAR_RATIO = 6.75;
+  private static final double TURN_GEAR_RATIO = 13.3714;
 
   private final CANSparkMax driveSparkMax;
   private final CANSparkMax turnSparkMax;
