@@ -131,9 +131,9 @@ public class Drive extends SubsystemBase {
       lastGyroRotation = gyroInputs.yawPosition;
     }
     poseEstimator.addDriveData(Timer.getFPGATimestamp(), twist);
-    checkVisionMeasurements();
     // Apply the twist (change since last loop cycle) to the current pose
     // poseEstimator.addVisionData(visionUpdates);
+    checkVisionMeasurements();
   }
 
   /**
@@ -153,6 +153,8 @@ public class Drive extends SubsystemBase {
       // The module returns the optimized state, useful for logging
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
+
+    checkVisionMeasurements();
 
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
@@ -177,175 +179,164 @@ public class Drive extends SubsystemBase {
     stop();
   }
 
-  private boolean checkVisionMeasurements() {
+  private void checkVisionMeasurements() {
+    double[] limelightPoseDoubleTop =
+        NetworkTableInstance.getDefault()
+            .getTable("limelight")
+            .getEntry("botpose_wpiblue")
+            .getDoubleArray(new double[] {0});
+    double[] limelightTargetSpacePoseDoubleTop =
+        NetworkTableInstance.getDefault()
+            .getTable("limelight")
+            .getEntry("botpose_targetspace")
+            .getDoubleArray(new double[] {0});
+    double tagAreaTop =
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
+    double[] limelightPoseDoubleBottom =
+        NetworkTableInstance.getDefault()
+            .getTable("limelight-bottom")
+            .getEntry("botpose_wpiblue")
+            .getDoubleArray(new double[] {0});
+    double[] limelightTargetSpacePoseDoubleBottom =
+        NetworkTableInstance.getDefault()
+            .getTable("limelight-bottom")
+            .getEntry("botpose_targetspace")
+            .getDoubleArray(new double[] {0});
+    double tagAreaBottom =
+        NetworkTableInstance.getDefault().getTable("limelight-bottom").getEntry("ta").getDouble(0);
+
+    // Check if the limelight rejects the position because it is too far away
+    // This has to be done with the targetspace pose instead of the wpilibblue pose, because
+    // limelight still
+    // updates the wpilibblue pose when it shouldn't update according to the pipeline settings
+    double sumTop = 0;
+    for (double value : limelightTargetSpacePoseDoubleTop) {
+      sumTop += value;
+    }
+    boolean topInRange = sumTop != 0;
+    double sumBottom = 0;
+    for (double value : limelightTargetSpacePoseDoubleBottom) {
+      sumBottom += value;
+    }
+    boolean bottomInRange = sumBottom != 0;
+
+    // Stop if limelight array is not full
+    // Stop if translation X or Y is not in field
+    // Stop if translation Z is negative
+    double[] limelightPoseDouble;
+    double tagArea;
+    boolean topValid =
+        topInRange
+            && (limelightPoseDoubleTop.length > 5
+                && limelightPoseDoubleTop[0] > 0.75
+                && limelightPoseDoubleTop[0] < /*FIELD_LENGTH*/ 16.5 - 0.75
+                && limelightPoseDoubleTop[1] > 0.3
+                && limelightPoseDoubleTop[1] < /*FIELD_WIDTH*/ 8.20 - 0.3
+                && limelightPoseDoubleTop[2] >= 0);
+    boolean bottomValid =
+        bottomInRange
+            && (limelightPoseDoubleBottom.length > 5
+                && limelightPoseDoubleBottom[0] > 0.75
+                && limelightPoseDoubleBottom[0] < /*FIELD_LENGTH*/ 16.5 - 0.75
+                && limelightPoseDoubleBottom[1] > 0.3
+                && limelightPoseDoubleBottom[1] < /*FIELD_WIDTH*/ 8.20 - 0.3
+                && limelightPoseDoubleBottom[2] >= 0);
+
+    if (topValid && bottomValid) {
+      // Take the measurements from the top limelight, because that is the best
+      limelightPoseDouble = limelightPoseDoubleTop;
+      // Except for the x and y position, take the average of that
+      limelightPoseDouble[0] = (limelightPoseDoubleBottom[0] + limelightPoseDoubleTop[0]) / 2;
+      limelightPoseDouble[1] = (limelightPoseDoubleBottom[1] + limelightPoseDoubleTop[1]) / 2;
+      // Take the tag area of the top limelight
+      tagArea = tagAreaTop;
+    } else if (bottomInRange) {
+      limelightPoseDouble = limelightPoseDoubleTop;
+      tagArea = tagAreaBottom;
+    } else if (topValid) {
+      limelightPoseDouble = limelightPoseDoubleTop;
+      tagArea = tagAreaTop;
+    } else {
+      limelightPoseDouble = limelightPoseDoubleTop;
+      tagArea = 0;
+    }
+
+    // Make pose from limelight translation and rotation
+    // April tag rotation accuracy is lower than pigeon
+    //            Pose2d limelightPose = new Pose2d(new Translation2d(limelightPoseDouble[0],
+    // limelightPoseDouble[1]), Rotation2d.fromDegrees(pigeon.getYaw()));
+    Pose2d limelightPose =
+        new Pose2d(
+            new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
+            Rotation2d.fromDegrees(limelightPoseDouble[5]));
+    //            SmartDashboard.putString("DT/vision/limelight pose", limelightPose.toString());
+    //            SmartDashboard.putNumber("DT/vision/limelight yaw", limelightPoseDouble[5]);
+
+    //
+    // NetworkTableInstance.getDefault().getTable("logtable").getEntry("limelightpose").setDoubleArray(poseToArray(limelightPose));
+    SmartDashboard.putNumberArray(
+        "DT/vision/LL-top pose",
+        new Double[] {
+          limelightPoseDoubleTop[0], limelightPoseDoubleTop[1], limelightPoseDoubleTop[5]
+        });
+    SmartDashboard.putNumberArray(
+        "DT/vision/LL final pose",
+        new Double[] {limelightPoseDouble[0], limelightPoseDouble[1], limelightPoseDouble[5]});
+
     try {
-      double[] limelightPoseDoubleTop =
+      double[] limelightTagCorners =
           NetworkTableInstance.getDefault()
               .getTable("limelight")
-              .getEntry("botpose_wpiblue")
+              .getEntry("tcornxy")
               .getDoubleArray(new double[] {0});
-      double[] limelightTargetSpacePoseDoubleTop =
-          NetworkTableInstance.getDefault()
-              .getTable("limelight")
-              .getEntry("botpose_targetspace")
-              .getDoubleArray(new double[] {0});
-      double tagAreaTop =
-          NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
-      double[] limelightPoseDoubleBottom =
+      double[] limelightTagCornersX = new double[4];
+      double[] limelightTagCornersY = new double[4];
+      double[] limelightBottomTagCorners =
           NetworkTableInstance.getDefault()
               .getTable("limelight-bottom")
-              .getEntry("botpose_wpiblue")
+              .getEntry("tcornxy")
               .getDoubleArray(new double[] {0});
-      double[] limelightTargetSpacePoseDoubleBottom =
-          NetworkTableInstance.getDefault()
-              .getTable("limelight-bottom")
-              .getEntry("botpose_targetspace")
-              .getDoubleArray(new double[] {0});
-      double tagAreaBottom =
-          NetworkTableInstance.getDefault()
-              .getTable("limelight-bottom")
-              .getEntry("ta")
-              .getDouble(0);
+      double[] limelightBottomTagCornersX = new double[4];
+      double[] limelightBottomTagCornersY = new double[4];
+      for (int i = 0; i < 4; i++) {
+        limelightTagCornersX[i] = limelightTagCorners[i * 2];
+        limelightTagCornersY[i] = limelightTagCorners[i * 2 + 1];
 
-      // Check if the limelight rejects the position because it is too far away
-      // This has to be done with the targetspace pose instead of the wpilibblue pose, because
-      // limelight still
-      // updates the wpilibblue pose when it shouldn't update according to the pipeline settings
-      double sumTop = 0;
-      for (double value : limelightTargetSpacePoseDoubleTop) {
-        sumTop += value;
+        limelightBottomTagCornersX[i] = limelightBottomTagCorners[i * 2];
+        limelightBottomTagCornersY[i] = limelightBottomTagCorners[i * 2 + 1];
       }
-      boolean topInRange = sumTop != 0;
-      double sumBottom = 0;
-      for (double value : limelightTargetSpacePoseDoubleBottom) {
-        sumBottom += value;
-      }
-      boolean bottomInRange = sumBottom != 0;
-
-      // Stop if limelight array is not full
-      // Stop if translation X or Y is not in field
-      // Stop if translation Z is negative
-      double[] limelightPoseDouble;
-      double tagArea;
-      boolean topValid =
-          topInRange
-              && (limelightPoseDoubleTop.length > 5
-                  && limelightPoseDoubleTop[0] > 0.75
-                  && limelightPoseDoubleTop[0] < /*FIELD_LENGTH*/ 16.5 - 0.75
-                  && limelightPoseDoubleTop[1] > 0.3
-                  && limelightPoseDoubleTop[1] < /*FIELD_WIDTH*/ 8.20 - 0.3
-                  && limelightPoseDoubleTop[2] >= 0);
-      boolean bottomValid =
-          bottomInRange
-              && (limelightPoseDoubleBottom.length > 5
-                  && limelightPoseDoubleBottom[0] > 0.75
-                  && limelightPoseDoubleBottom[0] < /*FIELD_LENGTH*/ 16.5 - 0.75
-                  && limelightPoseDoubleBottom[1] > 0.3
-                  && limelightPoseDoubleBottom[1] < /*FIELD_WIDTH*/ 8.20 - 0.3
-                  && limelightPoseDoubleBottom[2] >= 0);
-
-      if (topValid && bottomValid) {
-        // Take the measurements from the top limelight, because that is the best
-        limelightPoseDouble = limelightPoseDoubleTop;
-        // Except for the x and y position, take the average of that
-        limelightPoseDouble[0] = (limelightPoseDoubleBottom[0] + limelightPoseDoubleTop[0]) / 2;
-        limelightPoseDouble[1] = (limelightPoseDoubleBottom[1] + limelightPoseDoubleTop[1]) / 2;
-        // Take the tag area of the top limelight
-        tagArea = tagAreaTop;
-      } else if (bottomValid) {
-        limelightPoseDouble = limelightPoseDoubleBottom;
-        tagArea = tagAreaBottom;
-      } else if (topValid) {
-        limelightPoseDouble = limelightPoseDoubleTop;
-        tagArea = tagAreaTop;
-      } else {
-        return false;
-      }
-
-      // Make pose from limelight translation and rotation
-      // April tag rotation accuracy is lower than pigeon
-      //            Pose2d limelightPose = new Pose2d(new Translation2d(limelightPoseDouble[0],
-      // limelightPoseDouble[1]), Rotation2d.fromDegrees(pigeon.getYaw()));
-      Pose2d limelightPose =
-          new Pose2d(
-              new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
-              Rotation2d.fromDegrees(limelightPoseDouble[5]));
-      //            SmartDashboard.putString("DT/vision/limelight pose", limelightPose.toString());
-      //            SmartDashboard.putNumber("DT/vision/limelight yaw", limelightPoseDouble[5]);
-
-      //
-      // NetworkTableInstance.getDefault().getTable("logtable").getEntry("limelightpose").setDoubleArray(poseToArray(limelightPose));
+      SmartDashboard.putNumberArray("DT/vision/LL-top tag corners x", limelightTagCornersX);
+      SmartDashboard.putNumberArray("DT/vision/LL-top tag corners y", limelightTagCornersY);
       SmartDashboard.putNumberArray(
-          "DT/vision/LL-top pose",
-          new Double[] {
-            limelightPoseDoubleTop[0], limelightPoseDoubleTop[1], limelightPoseDoubleTop[5]
-          });
+          "DT/vision/LL-bottom tag corners x", limelightBottomTagCornersX);
       SmartDashboard.putNumberArray(
-          "DT/vision/LL-bottom pose",
-          new Double[] {
-            limelightPoseDoubleBottom[0], limelightPoseDoubleBottom[1], limelightPoseDoubleBottom[5]
-          });
-      SmartDashboard.putNumberArray(
-          "DT/vision/LL final pose",
-          new Double[] {limelightPoseDouble[0], limelightPoseDouble[1], limelightPoseDouble[5]});
-
-      try {
-        double[] limelightTagCorners =
-            NetworkTableInstance.getDefault()
-                .getTable("limelight")
-                .getEntry("tcornxy")
-                .getDoubleArray(new double[] {0});
-        double[] limelightTagCornersX = new double[4];
-        double[] limelightTagCornersY = new double[4];
-        double[] limelightBottomTagCorners =
-            NetworkTableInstance.getDefault()
-                .getTable("limelight-bottom")
-                .getEntry("tcornxy")
-                .getDoubleArray(new double[] {0});
-        double[] limelightBottomTagCornersX = new double[4];
-        double[] limelightBottomTagCornersY = new double[4];
-        for (int i = 0; i < 4; i++) {
-          limelightTagCornersX[i] = limelightTagCorners[i * 2];
-          limelightTagCornersY[i] = limelightTagCorners[i * 2 + 1];
-
-          limelightBottomTagCornersX[i] = limelightBottomTagCorners[i * 2];
-          limelightBottomTagCornersY[i] = limelightBottomTagCorners[i * 2 + 1];
-        }
-        SmartDashboard.putNumberArray("DT/vision/LL-top tag corners x", limelightTagCornersX);
-        SmartDashboard.putNumberArray("DT/vision/LL-top tag corners y", limelightTagCornersY);
-        SmartDashboard.putNumberArray(
-            "DT/vision/LL-bottom tag corners x", limelightBottomTagCornersX);
-        SmartDashboard.putNumberArray(
-            "DT/vision/LL-bottom tag corners y", limelightBottomTagCornersY);
-      } catch (Exception e) {
-      }
-
-      // Add estimator trust using april tag area
-      double stdX = 0.13;
-      double stdY = stdX;
-      if (tagArea < 0.5) {
-        stdY *= 50;
-        stdX *= 5;
-      }
-      //  poseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(stdX,
-      // stdY, stdY*10));
-      SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
-      SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
-
-      // Add limelight latency
-      double limelightLatency = limelightPoseDouble[6] / 1000;
-
-      List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-      visionUpdates.add(
-          new TimestampedVisionUpdate(
-              Timer.getFPGATimestamp() - limelightLatency,
-              limelightPose,
-              VecBuilder.fill(stdX, stdY, stdY * 10)));
-
-      return true;
-
+          "DT/vision/LL-bottom tag corners y", limelightBottomTagCornersY);
     } catch (Exception e) {
-      return false;
+    }
+
+    // Add estimator trust using april tag area
+    double stdX = 0.13;
+    double stdY = stdX;
+    if (tagArea < 0.5) {
+      stdY *= 50;
+      stdX *= 5;
+    }
+    //  poseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(stdX,
+    // stdY, stdY*10));
+    SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
+    SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
+
+    // Add limelight latency
+    double limelightLatency = limelightPoseDouble[6] / 1000;
+
+    List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
+    visionUpdates.add(
+        new TimestampedVisionUpdate(
+            Timer.getFPGATimestamp() - limelightLatency,
+            limelightPose,
+            VecBuilder.fill(stdX, stdY, stdY * 10)));
+    if (topValid || bottomValid) {
+      poseEstimator.addVisionData(visionUpdates);
     }
   }
 
@@ -404,6 +395,22 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return MAX_ANGULAR_SPEED;
+  }
+
+  public void updateOdoWithVision() {
+    double[] limelightPoseDouble =
+        NetworkTableInstance.getDefault()
+            .getTable("limelight")
+            .getEntry("botpose_wpiblue")
+            .getDoubleArray(new double[] {0});
+    Pose2d limeLightPose =
+        new Pose2d(
+            new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
+            Rotation2d.fromDegrees(limelightPoseDouble[5]));
+
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) {
+      poseEstimator.resetPose(limeLightPose);
+    }
   }
 
   /** Returns an array of module translations. */
