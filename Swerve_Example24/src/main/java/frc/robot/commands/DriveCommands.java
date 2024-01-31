@@ -19,9 +19,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
@@ -39,12 +42,22 @@ public class DriveCommands {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
+          Optional<Alliance> ally = DriverStation.getAlliance();
           // Apply deadband
           double linearMagnitude =
               MathUtil.applyDeadband(
                   Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
-          Rotation2d linearDirection =
-              new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          Rotation2d linearDirection;
+          if (ally.isPresent()) {
+            if (ally.get() == Alliance.Red) {
+              linearDirection = new Rotation2d(-xSupplier.getAsDouble(), -ySupplier.getAsDouble());
+            } else {
+              linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+            }
+          } else {
+            linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+          }
+
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
           // Square values
@@ -52,8 +65,8 @@ public class DriveCommands {
           omega = Math.copySign(omega * omega, omega);
 
           // Calcaulate new linear velocity
-
-          Translation2d linearVelocity =
+          Translation2d linearVelocity;
+          linearVelocity =
               new Pose2d(new Translation2d(), linearDirection)
                   .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
                   .getTranslation();
