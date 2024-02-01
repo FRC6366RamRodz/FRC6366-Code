@@ -14,25 +14,14 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterCtre;
 import frc.robot.subsystems.Shooter.ShooterIO;
 import frc.robot.subsystems.Shooter.ShooterSim;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.util.IO;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -44,12 +33,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Subsystems
-  private final Drive drive;
+
   public static Shooter shooter;
   public static IO io;
 
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -61,13 +49,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
+        
         shooter = new Shooter(new ShooterCtre());
         // drive = new Drive(
         // new GyroIOPigeon2(),
@@ -80,38 +62,17 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
         shooter = new Shooter(new ShooterSim());
         break;
 
       default:
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
         shooter = new Shooter(new ShooterIO() {});
         break;
     }
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up feedforward characterization
-    autoChooser.addOption(
-        "Drive FF Characterization",
-        new FeedForwardCharacterization(
-            drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
-
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -123,22 +84,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
   }
 
   /**
