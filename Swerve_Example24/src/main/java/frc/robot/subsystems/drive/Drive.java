@@ -133,7 +133,6 @@ public class Drive extends SubsystemBase {
     poseEstimator.addDriveData(Timer.getFPGATimestamp(), twist);
     // Apply the twist (change since last loop cycle) to the current pose
     // poseEstimator.addVisionData(visionUpdates);
-    checkVisionMeasurements();
   }
 
   /**
@@ -179,7 +178,7 @@ public class Drive extends SubsystemBase {
     stop();
   }
 
-  private void checkVisionMeasurements() {
+  public void checkVisionMeasurements() {
     double[] limelightPoseDoubleTop =
         NetworkTableInstance.getDefault()
             .getTable("limelight")
