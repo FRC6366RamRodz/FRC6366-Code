@@ -148,7 +148,8 @@ public class Robot extends LoggedRobot {
         RobotContainer.io.getOPLB(),
         RobotContainer.io.getOpRB());
 
-    RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
+    RobotContainer.io.op.setRumble(
+        RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
   }
 
   /** This function is called once when test mode is enabled. */
