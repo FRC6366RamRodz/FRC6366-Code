@@ -57,7 +57,7 @@ public class ShooterSim implements ShooterIO {
       double BottomVelocity,
       double feederVelocity,
       double anglePosition,
-      double intakeVelocity) {
+      double intakeVelocity, double SideRoller) {
     double AngleSet =
         angleSet.calculate(Units.radiansToDegrees(ShooterAngle.getAngleRads()), anglePosition);
     ShooterAngle.setInputVoltage(MathUtil.clamp(AngleSet, -12.0, 12.0));

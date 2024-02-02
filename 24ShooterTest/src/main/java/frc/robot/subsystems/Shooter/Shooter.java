@@ -17,6 +17,7 @@ public class Shooter {
   public double ShootSpeed;
   public double IntakeSpeed;
   public double FeedSpeed;
+  public double sideSpeed;
   public double shooterAngle;
   public boolean launchMode;
 
@@ -52,16 +53,19 @@ public class Shooter {
     }
 
     if (intake && shooterAngle < 2 && shooterAngle > -2) {
-      FeedSpeed = 2;
+      FeedSpeed = 0.4;
+      sideSpeed = 0;
     } else if (fire
         && shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
         && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
         && ShootSpeed < getAvrgShootSpd() + 10
         && ShootSpeed > getAvrgShootSpd() - 10
         && launchMode) {
-      FeedSpeed = 20;
+      FeedSpeed = 1;
+      sideSpeed = 1000;
     } else {
       FeedSpeed = 0;
+      sideSpeed = 0;
     }
 
     if (shoot && mod1) {
@@ -81,7 +85,7 @@ public class Shooter {
       launchMode = false;
     }
 
-    io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed);
+    io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed);
 
     angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge(), 0));
   }
