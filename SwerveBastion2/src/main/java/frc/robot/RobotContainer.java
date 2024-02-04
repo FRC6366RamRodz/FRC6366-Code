@@ -23,6 +23,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Arm.ArmIO;
+import frc.robot.subsystems.Arm.ArmSim;
+import frc.robot.subsystems.Arm.ArmSparkMax;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -40,6 +44,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   public static Drive drive;
+  public static Arm arm;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -67,6 +72,8 @@ public class RobotContainer {
         // new ModuleIOTalonFX(2),
         // new ModuleIOTalonFX(3));
         // flywheel = new Flywheel(new FlywheelIOTalonFX());
+
+        arm = new Arm(new ArmSparkMax());
         break;
 
       case SIM:
@@ -78,6 +85,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
+        arm = new Arm(new ArmSim());
         break;
 
       default:
@@ -89,6 +97,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        arm = new Arm(new ArmIO() {});
         break;
     }
 
