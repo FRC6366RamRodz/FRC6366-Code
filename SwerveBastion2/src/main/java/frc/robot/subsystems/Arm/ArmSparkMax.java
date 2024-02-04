@@ -72,6 +72,9 @@ public class ArmSparkMax implements ArmIO {
         LeftIntake.setControlFramePeriodMs(500);
         RightIntake.setControlFramePeriodMs(500);
 
+        upperArmPid = UpperArm.getPIDController();
+        lowerArmPid = LowerArm.getPIDController();
+
         upperArmPid.setP(6e-5);
         upperArmPid.setI(0);
         upperArmPid.setD(0);

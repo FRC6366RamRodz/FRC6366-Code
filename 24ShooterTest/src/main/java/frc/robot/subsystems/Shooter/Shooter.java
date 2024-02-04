@@ -5,6 +5,7 @@
 package frc.robot.subsystems.Shooter;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import org.littletonrobotics.junction.Logger;
@@ -88,6 +89,47 @@ public class Shooter {
     io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed);
 
     angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge(), 0));
+  }
+
+  public void advancedTeleop(boolean shoot, boolean fire, boolean intake, double distanceX) {
+    double ShootSpeed;
+    Rotation2d shooterAngle;
+    double IntakeSpeed;
+
+    if(shoot) {
+      shooterAngle = new Rotation2d((Math.asin(-9.8-distanceX*2))/2*((2*Math.PI*0.0508*getAvrgShootSpd())/60)).minus(new Rotation2d(Units.degreesToRadians(45)));
+      ShootSpeed = 2500;
+    } else {
+      shooterAngle = new Rotation2d(0);
+      ShootSpeed = 0;
+    }
+
+    if (fire
+        && shooterAngle.getDegrees() < Units.radiansToDegrees(getAnlge()) + 2
+        && shooterAngle.getDegrees() > Units.radiansToDegrees(getAnlge()) - 2
+        && ShootSpeed < getAvrgShootSpd() + 10
+        && ShootSpeed > getAvrgShootSpd() - 10
+        && launchMode) {
+      FeedSpeed = 1;
+      sideSpeed = 1000;
+    } else {
+      FeedSpeed = 0;
+      sideSpeed = 0;
+    }
+
+    if (shoot) {
+      launchMode = true;
+    } else {
+      launchMode = false;
+    }
+
+    if (intake && shooterAngle.getDegrees() < 2 && shooterAngle.getDegrees() > -2) {
+      IntakeSpeed = 1;
+    } else {
+      IntakeSpeed = 0;
+    }
+
+    io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle.getDegrees(), IntakeSpeed, sideSpeed);
   }
 
   public double LaunchPermision() {
