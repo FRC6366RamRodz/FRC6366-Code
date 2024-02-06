@@ -102,6 +102,7 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
     kCompressor.enableAnalog(20, 45);
+    RobotContainer.arm.armPeriodic();
   }
 
   /** This function is called once when the robot is disabled. */

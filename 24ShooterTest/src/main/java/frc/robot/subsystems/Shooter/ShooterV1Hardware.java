@@ -27,10 +27,10 @@ public class ShooterV1Hardware implements ShooterIO {
     public CANcoder angleEncoder = new CANcoder(5);
     public PIDController anglePID = new PIDController(7.0, 0, 0);
     public SimpleMotorFeedforward angleFeedback = new SimpleMotorFeedforward(0.1, 0.13);    public CANSparkMax topShooter = new CANSparkMax(1, MotorType.kBrushless);
-    public CANSparkMax bottomShooter = new CANSparkMax(2, MotorType.kBrushless);
-    public CANSparkMax FeedRoller = new CANSparkMax(3, MotorType.kBrushless);
-    public CANSparkMax sideRoller = new CANSparkMax(4, MotorType.kBrushless);
-    public CANSparkMax intake = new CANSparkMax(5, MotorType.kBrushless);
+    public CANSparkMax bottomShooter = new CANSparkMax(5, MotorType.kBrushless);
+    public CANSparkMax FeedRoller = new CANSparkMax(6, MotorType.kBrushless);
+    public CANSparkMax sideRoller = new CANSparkMax(7, MotorType.kBrushless);
+    public CANSparkMax intake = new CANSparkMax(8, MotorType.kBrushless);
     public SparkLimitSwitch feeedSwitch;
     public SparkPIDController topShooterController;
     public SparkPIDController bottomShooterController;
