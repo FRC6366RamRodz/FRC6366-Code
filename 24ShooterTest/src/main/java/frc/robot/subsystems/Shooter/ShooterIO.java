@@ -25,5 +25,6 @@ public interface ShooterIO {
       double BottomVelocity,
       double feederVelocity,
       double anglePosition,
-      double intakeVelocity, double SideRoller) {}
+      double intakeVelocity,
+      double SideRoller) {}
 }

@@ -49,7 +49,6 @@ public class Shooter {
       shooterAngle = 80;
     } else {
       IntakeSpeed = 0;
-      ;
       shooterAngle = 0;
     }
 
@@ -86,7 +85,7 @@ public class Shooter {
       launchMode = false;
     }
 
-    io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed);
+    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed);
 
     angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge(), 0));
   }
@@ -96,8 +95,13 @@ public class Shooter {
     Rotation2d shooterAngle;
     double IntakeSpeed;
 
-    if(shoot) {
-      shooterAngle = new Rotation2d((Math.asin(-9.8-distanceX*2))/2*((2*Math.PI*0.0508*getAvrgShootSpd())/60)).minus(new Rotation2d(Units.degreesToRadians(45)));
+    if (shoot) {
+      shooterAngle =
+          new Rotation2d(
+                  (Math.asin(-9.8 - distanceX * 2))
+                      / 2
+                      * ((2 * Math.PI * 0.0508 * getAvrgShootSpd()) / 60))
+              .minus(new Rotation2d(Units.degreesToRadians(45)));
       ShootSpeed = 2500;
     } else {
       shooterAngle = new Rotation2d(0);
@@ -129,7 +133,8 @@ public class Shooter {
       IntakeSpeed = 0;
     }
 
-    io.setMotors(ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle.getDegrees(), IntakeSpeed, sideSpeed);
+    io.setMotors(
+        ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle.getDegrees(), IntakeSpeed, sideSpeed);
   }
 
   public double LaunchPermision() {
@@ -149,6 +154,6 @@ public class Shooter {
   }
 
   public double getAvrgShootSpd() {
-    return (Math.abs(inputs.BottomVelocity) + Math.abs(inputs.TopVelocity)) / 2;
+    return (Math.abs(inputs.TopVelocity)) / 2;
   }
 }
