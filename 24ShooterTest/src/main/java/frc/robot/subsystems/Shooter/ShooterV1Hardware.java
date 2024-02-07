@@ -37,17 +37,11 @@ public class ShooterV1Hardware implements ShooterIO {
 
   public ShooterV1Hardware() {
 
-    topShooter.restoreFactoryDefaults();
-    bottomShooter.restoreFactoryDefaults();
-
     var angleConfig = new TalonFXConfiguration();
     angleConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleMotor.getConfigurator().apply(angleConfig);
-
-    topShooter.setSmartCurrentLimit(80);
-    topShooter.setInverted(false);
-    bottomShooter.setSmartCurrentLimit(80);
+    
     bottomShooter.setIdleMode(IdleMode.kCoast);
     bottomShooter.setIdleMode(IdleMode.kCoast);
     FeedRoller.setIdleMode(IdleMode.kBrake);
@@ -61,18 +55,29 @@ public class ShooterV1Hardware implements ShooterIO {
     feeedSwitch = FeedRoller.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     feeedSwitch.enableLimitSwitch(true);
 
+    topShooter.restoreFactoryDefaults();
+    bottomShooter.restoreFactoryDefaults();
+
+    bottomShooter.setSmartCurrentLimit(35);
+    topShooter.setSmartCurrentLimit(35);
+
     topShooterController = topShooter.getPIDController();
     bottomShooterController = bottomShooter.getPIDController();
+       
+    topShooterController.setFeedbackDevice(topShooter.getEncoder());
+    bottomShooterController.setFeedbackDevice(bottomShooter.getEncoder());
 
     topShooterController.setP(0.001);
     topShooterController.setI(0);
     topShooterController.setD(0);
+    topShooterController.setIZone(0);
     topShooterController.setFF(0.005);
     topShooterController.setOutputRange(-1, 1);
 
     bottomShooterController.setP(0.001);
     bottomShooterController.setI(0);
     bottomShooterController.setD(0);
+    bottomShooterController.setIZone(0);
     bottomShooterController.setFF(0.005);
     bottomShooterController.setOutputRange(-1, 1);
 
