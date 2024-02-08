@@ -62,18 +62,22 @@ public class DriveCommands {
           }
 
           double omega;
-          if (NetworkTableInstance.getDefault()
-                      .getTable("limelight-two")
-                      .getEntry("tv")
-                      .getDouble(0)
-                  == 1
-              && point.getAsBoolean()) {
-            omega =
-                NetworkTableInstance.getDefault()
+          if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+            if (NetworkTableInstance.getDefault()
                         .getTable("limelight-two")
-                        .getEntry("tx")
+                        .getEntry("tv")
                         .getDouble(0)
-                    / -26;
+                    == 1
+                && point.getAsBoolean()) {
+              omega =
+                  NetworkTableInstance.getDefault()
+                          .getTable("limelight-two")
+                          .getEntry("tx")
+                          .getDouble(0)
+                      / -26;
+            } else {
+              omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+            }
           } else {
             omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
           }

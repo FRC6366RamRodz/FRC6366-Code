@@ -8,18 +8,23 @@ import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
 public interface ArmIO {
-    @AutoLog
-    public static class ArmIOInputs {
-            public double UpperCoderPosition = 0.0;
-            public double LowerCoderPosition = 0.0;
-            public boolean BrakeU = false;
-            public boolean BrakeL = false;
-            public double IntakePosition = 0.0;
-    }
+  @AutoLog
+  public static class ArmIOInputs {
+    public double UpperCoderPosition = 0.0;
+    public double LowerCoderPosition = 0.0;
+    public boolean BrakeU = false;
+    public boolean BrakeL = false;
+    public double IntakePosition = 0.0;
+  }
 
-    public default void updateInputs(ArmIOInputs inputs) {
-    }
+  public default void updateInputs(ArmIOInputs inputs) {}
 
-    public default void setSpeed(double upperSpeed, double lowerSpeed, boolean Intake, boolean Lbrake, boolean Ubrake, boolean IntakeMode, double IntakeSpeed) {
-    }
+  public default void setSpeed(
+      double upperSpeed,
+      double lowerSpeed,
+      boolean Intake,
+      boolean Lbrake,
+      boolean Ubrake,
+      boolean IntakeMode,
+      double IntakeSpeed) {}
 }

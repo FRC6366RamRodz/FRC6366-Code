@@ -153,7 +153,11 @@ public class Drive extends SubsystemBase {
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
 
-    checkVisionMeasurements();
+    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+      checkVisionMeasurements();
+    } else {
+
+    }
 
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);

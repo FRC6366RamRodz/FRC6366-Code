@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -116,8 +117,11 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    RobotContainer.drive.updateOdoWithVision();
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+      RobotContainer.drive.updateOdoWithVision();
+    } else {
+
+    }
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -141,14 +145,18 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    RobotContainer.drive.updateOdoWithVision();
+    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+      RobotContainer.drive.updateOdoWithVision();
+    } else {
+
+    }
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-     //ARM   
-     RobotContainer.arm.SetPointMode();
+    // ARM
+    RobotContainer.arm.SetPointMode();
   }
 
   /** This function is called once when test mode is enabled. */

@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.MathUtil;
@@ -34,6 +35,13 @@ public class ShooterV1Hardware implements ShooterIO {
   public SparkPIDController topShooterController;
   public SparkPIDController bottomShooterController;
   public SparkPIDController SideRollerController;
+  //alt pid stuff
+  /*
+  private RelativeEncoder topEncoder;
+  private RelativeEncoder bottomEncoder;
+  private PIDController topPID;
+  private PIDController bottomPID;
+  */
 
   public ShooterV1Hardware() {
 
@@ -72,7 +80,7 @@ public class ShooterV1Hardware implements ShooterIO {
     topShooterController.setD(0);
     topShooterController.setIZone(0);
     topShooterController.setFF(0.005);
-    topShooterController.setOutputRange(-1, 1);
+    topShooterController.setOutputRange(-1, 1);    
 
     bottomShooterController.setP(0.001);
     bottomShooterController.setI(0);
@@ -90,6 +98,22 @@ public class ShooterV1Hardware implements ShooterIO {
     bottomShooterController.setOutputRange(-1, 1);
 
     anglePID.enableContinuousInput(-360, 360);
+
+   
+
+    topShooter.burnFlash();
+    bottomShooter.burnFlash();
+    FeedRoller.burnFlash();
+    sideRoller.burnFlash();
+    intake.burnFlash();
+
+    //alternate pid options
+    /*
+    topPID = new PIDController(0, 0, 0);
+    bottomPID = new PIDController(0, 0, 0);
+    topEncoder = topShooter.getEncoder();
+    bottomEncoder = bottomShooter.getEncoder();
+    */
   }
 
   @Override
@@ -128,5 +152,14 @@ public class ShooterV1Hardware implements ShooterIO {
     intake.set(-intakeVelocity);
 
     SideRollerController.setReference(SideRoller, ControlType.kVelocity);
+
+    //alternate PID stuff if rev never works
+    /*
+    double topPercent = MathUtil.applyDeadband(MathUtil.clamp(topPID.calculate(topEncoder.getVelocity(), TopVelocity),-1,1), 0.1);
+    double bottomPercent = MathUtil.applyDeadband(MathUtil.clamp(bottomPID.calculate(bottomEncoder.getVelocity(), BottomVelocity),-1,1), 0.1);
+    
+    topShooter.set(topPercent);
+    bottomShooter.set(bottomPercent);
+    */
   }
 }
