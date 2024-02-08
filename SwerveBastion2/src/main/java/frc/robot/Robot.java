@@ -132,7 +132,12 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    RobotContainer.drive.checkVisionMeasurements();
+    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+      RobotContainer.drive.checkVisionMeasurements();
+    } else {
+
+    }
+    
   }
 
   /** This function is called once when teleop is enabled. */
