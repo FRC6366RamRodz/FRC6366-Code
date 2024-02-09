@@ -5,11 +5,12 @@
 package frc.robot.subsystems.Arm;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 
@@ -33,17 +34,21 @@ public class ArmSparkMax implements ArmIO {
   private SparkLimitSwitch intakeSwithc2;
 
   public ArmSparkMax() {
-    UpperArm.clearFaults();
-    UpperArm.restoreFactoryDefaults();
-
-    LowerArm.clearFaults();
-    LowerArm.restoreFactoryDefaults();
 
     UpperArm = new CANSparkMax(5, MotorType.kBrushless);
     LowerArm = new CANSparkMax(6, MotorType.kBrushless);
 
-    UpperArm.setInverted(false);
+    UpperArm.clearFaults();
+    UpperArm.restoreFactoryDefaults();
+
+    UpperArm.setInverted(true);
+    UpperArm.setIdleMode(IdleMode.kCoast);
+
+    LowerArm.clearFaults();
+    LowerArm.restoreFactoryDefaults();
+
     LowerArm.setInverted(false);
+    LowerArm.setIdleMode(IdleMode.kCoast);
 
     UpperCoder = new CANcoder(5);
     LowerCoder = new CANcoder(6);
@@ -89,8 +94,10 @@ public class ArmSparkMax implements ArmIO {
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.LowerCoderPosition = LowerCoder.getAbsolutePosition().getValueAsDouble();
-    inputs.UpperCoderPosition = UpperCoder.getAbsolutePosition().getValueAsDouble();
+    inputs.LowerCoderPosition =
+        Units.rotationsToDegrees(LowerCoder.getAbsolutePosition().getValueAsDouble());
+    inputs.UpperCoderPosition =
+        Units.rotationsToDegrees(UpperCoder.getAbsolutePosition().getValueAsDouble());
     inputs.BrakeL = ArmBrakeL.get();
     inputs.BrakeU = ArmBrakeU.get();
 
@@ -119,10 +126,8 @@ public class ArmSparkMax implements ArmIO {
     LeftIntake.set(-IntakeSpeed);
     RightIntake.set(-IntakeSpeed);
 
-    double MaxSpd = 5000;
-
-    upperArmPid.setReference(upperSpeed * 5000, ControlType.kVelocity);
-    lowerArmPid.setReference(lowerSpeed * MaxSpd, ControlType.kVelocity);
+    UpperArm.set(upperSpeed);
+    LowerArm.set(lowerSpeed);
   }
 
   public double getUArm() {

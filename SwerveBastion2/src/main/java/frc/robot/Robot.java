@@ -117,7 +117,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
       RobotContainer.drive.updateOdoWithVision();
     } else {
 
@@ -132,12 +132,11 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
       RobotContainer.drive.checkVisionMeasurements();
     } else {
 
     }
-    
   }
 
   /** This function is called once when teleop is enabled. */
@@ -150,7 +149,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
       RobotContainer.drive.updateOdoWithVision();
     } else {
 

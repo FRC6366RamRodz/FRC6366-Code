@@ -62,7 +62,8 @@ public class DriveCommands {
           }
 
           double omega;
-          if (NetworkTableInstance.getDefault().getTable("limelight-two") != null) {
+          if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0)
+              != 0) {
             if (NetworkTableInstance.getDefault()
                         .getTable("limelight-two")
                         .getEntry("tv")

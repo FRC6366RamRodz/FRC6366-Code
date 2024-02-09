@@ -56,7 +56,7 @@ public class Arm {
             ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
     LarmPID =
         new PIDController(
-            ControllConstants.ARM.kP, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
+            ControllConstants.ARM.kP - 0.001, ControllConstants.ARM.kI, ControllConstants.ARM.kD);
 
     upDebounce = new Timer();
     downDebounce = new Timer();

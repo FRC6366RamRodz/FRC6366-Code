@@ -62,7 +62,7 @@ public class Shooter {
         && ShootSpeed > getAvrgShootSpd() - 10
         && launchMode) {
       FeedSpeed = 1;
-      sideSpeed = 1000;
+      sideSpeed = 5000;
     } else {
       FeedSpeed = 0;
       sideSpeed = 0;
@@ -134,14 +134,14 @@ public class Shooter {
     }
 
     io.setMotors(
-        ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle.getDegrees(), IntakeSpeed, sideSpeed);
+        ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle.getDegrees(), IntakeSpeed, sideSpeed);
   }
 
   public double LaunchPermision() {
     if (shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
         && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
-        && ShootSpeed < getAvrgShootSpd() + 10
-        && ShootSpeed > getAvrgShootSpd() - 10
+        && ShootSpeed < getAvrgShootSpd() + 15
+        && ShootSpeed > getAvrgShootSpd() - 15
         && launchMode) {
       return 1;
     } else {
@@ -154,6 +154,6 @@ public class Shooter {
   }
 
   public double getAvrgShootSpd() {
-    return (Math.abs(inputs.TopVelocity)) / 2;
+    return (Math.abs(inputs.TopVelocity) + Math.abs(inputs.BottomVelocity)) / 2;
   }
 }

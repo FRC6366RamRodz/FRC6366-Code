@@ -153,7 +153,7 @@ public class Drive extends SubsystemBase {
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
 
-    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
       checkVisionMeasurements();
     } else {
 
@@ -401,18 +401,22 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateOdoWithVision() {
-    double[] limelightPoseDouble =
-        NetworkTableInstance.getDefault()
-            .getTable("limelight")
-            .getEntry("botpose_wpiblue")
-            .getDoubleArray(new double[] {0});
-    Pose2d limeLightPose =
-        new Pose2d(
-            new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
-            Rotation2d.fromDegrees(limelightPoseDouble[5]));
+    if (NetworkTableInstance.getDefault().getTable("limelight") != null) {
+      double[] limelightPoseDouble =
+          NetworkTableInstance.getDefault()
+              .getTable("limelight")
+              .getEntry("botpose_wpiblue")
+              .getDoubleArray(new double[] {0});
+      Pose2d limeLightPose =
+          new Pose2d(
+              new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
+              Rotation2d.fromDegrees(limelightPoseDouble[5]));
+      if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0)
+          == 1) {
+        poseEstimator.resetPose(limeLightPose);
+      }
+    } else {
 
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) {
-      poseEstimator.resetPose(limeLightPose);
     }
   }
 

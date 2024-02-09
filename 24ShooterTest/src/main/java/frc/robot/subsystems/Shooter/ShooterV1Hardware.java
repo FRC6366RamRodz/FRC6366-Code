@@ -35,13 +35,17 @@ public class ShooterV1Hardware implements ShooterIO {
   public SparkPIDController topShooterController;
   public SparkPIDController bottomShooterController;
   public SparkPIDController SideRollerController;
-  //alt pid stuff
-  /*
+  // alt pid stuff
+  /// *
+
   private RelativeEncoder topEncoder;
   private RelativeEncoder bottomEncoder;
+  private SimpleMotorFeedforward topFEED;
+  private SimpleMotorFeedforward bottomFEED;
   private PIDController topPID;
   private PIDController bottomPID;
-  */
+
+  // */
 
   public ShooterV1Hardware() {
 
@@ -49,11 +53,16 @@ public class ShooterV1Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleMotor.getConfigurator().apply(angleConfig);
-    
+
+    bottomShooter.restoreFactoryDefaults();
+    topShooter.restoreFactoryDefaults();
+
     bottomShooter.setIdleMode(IdleMode.kCoast);
     bottomShooter.setIdleMode(IdleMode.kCoast);
     FeedRoller.setIdleMode(IdleMode.kBrake);
     sideRoller.setIdleMode(IdleMode.kCoast);
+
+    sideRoller.setInverted(true);
 
     intake.setControlFramePeriodMs(150);
 
@@ -71,22 +80,22 @@ public class ShooterV1Hardware implements ShooterIO {
 
     topShooterController = topShooter.getPIDController();
     bottomShooterController = bottomShooter.getPIDController();
-       
+
     topShooterController.setFeedbackDevice(topShooter.getEncoder());
     bottomShooterController.setFeedbackDevice(bottomShooter.getEncoder());
 
-    topShooterController.setP(0.001);
+    topShooterController.setP(6e-5);
     topShooterController.setI(0);
     topShooterController.setD(0);
     topShooterController.setIZone(0);
-    topShooterController.setFF(0.005);
-    topShooterController.setOutputRange(-1, 1);    
+    topShooterController.setFF(0.00015);
+    topShooterController.setOutputRange(-1, 1);
 
-    bottomShooterController.setP(0.001);
+    bottomShooterController.setP(6e-5);
     bottomShooterController.setI(0);
     bottomShooterController.setD(0);
     bottomShooterController.setIZone(0);
-    bottomShooterController.setFF(0.005);
+    bottomShooterController.setFF(0.00015);
     bottomShooterController.setOutputRange(-1, 1);
 
     SideRollerController = sideRoller.getPIDController();
@@ -99,21 +108,21 @@ public class ShooterV1Hardware implements ShooterIO {
 
     anglePID.enableContinuousInput(-360, 360);
 
-   
-
     topShooter.burnFlash();
     bottomShooter.burnFlash();
     FeedRoller.burnFlash();
     sideRoller.burnFlash();
     intake.burnFlash();
 
-    //alternate pid options
-    /*
-    topPID = new PIDController(0, 0, 0);
-    bottomPID = new PIDController(0, 0, 0);
+    // alternate pid options
+    /// *
+    topFEED = new SimpleMotorFeedforward(0.103, 0.000178);
+    bottomFEED = new SimpleMotorFeedforward(0.103, 0.000178);
+    topPID = new PIDController(0.0, 0, 0.00000);
+    bottomPID = new PIDController(0.0, 0, 0.00000);
     topEncoder = topShooter.getEncoder();
     bottomEncoder = bottomShooter.getEncoder();
-    */
+    // */
   }
 
   @Override
@@ -138,8 +147,9 @@ public class ShooterV1Hardware implements ShooterIO {
       double anglePosition,
       double intakeVelocity,
       double SideRoller) {
-    topShooterController.setReference(TopVelocity, ControlType.kVelocity);
-    bottomShooterController.setReference(BottomVelocity, ControlType.kVelocity);
+
+    // topShooterController.setReference(TopVelocity, ControlType.kVelocity);
+    // bottomShooterController.setReference(BottomVelocity, ControlType.kVelocity);
 
     double ShooterAngle =
         anglePID.calculate(
@@ -153,13 +163,27 @@ public class ShooterV1Hardware implements ShooterIO {
 
     SideRollerController.setReference(SideRoller, ControlType.kVelocity);
 
-    //alternate PID stuff if rev never works
-    /*
-    double topPercent = MathUtil.applyDeadband(MathUtil.clamp(topPID.calculate(topEncoder.getVelocity(), TopVelocity),-1,1), 0.1);
-    double bottomPercent = MathUtil.applyDeadband(MathUtil.clamp(bottomPID.calculate(bottomEncoder.getVelocity(), BottomVelocity),-1,1), 0.1);
-    
+    // alternate PID stuff if rev never works
+    /// *
+    double topPercent =
+        MathUtil.applyDeadband(
+            MathUtil.clamp(
+                topPID.calculate(topEncoder.getVelocity(), TopVelocity)
+                    + topFEED.calculate(TopVelocity),
+                -1,
+                1),
+            0.1);
+    double bottomPercent =
+        MathUtil.applyDeadband(
+            MathUtil.clamp(
+                bottomPID.calculate(bottomEncoder.getVelocity(), BottomVelocity)
+                    + bottomFEED.calculate(BottomVelocity),
+                -1,
+                1),
+            0.1);
+
     topShooter.set(topPercent);
     bottomShooter.set(bottomPercent);
-    */
+    // */
   }
 }

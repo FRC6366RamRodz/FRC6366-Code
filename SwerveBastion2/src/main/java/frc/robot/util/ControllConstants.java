@@ -11,7 +11,7 @@ public class ControllConstants {
   public static final double DeadBandTriger = 0.05;
 
   public static class ARM {
-    public static final double kP = 0.005;
+    public static final double kP = 0.006;
     public static final double kI = 0;
     public static final double kD = 0.00000001;
     public static final double kIz = 0;
