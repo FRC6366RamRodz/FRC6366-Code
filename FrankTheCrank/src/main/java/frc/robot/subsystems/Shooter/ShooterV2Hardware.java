@@ -138,7 +138,7 @@ public class ShooterV2Hardware implements ShooterIO {
 
     // Arm Calculations
     double ArmVolts =
-        AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0)
+        AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), Units.degreesToRadians(anglePosition) - Units.rotationsToRadians(ArmEncoder.getPosition().getValueAsDouble()))
             + AnglePID.calculate(F_ArmMotor.getPosition().getValueAsDouble() * 360, anglePosition);
     F_ArmMotor.setVoltage(ArmVolts);
     ;
