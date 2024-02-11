@@ -32,10 +32,8 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.util.IO;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -63,20 +61,21 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         shooter = new Shooter(new ShooterV1Hardware());
-        //drive =
+        // drive =
         //    new Drive(
         //        new GyroIOPigeon2(),
         //        new ModuleIOSparkMax(0),
         //        new ModuleIOSparkMax(1),
         //        new ModuleIOSparkMax(2),
         //        new ModuleIOSparkMax(3));
-         drive = new Drive(
-         new GyroIOPigeon2(),
-         new ModuleIOTalonFX(0),
-         new ModuleIOTalonFX(1),
-         new ModuleIOTalonFX(2),
-         new ModuleIOTalonFX(3));
-        
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
+
         break;
 
       case SIM:
@@ -92,7 +91,7 @@ public class RobotContainer {
         break;
 
       default:
-        shooter = new Shooter(new ShooterIO(){});
+        shooter = new Shooter(new ShooterIO() {});
         // Replayed robot, disable IO implementations
         drive =
             new Drive(

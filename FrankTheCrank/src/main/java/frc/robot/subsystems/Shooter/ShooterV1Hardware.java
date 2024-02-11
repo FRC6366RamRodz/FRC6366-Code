@@ -25,7 +25,6 @@ public class ShooterV1Hardware implements ShooterIO {
   public TalonFX angleMotor = new TalonFX(5);
   public CANcoder angleEncoder = new CANcoder(5);
   public PIDController anglePID = new PIDController(0.2, 0, 0);
-  public SimpleMotorFeedforward angleFeedback = new SimpleMotorFeedforward(0.1, 0.13);
   public CANSparkMax topShooter = new CANSparkMax(5, MotorType.kBrushless);
   public CANSparkMax bottomShooter = new CANSparkMax(6, MotorType.kBrushless);
   public CANSparkMax FeedRoller = new CANSparkMax(7, MotorType.kBrushless);
@@ -57,7 +56,7 @@ public class ShooterV1Hardware implements ShooterIO {
     bottomShooter.restoreFactoryDefaults();
     topShooter.restoreFactoryDefaults();
 
-    bottomShooter.setIdleMode(IdleMode.kCoast);
+    topShooter.setIdleMode(IdleMode.kCoast);
     bottomShooter.setIdleMode(IdleMode.kCoast);
     FeedRoller.setIdleMode(IdleMode.kBrake);
     sideRoller.setIdleMode(IdleMode.kCoast);

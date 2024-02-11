@@ -15,12 +15,14 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -66,6 +68,7 @@ public class Robot extends LoggedRobot {
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
+        LoggedPowerDistribution.getInstance(50, ModuleType.kRev);
         break;
 
       case SIM:
@@ -148,12 +151,13 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.teleop(RobotContainer.io.getOpA(),
-    RobotContainer.io.getOpX(),
-    RobotContainer.io.getOPB(),
-    RobotContainer.io.getOpY(),
-    RobotContainer.io.getOPLB(),
-    RobotContainer.io.getOpRB());
+    RobotContainer.shooter.teleop(
+        RobotContainer.io.getOpA(),
+        RobotContainer.io.getOpX(),
+        RobotContainer.io.getOPB(),
+        RobotContainer.io.getOpY(),
+        RobotContainer.io.getOPLB(),
+        RobotContainer.io.getOpRB());
 
     RobotContainer.io.op.setRumble(
         RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
