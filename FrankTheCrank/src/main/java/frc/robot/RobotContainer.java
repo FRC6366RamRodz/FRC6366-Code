@@ -23,12 +23,19 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.subsystems.Shooter.Shooter;
+import frc.robot.subsystems.Shooter.ShooterIO;
+import frc.robot.subsystems.Shooter.ShooterSim;
+import frc.robot.subsystems.Shooter.ShooterV1Hardware;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.util.IO;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -40,6 +47,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   public static Drive drive;
+  public static Shooter shooter;
+  public static IO io = new IO();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -53,23 +62,25 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
-        // drive = new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFX(0),
-        // new ModuleIOTalonFX(1),
-        // new ModuleIOTalonFX(2),
-        // new ModuleIOTalonFX(3));
-        // flywheel = new Flywheel(new FlywheelIOTalonFX());
+        shooter = new Shooter(new ShooterV1Hardware());
+        //drive =
+        //    new Drive(
+        //        new GyroIOPigeon2(),
+        //        new ModuleIOSparkMax(0),
+        //        new ModuleIOSparkMax(1),
+        //        new ModuleIOSparkMax(2),
+        //        new ModuleIOSparkMax(3));
+         drive = new Drive(
+         new GyroIOPigeon2(),
+         new ModuleIOTalonFX(0),
+         new ModuleIOTalonFX(1),
+         new ModuleIOTalonFX(2),
+         new ModuleIOTalonFX(3));
+        
         break;
 
       case SIM:
+        shooter = new Shooter(new ShooterSim());
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
@@ -81,6 +92,7 @@ public class RobotContainer {
         break;
 
       default:
+        shooter = new Shooter(new ShooterIO(){});
         // Replayed robot, disable IO implementations
         drive =
             new Drive(
