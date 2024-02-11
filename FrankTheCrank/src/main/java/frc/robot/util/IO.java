@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.XboxController;
 
 /** Add your docs here. */
 public class IO {
-  public XboxController driver = new XboxController(0);
   public XboxController op = new XboxController(1);
 
   public IO() {}

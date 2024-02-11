@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.6279768172071953,
+      "y": 5.55
+    },
+    "rotation": 180.0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -10,7 +16,13 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "named",
+                "data": {
+                  "name": "shoot"
+                }
+              },
+              {
+                "type": "deadline",
                 "data": {
                   "commands": [
                     {
@@ -18,18 +30,36 @@
                       "data": {
                         "pathName": "speaker to center"
                       }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
+                      }
                     }
                   ]
                 }
               },
               {
-                "type": "parallel",
+                "type": "named",
+                "data": {
+                  "name": "autoLineShot"
+                }
+              },
+              {
+                "type": "deadline",
                 "data": {
                   "commands": [
                     {
                       "type": "path",
                       "data": {
                         "pathName": "center to left"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
                       }
                     }
                   ]
@@ -42,13 +72,25 @@
                 }
               },
               {
-                "type": "parallel",
+                "type": "named",
+                "data": {
+                  "name": "autoLineShot"
+                }
+              },
+              {
+                "type": "deadline",
                 "data": {
                   "commands": [
                     {
                       "type": "path",
                       "data": {
                         "pathName": "LeftShot-right"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
                       }
                     }
                   ]
@@ -58,6 +100,18 @@
                 "type": "path",
                 "data": {
                   "pathName": "right-shot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "autoLineShot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "doNothing"
                 }
               }
             ]

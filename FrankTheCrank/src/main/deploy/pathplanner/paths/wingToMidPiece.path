@@ -3,38 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.32206408027004,
-        "y": 5.594086781129076
+        "x": 5.714947816299927,
+        "y": 6.1679865756869265
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7493224696705398,
-        "y": 5.476601322544562
+        "x": 6.963230813760376,
+        "y": 6.10924384639467
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.6103945732041742,
-        "y": 4.238192011242402
+        "x": 8.005914258697928,
+        "y": 5.783221698822647
       },
       "prevControl": {
-        "x": 2.146014887099947,
-        "y": 4.719434257990839
+        "x": 6.9926021784065036,
+        "y": 5.856650110437967
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.4,
-      "rotationDegrees": 144.82848178628205,
-      "rotateFast": true
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -45,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 151.38954033403476,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "4PieceCenterPaths",
+  "folder": "AmpSide3PiecePaths",
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

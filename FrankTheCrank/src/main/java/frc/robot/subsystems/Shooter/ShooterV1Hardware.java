@@ -134,7 +134,7 @@ public class ShooterV1Hardware implements ShooterIO {
     inputs.anglePosition =
         Units.rotationsToDegrees(angleEncoder.getAbsolutePosition().getValueAsDouble());
     inputs.angleVelocity = (angleEncoder.getVelocity().getValueAsDouble()) * 60;
-    inputs.feederVelocity = FeedRoller.getEncoder().getVelocity();
+    inputs.HandlerVelocity = FeedRoller.getEncoder().getVelocity();
     inputs.intakeVelocity = intake.getEncoder().getVelocity();
   }
 
@@ -142,10 +142,11 @@ public class ShooterV1Hardware implements ShooterIO {
   public void setMotors(
       double TopVelocity,
       double BottomVelocity,
-      double feederVelocity,
+      double HandlerVelocity,
       double anglePosition,
       double intakeVelocity,
-      double SideRoller) {
+      double feederVelocity,
+      boolean limitOff) {
 
     // topShooterController.setReference(TopVelocity, ControlType.kVelocity);
     // bottomShooterController.setReference(BottomVelocity, ControlType.kVelocity);
@@ -157,10 +158,10 @@ public class ShooterV1Hardware implements ShooterIO {
     angleMotor.setControl(
         new VoltageOut(MathUtil.clamp(MathUtil.applyDeadband(-ShooterAngle, 1), -12, 12)));
 
-    FeedRoller.set(-feederVelocity);
+    FeedRoller.set(-HandlerVelocity);
     intake.set(-intakeVelocity);
 
-    SideRollerController.setReference(SideRoller, ControlType.kVelocity);
+    SideRollerController.setReference(feederVelocity, ControlType.kVelocity);
 
     // alternate PID stuff if rev never works
     /// *

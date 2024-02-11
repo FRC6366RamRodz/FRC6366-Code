@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -21,12 +22,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AutoLineShot;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.Intake;
+import frc.robot.commands.StageShot;
+import frc.robot.commands.WingShot;
+import frc.robot.commands.doNothing;
+import frc.robot.commands.shoot;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIO;
 import frc.robot.subsystems.Shooter.ShooterSim;
-import frc.robot.subsystems.Shooter.ShooterV1Hardware;
+import frc.robot.subsystems.Shooter.ShooterV2Hardware;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -47,6 +54,12 @@ public class RobotContainer {
   public static Drive drive;
   public static Shooter shooter;
   public static IO io = new IO();
+  public Command Intake = new Intake();
+  public Command shoot = new shoot();
+  public Command autoLineShot = new AutoLineShot();
+  public Command wingShot = new WingShot();
+  public Command doNothing = new doNothing();
+  public Command stageShot = new StageShot();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -60,7 +73,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        shooter = new Shooter(new ShooterV1Hardware());
+        shooter = new Shooter(new ShooterV2Hardware());
         // drive =
         //    new Drive(
         //        new GyroIOPigeon2(),
@@ -102,7 +115,12 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
-
+    NamedCommands.registerCommand("intake", Intake);
+    NamedCommands.registerCommand("shoot", shoot);
+    NamedCommands.registerCommand("autoLineShot", autoLineShot);
+    NamedCommands.registerCommand("WingShot", wingShot);
+    NamedCommands.registerCommand("doNothing", doNothing);
+    NamedCommands.registerCommand("StageShot", stageShot);
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

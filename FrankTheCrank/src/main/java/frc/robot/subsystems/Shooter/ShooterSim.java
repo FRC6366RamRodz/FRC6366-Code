@@ -4,8 +4,9 @@
 
 package frc.robot.subsystems.Shooter;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -13,67 +14,86 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Add your docs here. */
 public class ShooterSim implements ShooterIO {
-  private SingleJointedArmSim ShooterAngle =
+  private SingleJointedArmSim shooterAngle =
       new SingleJointedArmSim(
-          DCMotor.getKrakenX60(1),
-          50,
-          0.008,
-          Units.inchesToMeters(1),
-          Units.degreesToRadians(-90),
+          DCMotor.getFalcon500(1),
+          130,
+          0.07480059831487,
+          Units.inchesToMeters(21.729),
+          Units.degreesToRadians(-50),
           Units.degreesToRadians(90),
-          false,
-          0);
-  private FlywheelSim intake = new FlywheelSim(DCMotor.getNEO(1), 1, 0.04);
-  private FlywheelSim feeder = new FlywheelSim(DCMotor.getFalcon500(1), 1, 0.04);
-  private FlywheelSim TopShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.04);
-  private FlywheelSim BottomShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 1, 0.04);
+          true,
+          Units.degreesToRadians(-50));
+  private FlywheelSim intake = new FlywheelSim(DCMotor.getNEO(1), 5, 0.004);
+  private FlywheelSim handler = new FlywheelSim(DCMotor.getNEO(1), 5, 0.04);
+  private FlywheelSim feeder = new FlywheelSim(DCMotor.getNeo550(1), 15, 0.04);
+  private FlywheelSim topShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 2, 0.004);
+  private FlywheelSim bottomShooter = new FlywheelSim(DCMotor.getKrakenX60(1), 2, 0.004);
 
-  private PIDController angleSet = new PIDController(0.7, 0, 0.0001);
-  private PIDController topShooter = new PIDController(0.2, 0, 0.0008);
-  private PIDController bottomShooter = new PIDController(0.2, 0, 0.0008);
-  private PIDController Feeder = new PIDController(0.2, 0, 0.0008);
-  private PIDController Intake = new PIDController(0.2, 0, 0.0008);
+  private PIDController anglePID = new PIDController(0.1, 0, 0.0000);
+  private ArmFeedforward angleFeedForward = new ArmFeedforward(0, 0.0405, 8);
+
+  private PIDController topPID = new PIDController(0.01, 0, 0.0000);
+  private PIDController bottomPID = new PIDController(0.01, 0, 0.0000);
+  private SimpleMotorFeedforward topFeed = new SimpleMotorFeedforward(0.010, 0.003976);
+  private SimpleMotorFeedforward bottomFeed = new SimpleMotorFeedforward(0.010, 0.003976);
+
+  public ShooterSim() {
+    anglePID.enableContinuousInput(-180, 180);
+  }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    ShooterAngle.update(0.02);
+    shooterAngle.update(0.02);
     intake.update(0.02);
     feeder.update(0.02);
-    TopShooter.update(0.02);
-    BottomShooter.update(0.02);
+    topShooter.update(0.02);
+    bottomShooter.update(0.02);
+    handler.update(0.02);
 
-    inputs.TopVelocity = TopShooter.getAngularVelocityRPM();
-    inputs.BottomVelocity = BottomShooter.getAngularVelocityRPM();
-    inputs.anglePosition = Units.radiansToDegrees(ShooterAngle.getAngleRads());
-    inputs.angleVelocity =
-        Units.radiansPerSecondToRotationsPerMinute(ShooterAngle.getVelocityRadPerSec());
+    inputs.TopVelocity = topShooter.getAngularVelocityRPM();
+    inputs.BottomVelocity = bottomShooter.getAngularVelocityRPM();
+
+    inputs.HandlerVelocity = handler.getAngularVelocityRPM();
     inputs.feederVelocity = feeder.getAngularVelocityRPM();
     inputs.intakeVelocity = intake.getAngularVelocityRPM();
+
+    inputs.anglePosition = Units.radiansToDegrees(shooterAngle.getAngleRads());
+    inputs.angleVelocity =
+        Units.radiansPerSecondToRotationsPerMinute(shooterAngle.getVelocityRadPerSec());
   }
 
   @Override
   public void setMotors(
       double TopVelocity,
       double BottomVelocity,
-      double feederVelocity,
+      double HandlerVelocity,
       double anglePosition,
       double intakeVelocity,
-      double SideRoller) {
-    double AngleSet =
-        angleSet.calculate(Units.radiansToDegrees(ShooterAngle.getAngleRads()), anglePosition);
-    ShooterAngle.setInputVoltage(MathUtil.clamp(AngleSet, -12.0, 12.0));
+      double feederVelocity,
+      boolean limitOff) {
 
-    double topVelocity = topShooter.calculate(TopShooter.getAngularVelocityRPM(), TopVelocity);
-    TopShooter.setInputVoltage(MathUtil.clamp(topVelocity, -12.0, 12.0));
+    double angleVelocity =
+        angleFeedForward.calculate(
+                anglePosition, Units.degreesToRadians(anglePosition) - shooterAngle.getAngleRads())
+            + anglePID.calculate(
+                Units.radiansToDegrees(shooterAngle.getAngleRads()), anglePosition);
+    shooterAngle.setInputVoltage(angleVelocity);
+
+    double topVelocity =
+        topFeed.calculate(TopVelocity)
+            + topPID.calculate(topShooter.getAngularVelocityRPM(), TopVelocity);
+    topShooter.setInputVoltage(topVelocity);
 
     double bottomVelocity =
-        bottomShooter.calculate(BottomShooter.getAngularVelocityRPM(), -BottomVelocity);
-    BottomShooter.setInputVoltage(MathUtil.clamp(bottomVelocity, -12.0, 12.0));
+        bottomFeed.calculate(BottomVelocity)
+            + bottomPID.calculate(bottomShooter.getAngularVelocityRPM(), BottomVelocity);
+    bottomShooter.setInputVoltage(bottomVelocity);
 
-    double FeederVelocity = Feeder.calculate(feeder.getAngularVelocityRPM(), feederVelocity);
-    feeder.setInputVoltage(FeederVelocity);
+    intake.setInputVoltage(intakeVelocity * 12);
 
-    double IntakeVelocity = Intake.calculate(intake.getAngularVelocityRPM(), intakeVelocity);
-    intake.setInputVoltage(IntakeVelocity);
+    feeder.setInput(feederVelocity);
+
+    handler.setInput(HandlerVelocity);
   }
 }

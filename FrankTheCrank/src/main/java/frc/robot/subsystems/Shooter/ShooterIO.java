@@ -12,10 +12,11 @@ public interface ShooterIO {
   public static class ShooterIOInputs {
     public double TopVelocity = 0.0;
     public double BottomVelocity = 0.0;
-    public double feederVelocity = 0.0;
+    public double HandlerVelocity = 0.0;
     public double angleVelocity = 0.0;
     public double anglePosition = 0.0;
     public double intakeVelocity = 0.0;
+    public double feederVelocity = 0.0;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}
@@ -23,8 +24,9 @@ public interface ShooterIO {
   public default void setMotors(
       double TopVelocity,
       double BottomVelocity,
-      double feederVelocity,
+      double HandlerVelocity,
       double anglePosition,
       double intakeVelocity,
-      double SideRoller) {}
+      double feederVelocity,
+      boolean limitOff) {}
 }

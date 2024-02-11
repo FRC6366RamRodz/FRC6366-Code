@@ -13,10 +13,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -120,7 +121,9 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    RobotContainer.drive.updateOdoWithVision();
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      RobotContainer.drive.updateOdoWithVision();
+    }
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -132,7 +135,9 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    RobotContainer.drive.checkVisionMeasurements();
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      RobotContainer.drive.checkVisionMeasurements();
+    }
   }
 
   /** This function is called once when teleop is enabled. */
@@ -145,19 +150,22 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    RobotContainer.drive.updateOdoWithVision();
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      RobotContainer.drive.updateOdoWithVision();
+    }
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.teleop(
+    RobotContainer.shooter.run3PointArm(
         RobotContainer.io.getOpA(),
         RobotContainer.io.getOpX(),
         RobotContainer.io.getOPB(),
         RobotContainer.io.getOpY(),
         RobotContainer.io.getOPLB(),
-        RobotContainer.io.getOpRB());
+        RobotContainer.io.getOpRB(),
+        false);
 
     RobotContainer.io.op.setRumble(
         RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());

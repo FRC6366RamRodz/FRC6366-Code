@@ -67,7 +67,12 @@ public class DriveCommands {
                       .getEntry("tv")
                       .getDouble(0)
                   == 1
-              && point.getAsBoolean()) {
+              && point.getAsBoolean()
+              && NetworkTableInstance.getDefault()
+                      .getTable("limelight-two")
+                      .getEntry("tl")
+                      .getDouble(0)
+                  != 0) {
             omega =
                 NetworkTableInstance.getDefault()
                         .getTable("limelight-two")

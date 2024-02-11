@@ -55,36 +55,36 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnCurrent;
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
-  private final double TURN_GEAR_RATIO = 150.0 / 7.0;
+  private final double DRIVE_GEAR_RATIO = 5.60;
+  private final double TURN_GEAR_RATIO = 13.3714;
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
 
   public ModuleIOTalonFX(int index) {
     switch (index) {
-      case 0:
-        driveTalon = new TalonFX(0);
-        turnTalon = new TalonFX(1);
+      case 0: // fl
+        driveTalon = new TalonFX(1);
+        turnTalon = new TalonFX(11);
+        cancoder = new CANcoder(1);
+        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        break;
+      case 1: // fr
+        driveTalon = new TalonFX(2);
+        turnTalon = new TalonFX(12);
         cancoder = new CANcoder(2);
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
-      case 1:
+      case 2: // bl
         driveTalon = new TalonFX(3);
+        turnTalon = new TalonFX(13);
+        cancoder = new CANcoder(3);
+        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        break;
+      case 3: // br
+        driveTalon = new TalonFX(4);
         turnTalon = new TalonFX(4);
-        cancoder = new CANcoder(5);
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
-        break;
-      case 2:
-        driveTalon = new TalonFX(6);
-        turnTalon = new TalonFX(7);
-        cancoder = new CANcoder(8);
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
-        break;
-      case 3:
-        driveTalon = new TalonFX(9);
-        turnTalon = new TalonFX(10);
-        cancoder = new CANcoder(11);
+        cancoder = new CANcoder(14);
         absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
         break;
       default:

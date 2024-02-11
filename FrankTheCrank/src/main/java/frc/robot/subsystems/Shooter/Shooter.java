@@ -12,9 +12,11 @@ import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class Shooter {
+
   private Pose3d angle = new Pose3d();
   private final ShooterIO io;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+
   public double ShootSpeed;
   public double IntakeSpeed;
   public double FeedSpeed;
@@ -31,115 +33,83 @@ public class Shooter {
 
     Logger.processInputs("Shooter", inputs);
     Logger.recordOutput("Angle", angle);
+
+    angle =
+        new Pose3d(
+            0.42,
+            0.08,
+            0.52,
+            new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
   }
 
-  public void teleop(
-      boolean intake, boolean shoot, boolean amp, boolean fire, boolean mod1, boolean mod2) {
-    if (intake && shooterAngle < 2 && shooterAngle > -2) {
+  public void run3PointArm(
+      boolean intake,
+      boolean speaker,
+      boolean amp,
+      boolean launch,
+      boolean center,
+      boolean wing,
+      boolean autoline) {
+
+    if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
+      ShootSpeed = 0.0;
       IntakeSpeed = 1;
-      shooterAngle = 0;
-    } else if (shoot && mod1) {
-      IntakeSpeed = 0;
-      shooterAngle = 50;
-    } else if (shoot && mod2) {
-      IntakeSpeed = 0;
-      shooterAngle = 30;
-    } else if (amp) {
-      IntakeSpeed = 0;
-      shooterAngle = 80;
-    } else {
-      IntakeSpeed = 0;
-      shooterAngle = 0;
-    }
-
-    if (intake && shooterAngle < 2 && shooterAngle > -2) {
-      FeedSpeed = 0.4;
-      sideSpeed = 0;
-    } else if (fire
-        && shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
-        && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
-        && ShootSpeed < getAvrgShootSpd() + 10
-        && ShootSpeed > getAvrgShootSpd() - 10
-        && launchMode) {
       FeedSpeed = 1;
-      sideSpeed = 5000;
-    } else {
-      FeedSpeed = 0;
-      sideSpeed = 0;
-    }
-
-    if (shoot && mod1) {
-      ShootSpeed = 1000;
+      shooterAngle = -50;
+      launchMode = false;
+    } else if (speaker && center) {
+      ShootSpeed = 3800;
+      IntakeSpeed = 0.0;
+      FeedSpeed = 1;
+      shooterAngle = -10;
       launchMode = true;
-    } else if (shoot && mod2) {
-      ShootSpeed = 800;
+    } else if (speaker && wing) {
+      ShootSpeed = 4500;
+      IntakeSpeed = 0.0;
+      FeedSpeed = 1;
+      shooterAngle = -2;
       launchMode = true;
-    } else if (shoot) {
+    } else if (speaker && !center && !wing) {
+      ShootSpeed = 3400;
+      IntakeSpeed = 0.0;
+      FeedSpeed = 1;
+      shooterAngle = -35;
+      launchMode = true;
+    } else if (amp) {
       ShootSpeed = 500;
-      launchMode = true;
-    } else if (amp) {
-      ShootSpeed = 200;
-      launchMode = true;
-    } else {
-      ShootSpeed = 0;
-      launchMode = false;
-    }
-
-    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed);
-
-    angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge(), 0));
-  }
-
-  public void advancedTeleop(boolean shoot, boolean fire, boolean intake, double distanceX) {
-    double ShootSpeed;
-    Rotation2d shooterAngle;
-    double IntakeSpeed;
-
-    if (shoot) {
-      shooterAngle =
-          new Rotation2d(
-                  (Math.asin(-9.8 - distanceX * 2))
-                      / 2
-                      * ((2 * Math.PI * 0.0508 * getAvrgShootSpd()) / 60))
-              .minus(new Rotation2d(Units.degreesToRadians(45)));
-      ShootSpeed = 2500;
-    } else {
-      shooterAngle = new Rotation2d(0);
-      ShootSpeed = 0;
-    }
-
-    if (fire
-        && shooterAngle.getDegrees() < Units.radiansToDegrees(getAnlge()) + 2
-        && shooterAngle.getDegrees() > Units.radiansToDegrees(getAnlge()) - 2
-        && ShootSpeed < getAvrgShootSpd() + 10
-        && ShootSpeed > getAvrgShootSpd() - 10
-        && launchMode) {
+      IntakeSpeed = 0.0;
       FeedSpeed = 1;
-      sideSpeed = 1000;
-    } else {
-      FeedSpeed = 0;
-      sideSpeed = 0;
-    }
-
-    if (shoot) {
+      shooterAngle = 50;
+      launchMode = true;
+    } else if (autoline) {
+      ShootSpeed = 3800;
+      IntakeSpeed = 0.0;
+      FeedSpeed = 1;
+      shooterAngle = -40;
       launchMode = true;
     } else {
+      ShootSpeed = 0.0;
+      IntakeSpeed = 0.0;
+      FeedSpeed = 0.0;
+      shooterAngle = -50.0;
       launchMode = false;
     }
 
-    if (intake && shooterAngle.getDegrees() < 2 && shooterAngle.getDegrees() > -2) {
-      IntakeSpeed = 1;
+    boolean limitOff;
+    if (LaunchPermision() == 1 && launch && (amp || speaker)) {
+      sideSpeed = 0.5;
+      limitOff = true;
     } else {
-      IntakeSpeed = 0;
+      sideSpeed = 0;
+      limitOff = false;
     }
 
-    io.setMotors(
-        ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle.getDegrees(), IntakeSpeed, sideSpeed);
+    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff);
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
-        && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
+    if (shooterAngle < getAnlge().plus(new Rotation2d(2)).getDegrees()
+        && shooterAngle > getAnlge().minus(new Rotation2d(2)).getDegrees()
         && ShootSpeed < getAvrgShootSpd() + 15
         && ShootSpeed > getAvrgShootSpd() - 15
         && launchMode) {
@@ -149,8 +119,8 @@ public class Shooter {
     }
   }
 
-  public double getAnlge() {
-    return Units.degreesToRadians(inputs.anglePosition);
+  public Rotation2d getAnlge() {
+    return new Rotation2d(Units.degreesToRadians(inputs.anglePosition));
   }
 
   public double getAvrgShootSpd() {
