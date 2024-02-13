@@ -14,16 +14,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.drive.Drive;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
@@ -37,19 +40,11 @@ public class DriveCommands {
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
-  public static Command joystickDrive(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier,
-      BooleanSupplier point) {
-    return Commands.run(
-        () -> {
+  public static Command joystickDrive(Drive drive,DoubleSupplier xSupplier,DoubleSupplier ySupplier,DoubleSupplier omegaSupplier,BooleanSupplier point, BooleanSupplier speak) {
+    return Commands.run( () -> {
           Optional<Alliance> ally = DriverStation.getAlliance();
           // Apply deadband
-          double linearMagnitude =
-              MathUtil.applyDeadband(
-                  Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
+          double linearMagnitude = MathUtil.applyDeadband(Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()), DEADBAND);
           Rotation2d linearDirection;
           if (ally.isPresent()) {
             if (ally.get() == Alliance.Red) {
@@ -64,7 +59,29 @@ public class DriveCommands {
           double omega;
           if (NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tv").getDouble(0) == 1 && point.getAsBoolean() && NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tl").getDouble(0)!= 0) {
             omega = NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tx").getDouble(0) / -26;
-          } else {
+          } else if(speak.getAsBoolean()){
+            double x1, y1, offset;
+            if (ally.get() == Alliance.Blue){
+              x1 = 0; 
+              y1 = 5.5;
+              offset = Math.PI;
+            } else {
+              x1 = 16.45;
+              y1 = 5.5;
+              offset = 0.0;
+            }
+           
+
+            double x2 = getPose().getX(), y2 = getPose().getY();
+            double x = x2 - x1;
+            double y = y2 - y1;
+            double theta = Math.atan(y/x);
+            try (PIDController error = new PIDController(1, 0.0, 0.0)) {
+              omega = error.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
+            }
+
+           
+          }else {
             omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
           }
 
@@ -88,5 +105,9 @@ public class DriveCommands {
                   drive.getRotation()));
         },
         drive);
+  }
+
+  public static Pose2d getPose() {
+   return RobotContainer.drive.getPose();
   }
 }
