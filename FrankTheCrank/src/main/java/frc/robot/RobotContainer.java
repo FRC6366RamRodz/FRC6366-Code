@@ -74,7 +74,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        shooter = new Shooter(new ShooterV2Hardware());
+        shooter = new Shooter(new ShooterSim());
          drive =
             new Drive(
                 new GyroIOPigeon2(),
