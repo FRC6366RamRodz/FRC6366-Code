@@ -158,17 +158,9 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.run3PointArm(
-        RobotContainer.io.getOpA(),
-        RobotContainer.io.getOpX(),
-        RobotContainer.io.getOPB(),
-        RobotContainer.io.getOpY(),
-        RobotContainer.io.getOPLB(),
-        RobotContainer.io.getOpRB(),
-        false);
+    RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), false);
 
-    RobotContainer.io.op.setRumble(
-        RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
+    RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
   }
 
   /** This function is called once when test mode is enabled. */

@@ -35,21 +35,10 @@ public class Shooter {
     Logger.recordOutput("Angle", angle);
 
     angle =
-        new Pose3d(
-            0.42,
-            0.08,
-            0.52,
-            new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
+        new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
   }
 
-  public void run3PointArm(
-      boolean intake,
-      boolean speaker,
-      boolean amp,
-      boolean launch,
-      boolean center,
-      boolean wing,
-      boolean autoline) {
+  public void run3PointArm(boolean intake,boolean speaker,boolean amp,boolean launch,boolean center,boolean wing,boolean autoline) {
 
     if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
       ShootSpeed = 0.0;
@@ -108,11 +97,7 @@ public class Shooter {
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < getAnlge().plus(new Rotation2d(2)).getDegrees()
-        && shooterAngle > getAnlge().minus(new Rotation2d(2)).getDegrees()
-        && ShootSpeed < getAvrgShootSpd() + 15
-        && ShootSpeed > getAvrgShootSpd() - 15
-        && launchMode) {
+    if (shooterAngle < getAnlge().plus(new Rotation2d(2)).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(2)).getDegrees() && ShootSpeed < getAvrgShootSpd() + 15 && ShootSpeed > getAvrgShootSpd() - 15&& launchMode) {
       return 1;
     } else {
       return 0;

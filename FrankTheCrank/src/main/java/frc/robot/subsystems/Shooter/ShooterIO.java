@@ -19,14 +19,9 @@ public interface ShooterIO {
     public double feederVelocity = 0.0;
   }
 
-  public default void updateInputs(ShooterIOInputs inputs) {}
+  public default void updateInputs(ShooterIOInputs inputs) {
+  }
 
-  public default void setMotors(
-      double TopVelocity,
-      double BottomVelocity,
-      double HandlerVelocity,
-      double anglePosition,
-      double intakeVelocity,
-      double feederVelocity,
-      boolean limitOff) {}
+  public default void setMotors(double TopVelocity, double BottomVelocity, double HandlerVelocity, double anglePosition, double intakeVelocity, double feederVelocity, boolean limitOff) {
+  }
 }

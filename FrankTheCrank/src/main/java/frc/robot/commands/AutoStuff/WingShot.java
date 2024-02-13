@@ -2,16 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.AutoStuff;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 
-public class StageShot extends Command {
+public class WingShot extends Command {
   public Timer shotTime = new Timer();
-  /** Creates a new StageShot. */
-  public StageShot() {
+  /** Creates a new WingShot. */
+  public WingShot() {
+
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -27,9 +28,9 @@ public class StageShot extends Command {
   public void execute() {
     if (RobotContainer.shooter.LaunchPermision() == 1) {
       shotTime.start();
-      RobotContainer.shooter.run3PointArm(false, true, false, true, true, false, false);
+      RobotContainer.shooter.run3PointArm(false, true, false, true, false, true, false);
     } else {
-      RobotContainer.shooter.run3PointArm(false, true, false, false, true, false, false);
+      RobotContainer.shooter.run3PointArm(false, true, false, false, false, true, false);
     }
   }
 

@@ -137,16 +137,13 @@ public class ShooterV2Hardware implements ShooterIO {
       boolean limitOff) {
 
     // Arm Calculations
-    double ArmVolts =
-        AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), Units.degreesToRadians(anglePosition) - Units.rotationsToRadians(ArmEncoder.getPosition().getValueAsDouble()))
-            + AnglePID.calculate(F_ArmMotor.getPosition().getValueAsDouble() * 360, anglePosition);
+    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), Units.degreesToRadians(anglePosition) - Units.rotationsToRadians(ArmEncoder.getPosition().getValueAsDouble())) + AnglePID.calculate(F_ArmMotor.getPosition().getValueAsDouble() * 360, anglePosition);
     F_ArmMotor.setVoltage(ArmVolts);
-    ;
+    
 
     // Shooter
     double topVolts = TopFeedForward.calculate(TopVelocity) + TopPID.calculate(TopVelocity);
-    double bottomVolts =
-        BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(BottomVelocity);
+    double bottomVolts = BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(BottomVelocity);
     K_topShooter.setVoltage(topVolts);
     K_bottomShooter.setVoltage(bottomVolts);
 
