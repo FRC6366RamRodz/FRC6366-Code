@@ -16,6 +16,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
@@ -24,7 +25,6 @@ import edu.wpi.first.math.util.Units;
 public class ShooterV1Hardware implements ShooterIO {
   public TalonFX angleMotor = new TalonFX(5);
   public CANcoder angleEncoder = new CANcoder(5);
-  public PIDController anglePID = new PIDController(0.2, 0, 0);
   public SimpleMotorFeedforward angleFeedback = new SimpleMotorFeedforward(0.1, 0.13);
   public CANSparkMax topShooter = new CANSparkMax(5, MotorType.kBrushless);
   public CANSparkMax bottomShooter = new CANSparkMax(6, MotorType.kBrushless);
@@ -35,6 +35,8 @@ public class ShooterV1Hardware implements ShooterIO {
   public SparkPIDController topShooterController;
   public SparkPIDController bottomShooterController;
   public SparkPIDController SideRollerController;
+  public ArmFeedforward armFeedforward = new ArmFeedforward(0, 0.24, 0);
+  public PIDController anglePID = new PIDController(0.062, 0, 0.00001);
   // alt pid stuff
   /// *
 
@@ -106,7 +108,7 @@ public class ShooterV1Hardware implements ShooterIO {
     bottomShooterController.setFF(0.000015);
     bottomShooterController.setOutputRange(-1, 1);
 
-    anglePID.enableContinuousInput(-360, 360);
+    anglePID.enableContinuousInput(0, 360);
 
     topShooter.burnFlash();
     bottomShooter.burnFlash();
@@ -116,10 +118,10 @@ public class ShooterV1Hardware implements ShooterIO {
 
     // alternate pid options
     /// *
-    topFEED = new SimpleMotorFeedforward(0.103, 0.000178);
-    bottomFEED = new SimpleMotorFeedforward(0.103, 0.000178);
-    topPID = new PIDController(0.0, 0, 0.00000);
-    bottomPID = new PIDController(0.0, 0, 0.00000);
+    topFEED = new SimpleMotorFeedforward(0.108, 0.000155);
+    bottomFEED = new SimpleMotorFeedforward(0.108, 0.000155);
+    topPID = new PIDController(0.0002, 0, 0.00000);
+    bottomPID = new PIDController(0.0002, 0, 0.00000);
     topEncoder = topShooter.getEncoder();
     bottomEncoder = bottomShooter.getEncoder();
     // */
@@ -155,8 +157,9 @@ public class ShooterV1Hardware implements ShooterIO {
         anglePID.calculate(
             Units.rotationsToDegrees(angleEncoder.getAbsolutePosition().getValueAsDouble()),
             anglePosition);
-    angleMotor.setControl(
-        new VoltageOut(MathUtil.clamp(MathUtil.applyDeadband(-ShooterAngle, 1), -12, 12)));
+
+    double ArmForward = armFeedforward.calculate(Units.degreesToRadians(anglePosition), 0);
+    angleMotor.setControl(new VoltageOut(ShooterAngle + ArmForward));
 
     FeedRoller.set(-feederVelocity);
     intake.set(-intakeVelocity);

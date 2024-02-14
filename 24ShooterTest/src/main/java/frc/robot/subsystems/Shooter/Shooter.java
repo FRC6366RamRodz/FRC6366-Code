@@ -40,13 +40,16 @@ public class Shooter {
       shooterAngle = 0;
     } else if (shoot && mod1) {
       IntakeSpeed = 0;
-      shooterAngle = 50;
+      shooterAngle = 52;
     } else if (shoot && mod2) {
       IntakeSpeed = 0;
-      shooterAngle = 30;
+      shooterAngle = 40;
+    } else if (shoot && !mod1 && !mod2) {
+      IntakeSpeed = 0;
+      shooterAngle = 20;
     } else if (amp) {
       IntakeSpeed = 0;
-      shooterAngle = 80;
+      shooterAngle = 112;
     } else {
       IntakeSpeed = 0;
       shooterAngle = 0;
@@ -56,8 +59,7 @@ public class Shooter {
       FeedSpeed = 0.4;
       sideSpeed = 0;
     } else if (fire
-        && shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
-        && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
+        && LaunchPermision() == 1
         && ShootSpeed < getAvrgShootSpd() + 10
         && ShootSpeed > getAvrgShootSpd() - 10
         && launchMode) {
@@ -69,16 +71,16 @@ public class Shooter {
     }
 
     if (shoot && mod1) {
-      ShootSpeed = 1000;
+      ShootSpeed = 5200;
       launchMode = true;
     } else if (shoot && mod2) {
-      ShootSpeed = 800;
+      ShootSpeed = 4400;
       launchMode = true;
     } else if (shoot) {
-      ShootSpeed = 500;
+      ShootSpeed = 3800;
       launchMode = true;
     } else if (amp) {
-      ShootSpeed = 200;
+      ShootSpeed = 400;
       launchMode = true;
     } else {
       ShootSpeed = 0;
@@ -138,8 +140,8 @@ public class Shooter {
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < Units.radiansToDegrees(getAnlge()) + 2
-        && shooterAngle > Units.radiansToDegrees(getAnlge()) - 2
+    if (shooterAngle < Units.radiansToDegrees(getAnlge()) + 5
+        && shooterAngle > Units.radiansToDegrees(getAnlge()) - 5
         && ShootSpeed < getAvrgShootSpd() + 15
         && ShootSpeed > getAvrgShootSpd() - 15
         && launchMode) {
