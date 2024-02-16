@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.Shooter;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -13,6 +15,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -41,6 +45,10 @@ public class ShooterV2Hardware implements ShooterIO {
 
   // Encoders
   public static CANcoder ArmEncoder = new CANcoder(5);
+  public static StatusSignal<Double> absolutePosition;
+  public static StatusSignal<Double> TopVelocity;
+  public static StatusSignal<Double> BottomVelocity;
+
 
   // limit Switch
   public SparkLimitSwitch HandlerSwitch = N_Handler.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
@@ -57,7 +65,8 @@ public class ShooterV2Hardware implements ShooterIO {
     f_Feeder.clearFaults();
 
     // lazy motor
-    N_Intake.setControlFramePeriodMs(250);
+    N_Intake.setControlFramePeriodMs(450);
+    f_Feeder.setControlFramePeriodMs(100);
 
     HandlerSwitch.enableLimitSwitch(true);
 
@@ -92,6 +101,11 @@ public class ShooterV2Hardware implements ShooterIO {
 
     F_ArmMotor.getConfigurator().apply(angleConfig);
 
+    absolutePosition = ArmEncoder.getAbsolutePosition();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(250, absolutePosition);
+    ArmEncoder.optimizeBusUtilization();
+
     // shooter stuff
     double SHks = 0.94;
     double SHkv = 0.00161;
@@ -110,6 +124,7 @@ public class ShooterV2Hardware implements ShooterIO {
     double ARv = 0.0;
     AngleFeedForward = new ArmFeedforward(ARs, ARg, ARv);
 
+
     double ARp = 0.11;
     double ARi = 0.0;
     double ARd = 0.0006;
@@ -126,7 +141,7 @@ public class ShooterV2Hardware implements ShooterIO {
     inputs.HandlerVelocity = N_Handler.getEncoder().getVelocity();
     inputs.feederVelocity = f_Feeder.getEncoder().getVelocity();
 
-    inputs.anglePosition = ArmEncoder.getAbsolutePosition().getValueAsDouble() * 360;
+    inputs.anglePosition = absolutePosition.getValueAsDouble() * 360;
     inputs.angleVelocity = ArmEncoder.getVelocity().getValueAsDouble() * 60;
   }
 
@@ -141,7 +156,7 @@ public class ShooterV2Hardware implements ShooterIO {
       boolean limitOff) {
 
     // Arm Calculations
-    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + AnglePID.calculate(ArmEncoder.getAbsolutePosition().getValueAsDouble()*360, anglePosition);
+    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -5, 12);
     F_ArmMotor.setVoltage(ArmVolts);
     
 
