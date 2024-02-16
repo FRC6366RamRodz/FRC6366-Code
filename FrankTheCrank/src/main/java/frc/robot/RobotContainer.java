@@ -74,7 +74,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        shooter = new Shooter(new ShooterSim());
+        shooter = new Shooter(new ShooterV2Hardware());
          drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -148,7 +148,7 @@ public class RobotContainer {
             () -> (-controller.getLeftY()),
             () -> (-controller.getLeftX()),
             () -> -controller.getRightX(),
-            controller.y(), controller.x()));
+            controller.y(), controller.a()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     controller
         .b()

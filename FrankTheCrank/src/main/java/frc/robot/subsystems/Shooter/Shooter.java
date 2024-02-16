@@ -43,43 +43,43 @@ public class Shooter {
     if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
       ShootSpeed = 0.0;
       IntakeSpeed = 1;
-      FeedSpeed = 1;
+      //FeedSpeed = 1;
       shooterAngle = -50;
       launchMode = false;
     } else if (speaker && center) {
-      ShootSpeed = 3800;
+      ShootSpeed = 3900;
       IntakeSpeed = 0.0;
-      FeedSpeed = 1;
-      shooterAngle = -10;
+      //FeedSpeed = 1;
+      shooterAngle = -14.5;
       launchMode = true;
     } else if (speaker && wing) {
-      ShootSpeed = 4500;
+      ShootSpeed = 4300;
       IntakeSpeed = 0.0;
-      FeedSpeed = 1;
-      shooterAngle = -2;
+      //FeedSpeed = 1;
+      shooterAngle = -10;
       launchMode = true;
     } else if (speaker && !center && !wing) {
       ShootSpeed = 3400;
       IntakeSpeed = 0.0;
-      FeedSpeed = 1;
+      //FeedSpeed = 1;
       shooterAngle = -35;
       launchMode = true;
     } else if (amp) {
-      ShootSpeed = 500;
+      ShootSpeed = 3400;
       IntakeSpeed = 0.0;
-      FeedSpeed = 1;
+      //FeedSpeed = 1;
       shooterAngle = 50;
       launchMode = true;
     } else if (autoline) {
       ShootSpeed = 3800;
       IntakeSpeed = 0.0;
-      FeedSpeed = 1;
+      //FeedSpeed = 1;
       shooterAngle = -40;
       launchMode = true;
     } else {
       ShootSpeed = 0.0;
       IntakeSpeed = 0.0;
-      FeedSpeed = 0.0;
+      //FeedSpeed = 0.0;
       shooterAngle = -50.0;
       launchMode = false;
     }
@@ -88,16 +88,22 @@ public class Shooter {
     if (LaunchPermision() == 1 && launch && (amp || speaker)) {
       sideSpeed = 0.5;
       limitOff = true;
+      FeedSpeed = 0.5;
+    } else if (intake){
+      sideSpeed = 0.0;
+      limitOff = true;
+      FeedSpeed = 0.25;
     } else {
       sideSpeed = 0;
       limitOff = false;
+      FeedSpeed = 0;
     }
 
     io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff);
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < getAnlge().plus(new Rotation2d(2)).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(2)).getDegrees() && ShootSpeed < getAvrgShootSpd() + 15 && ShootSpeed > getAvrgShootSpd() - 15&& launchMode) {
+    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 100 && ShootSpeed > getAvrgShootSpd() - 100 && launchMode) {
       return 1;
     } else {
       return 0;

@@ -58,7 +58,7 @@ public class DriveCommands {
 
           double omega;
           if (NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tv").getDouble(0) == 1 && point.getAsBoolean() && NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tl").getDouble(0)!= 0) {
-            omega = NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tx").getDouble(0) / -26;
+            omega = (NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tx").getDouble(0) / -26)* 0.3;
           } else if(speak.getAsBoolean()){
             double x1, y1, offset;
             if (ally.get() == Alliance.Blue){
@@ -76,7 +76,7 @@ public class DriveCommands {
             double x = x2 - x1;
             double y = y2 - y1;
             double theta = Math.atan(y/x);
-            try (PIDController error = new PIDController(0.8, 0.0, 0.0)) {
+            try (PIDController error = new PIDController(1, 0.0, 0.0)) {
               omega = error.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
             }
 

@@ -7,6 +7,7 @@ package frc.robot.subsystems.Shooter;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -24,9 +25,9 @@ public class ShooterV2Hardware implements ShooterIO {
   public static TalonFX F_ArmMotor = new TalonFX(5);
   public static TalonFX K_topShooter = new TalonFX(6);
   public static TalonFX K_bottomShooter = new TalonFX(7);
-  public static CANSparkMax N_Intake = new CANSparkMax(1, MotorType.kBrushless);
-  public static CANSparkMax N_Handler = new CANSparkMax(2, MotorType.kBrushless);
-  public static CANSparkMax f_Feeder = new CANSparkMax(3, MotorType.kBrushless);
+  public static CANSparkMax N_Intake = new CANSparkMax(5, MotorType.kBrushless);
+  public static CANSparkMax N_Handler = new CANSparkMax(6, MotorType.kBrushless);
+  public static CANSparkMax f_Feeder = new CANSparkMax(7, MotorType.kBrushless);
 
   // Controll Loops for shooter wheels
   public static SimpleMotorFeedforward TopFeedForward;
@@ -42,7 +43,7 @@ public class ShooterV2Hardware implements ShooterIO {
   public static CANcoder ArmEncoder = new CANcoder(5);
 
   // limit Switch
-  public SparkLimitSwitch HandlerSwitch;
+  public SparkLimitSwitch HandlerSwitch = N_Handler.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
   public ShooterV2Hardware() {
 
@@ -56,17 +57,19 @@ public class ShooterV2Hardware implements ShooterIO {
     f_Feeder.clearFaults();
 
     // lazy motor
-    N_Intake.setControlFramePeriodMs(500);
+    N_Intake.setControlFramePeriodMs(250);
 
     HandlerSwitch.enableLimitSwitch(true);
 
     N_Intake.setIdleMode(IdleMode.kCoast);
     N_Handler.setIdleMode(IdleMode.kBrake);
-    f_Feeder.setIdleMode(IdleMode.kCoast);
+    f_Feeder.setIdleMode(IdleMode.kBrake);
 
     N_Intake.enableVoltageCompensation(12);
     N_Handler.enableVoltageCompensation(12);
     f_Feeder.enableVoltageCompensation(12);
+
+    N_Intake.setInverted(true);
 
     N_Intake.burnFlash();
     N_Handler.burnFlash();
@@ -77,6 +80,7 @@ public class ShooterV2Hardware implements ShooterIO {
     shooterConfig.CurrentLimits.StatorCurrentLimit = 35;
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     K_topShooter.getConfigurator().apply(shooterConfig);
     K_bottomShooter.getConfigurator().apply(shooterConfig);
@@ -89,26 +93,26 @@ public class ShooterV2Hardware implements ShooterIO {
     F_ArmMotor.getConfigurator().apply(angleConfig);
 
     // shooter stuff
-    double SHks = 0.0;
-    double SHkv = 0.0;
+    double SHks = 0.94;
+    double SHkv = 0.00161;
     TopFeedForward = new SimpleMotorFeedforward(SHks, SHkv);
     BottomFeedForward = new SimpleMotorFeedforward(SHks, SHkv);
 
-    double SHp = 0.0;
+    double SHp = 0.0001;
     double SHi = 0.0;
-    double SHd = 0.0;
+    double SHd = 0.00;
     TopPID = new PIDController(SHp, SHi, SHd);
     BottomPID = new PIDController(SHp, SHi, SHd);
 
     // angle stuff
     double ARs = 0.0;
-    double ARg = 0.0;
+    double ARg = 0.4;
     double ARv = 0.0;
     AngleFeedForward = new ArmFeedforward(ARs, ARg, ARv);
 
-    double ARp = 0.0;
+    double ARp = 0.11;
     double ARi = 0.0;
-    double ARd = 0.0;
+    double ARd = 0.0006;
     AnglePID = new PIDController(ARp, ARi, ARd);
 
     AnglePID.enableContinuousInput(-180, 180);
@@ -137,13 +141,13 @@ public class ShooterV2Hardware implements ShooterIO {
       boolean limitOff) {
 
     // Arm Calculations
-    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), Units.degreesToRadians(anglePosition) - Units.rotationsToRadians(ArmEncoder.getPosition().getValueAsDouble())) + AnglePID.calculate(F_ArmMotor.getPosition().getValueAsDouble() * 360, anglePosition);
+    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + AnglePID.calculate(ArmEncoder.getAbsolutePosition().getValueAsDouble()*360, anglePosition);
     F_ArmMotor.setVoltage(ArmVolts);
     
 
     // Shooter
-    double topVolts = TopFeedForward.calculate(TopVelocity) + TopPID.calculate(TopVelocity);
-    double bottomVolts = BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(BottomVelocity);
+    double topVolts = TopFeedForward.calculate(TopVelocity) + TopPID.calculate(K_topShooter.getVelocity().getValueAsDouble()*60,TopVelocity);
+    double bottomVolts = BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(K_bottomShooter.getVelocity().getValueAsDouble()*60,BottomVelocity);
     K_topShooter.setVoltage(topVolts);
     K_bottomShooter.setVoltage(bottomVolts);
 
