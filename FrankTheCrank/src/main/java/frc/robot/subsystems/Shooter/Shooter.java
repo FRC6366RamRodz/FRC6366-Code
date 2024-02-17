@@ -4,10 +4,13 @@
 
 package frc.robot.subsystems.Shooter;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.RobotContainer;
+
 import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
@@ -102,6 +105,40 @@ public class Shooter {
     io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff);
   }
 
+  public void advancedShoot(boolean X) {
+    double x1, y1, x2, y2, height;
+    x1 = 16.45;
+    y1 = 5.5;
+    x2 = getPose().getX();
+    y2 = getPose().getY();
+    height = 3.0;
+    double Distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 1));
+
+    double Target;
+    Target = Math.atan(2*(height/Distance));
+    double velocity, finalAngle;
+    if (Target <= Units.degreesToRadians(50)) {
+      velocity = 1/Math.cos(Target) * Math.sqrt((9.8*Distance)/-Math.abs(Math.abs(Math.tan(Target))));
+      finalAngle = Units.radiansToDegrees(-Target);
+    } else {
+      velocity = (2 * Math.PI * 0.0508 * 3400)/ 60;
+      finalAngle = -35;
+    }
+
+    double Rpm = (30 * velocity) / Math.PI * 0.0508;
+    double finalRPM;
+    if (Rpm > 6000) {
+      finalRPM = 3400;
+    } else {
+      finalRPM = Rpm;
+    }
+    if(X) {
+    io.setMotors(finalRPM, finalRPM, 0, finalAngle, 0, 0, false);
+    } else {
+      io.setMotors(0, 0, 0, -50, 0, 0, false);
+    }
+  }
+
   public double LaunchPermision() {
     if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 100 && ShootSpeed > getAvrgShootSpd() - 100 && launchMode) {
       return 1;
@@ -116,5 +153,9 @@ public class Shooter {
 
   public double getAvrgShootSpd() {
     return (Math.abs(inputs.TopVelocity) + Math.abs(inputs.BottomVelocity)) / 2;
+  }
+
+  public static Pose2d getPose() {
+   return RobotContainer.drive.getPose();
   }
 }
