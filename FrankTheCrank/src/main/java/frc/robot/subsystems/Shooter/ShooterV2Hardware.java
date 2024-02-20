@@ -135,6 +135,8 @@ public class ShooterV2Hardware implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
+    BaseStatusSignal.refreshAll(absolutePosition);
+
     inputs.TopVelocity = K_topShooter.getVelocity().getValueAsDouble() * 60;
     inputs.BottomVelocity = K_bottomShooter.getVelocity().getValueAsDouble() * 60;
 
