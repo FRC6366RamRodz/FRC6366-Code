@@ -49,7 +49,6 @@ public class ShooterV2Hardware implements ShooterIO {
   public static StatusSignal<Double> TopVelocity;
   public static StatusSignal<Double> BottomVelocity;
 
-
   // limit Switch
   public SparkLimitSwitch HandlerSwitch = N_Handler.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
@@ -90,6 +89,9 @@ public class ShooterV2Hardware implements ShooterIO {
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    shooterConfig.Slot0.kP = 0.0;
+    shooterConfig.Slot0.kI = 0.0;
+    shooterConfig.Slot0.kP = 0.0;
 
     K_topShooter.getConfigurator().apply(shooterConfig);
     K_bottomShooter.getConfigurator().apply(shooterConfig);
@@ -107,16 +109,18 @@ public class ShooterV2Hardware implements ShooterIO {
     ArmEncoder.optimizeBusUtilization();
 
     // shooter stuff
-    double SHks = 0.94;
-    double SHkv = 0.00161;
+    double SHks = 0.00;
+    double SHkv = 0.00195;//00195;
     TopFeedForward = new SimpleMotorFeedforward(SHks, SHkv);
     BottomFeedForward = new SimpleMotorFeedforward(SHks, SHkv);
 
-    double SHp = 0.0001;
-    double SHi = 0.0;
+    double SHp = 0.0001;//0.0001
+    double SHi = 0.000;
     double SHd = 0.00;
     TopPID = new PIDController(SHp, SHi, SHd);
     BottomPID = new PIDController(SHp, SHi, SHd);
+    TopPID.setTolerance(100);
+    BottomPID.setTolerance(100);
 
     // angle stuff
     double ARs = 0.0;
@@ -125,12 +129,14 @@ public class ShooterV2Hardware implements ShooterIO {
     AngleFeedForward = new ArmFeedforward(ARs, ARg, ARv);
 
 
-    double ARp = 0.11;
-    double ARi = 0.0;
-    double ARd = 0.0006;
+    double ARp = 0.15;//0.15
+    double ARi = 0.18;//0.2
+    double ARd = 0.000;
     AnglePID = new PIDController(ARp, ARi, ARd);
 
     AnglePID.enableContinuousInput(-180, 180);
+    
+    AnglePID.setTolerance(2);
   }
 
   @Override
@@ -144,7 +150,7 @@ public class ShooterV2Hardware implements ShooterIO {
     inputs.feederVelocity = f_Feeder.getEncoder().getVelocity();
 
     inputs.anglePosition = absolutePosition.getValueAsDouble() * 360;
-    inputs.angleVelocity = ArmEncoder.getVelocity().getValueAsDouble() * 60;
+    inputs.angleVelocity = F_ArmMotor.getVelocity().getValueAsDouble()*60;
   }
 
   @Override
@@ -158,15 +164,15 @@ public class ShooterV2Hardware implements ShooterIO {
       boolean limitOff) {
 
     // Arm Calculations
-    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -5, 12);
+    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
     F_ArmMotor.setVoltage(ArmVolts);
     
 
     // Shooter
-    double topVolts = TopFeedForward.calculate(TopVelocity) + TopPID.calculate(K_topShooter.getVelocity().getValueAsDouble()*60,TopVelocity);
-    double bottomVolts = BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(K_bottomShooter.getVelocity().getValueAsDouble()*60,BottomVelocity);
-    K_topShooter.setVoltage(topVolts);
-    K_bottomShooter.setVoltage(bottomVolts);
+  //  double topVolts = TopFeedForward.calculate(TopVelocity) + TopPID.calculate(K_topShooter.getVelocity().getValueAsDouble()*60,TopVelocity);
+  //  double bottomVolts = BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(K_bottomShooter.getVelocity().getValueAsDouble()*60,BottomVelocity);
+  //  K_topShooter.setVoltage(topVolts);
+  //  K_bottomShooter.setVoltage(bottomVolts);
 
     HandlerSwitch.enableLimitSwitch(!limitOff);
     N_Handler.set(HandlerVelocity);

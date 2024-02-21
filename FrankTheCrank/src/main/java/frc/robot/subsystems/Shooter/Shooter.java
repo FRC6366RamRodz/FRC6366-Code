@@ -50,16 +50,16 @@ public class Shooter {
       shooterAngle = -50;
       launchMode = false;
     } else if (speaker && center) {
-      ShootSpeed = 3900;
+      ShootSpeed = 5300;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
-      shooterAngle = -14.5;
+      shooterAngle = -8;
       launchMode = true;
     } else if (speaker && wing) {
       ShootSpeed = 4300;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
-      shooterAngle = -10;
+      shooterAngle = -5;
       launchMode = true;
     } else if (speaker && !center && !wing) {
       ShootSpeed = 3400;
@@ -77,7 +77,7 @@ public class Shooter {
       ShootSpeed = 3800;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
-      shooterAngle = -40;
+      shooterAngle = -20;
       launchMode = true;
     } else {
       ShootSpeed = 0.0;

@@ -75,13 +75,13 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         shooter = new Shooter(new ShooterV2Hardware());
-         drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOSparkMax(0),
-                new ModuleIOSparkMax(1),
-                new ModuleIOSparkMax(2),
-                new ModuleIOSparkMax(3));
+         //drive =
+         //   new Drive(
+         //       new GyroIOPigeon2(),
+         //       new ModuleIOSparkMax(0),
+         //       new ModuleIOSparkMax(1),
+         //       new ModuleIOSparkMax(2),
+         //       new ModuleIOSparkMax(3));
         //drive =
         //    new Drive(
         //        new GyroIOPigeon2(),
@@ -89,6 +89,14 @@ public class RobotContainer {
         //        new ModuleIOTalonFX(1),
         //        new ModuleIOTalonFX(2),
         //        new ModuleIOTalonFX(3));
+
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim(),
+                new ModuleIOSim());
 
         break;
 
