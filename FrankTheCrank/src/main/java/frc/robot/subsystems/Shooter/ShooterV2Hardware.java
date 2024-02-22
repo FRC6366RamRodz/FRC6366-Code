@@ -19,10 +19,8 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class ShooterV2Hardware implements ShooterIO {
@@ -113,7 +111,7 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;
-    angleConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.1388;
+    angleConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.1388;
 
     F_ArmMotor.getConfigurator().apply(angleConfig);
 
@@ -166,7 +164,7 @@ public class ShooterV2Hardware implements ShooterIO {
     // Arm Calculations
     //double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
     //F_ArmMotor.setVoltage(ArmVolts);
-    F_ArmMotor.setControl(new MotionMagicVoltage(anglePosition));
+    F_ArmMotor.setControl(new MotionMagicVoltage(anglePosition).withSlot(0).withOverrideBrakeDurNeutral(true));
     
     K_bottomShooter.setControl(new VelocityVoltage(TopVelocity).withSlot(0));
     K_topShooter.setControl(new VelocityVoltage(BottomVelocity).withSlot(0));

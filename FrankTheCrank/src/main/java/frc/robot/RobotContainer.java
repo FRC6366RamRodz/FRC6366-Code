@@ -39,7 +39,6 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.util.IO;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -82,22 +81,13 @@ public class RobotContainer {
          //       new ModuleIOSparkMax(1),
          //       new ModuleIOSparkMax(2),
          //       new ModuleIOSparkMax(3));
-        //drive =
-        //    new Drive(
-        //        new GyroIOPigeon2(),
-        //        new ModuleIOTalonFX(0),
-        //        new ModuleIOTalonFX(1),
-        //        new ModuleIOTalonFX(2),
-        //        new ModuleIOTalonFX(3));
-
         drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-
+           new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
         break;
 
       case SIM:

@@ -140,7 +140,7 @@ public class Shooter {
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 100 && ShootSpeed > getAvrgShootSpd() - 100 && launchMode) {
+    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 100 && ShootSpeed > getAvrgShootSpd() - 100 && getArmSpd() > -2 && getArmSpd() < 2 && launchMode) {
       return 1;
     } else {
       return 0;
@@ -157,5 +157,9 @@ public class Shooter {
 
   public static Pose2d getPose() {
    return RobotContainer.drive.getPose();
+  }
+
+  public double getArmSpd() {
+    return inputs.angleVelocity;
   }
 }
