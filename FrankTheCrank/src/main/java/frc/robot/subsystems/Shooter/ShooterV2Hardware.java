@@ -7,8 +7,11 @@ package frc.robot.subsystems.Shooter;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -19,7 +22,6 @@ import com.revrobotics.SparkLimitSwitch;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
@@ -32,12 +34,6 @@ public class ShooterV2Hardware implements ShooterIO {
   public static CANSparkMax N_Intake = new CANSparkMax(5, MotorType.kBrushless);
   public static CANSparkMax N_Handler = new CANSparkMax(6, MotorType.kBrushless);
   public static CANSparkMax f_Feeder = new CANSparkMax(7, MotorType.kBrushless);
-
-  // Controll Loops for shooter wheels
-  public static SimpleMotorFeedforward TopFeedForward;
-  public static SimpleMotorFeedforward BottomFeedForward;
-  public static PIDController TopPID;
-  public static PIDController BottomPID;
 
   // Controll Loops for Angle motor
   public static ArmFeedforward AngleFeedForward;
@@ -85,21 +81,39 @@ public class ShooterV2Hardware implements ShooterIO {
 
     // TalonFX stuff
     var shooterConfig = new TalonFXConfiguration();
+    //config
     shooterConfig.CurrentLimits.StatorCurrentLimit = 35;
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    shooterConfig.Slot0.kP = 0.0;
+    shooterConfig.Slot0.kV = 0.12; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
+    shooterConfig.Slot0.kP = 0.1;
     shooterConfig.Slot0.kI = 0.0;
-    shooterConfig.Slot0.kP = 0.0;
+    shooterConfig.Slot0.kD = 0.0;
+    shooterConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
 
     K_topShooter.getConfigurator().apply(shooterConfig);
     K_bottomShooter.getConfigurator().apply(shooterConfig);
 
     var angleConfig = new TalonFXConfiguration();
+    //config
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    angleConfig.Slot0.kS = 0.0;
+    angleConfig.Slot0.kV = 0.0;
+    angleConfig.Slot0.kP = 0.0;
+    angleConfig.Slot0.kI = 0.0;
+    angleConfig.Slot0.kD = 0.0;
+    angleConfig.MotionMagic.MotionMagicAcceleration = 160; // 80 rps cruise velocity
+    angleConfig.MotionMagic.MotionMagicCruiseVelocity = 80; // 160 rps/s acceleration (0.5 seconds)
+    angleConfig.MotionMagic.MotionMagicJerk = 1600; // 1600 rps/s^2 jerk (0.1 seconds)
+    angleConfig.Feedback.FeedbackRemoteSensorID = ArmEncoder.getDeviceID();
+    angleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;
+    angleConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.1388;
 
     F_ArmMotor.getConfigurator().apply(angleConfig);
 
@@ -107,20 +121,6 @@ public class ShooterV2Hardware implements ShooterIO {
 
     BaseStatusSignal.setUpdateFrequencyForAll(250, absolutePosition);
     ArmEncoder.optimizeBusUtilization();
-
-    // shooter stuff
-    double SHks = 0.00;
-    double SHkv = 0.00195;//00195;
-    TopFeedForward = new SimpleMotorFeedforward(SHks, SHkv);
-    BottomFeedForward = new SimpleMotorFeedforward(SHks, SHkv);
-
-    double SHp = 0.0001;//0.0001
-    double SHi = 0.000;
-    double SHd = 0.00;
-    TopPID = new PIDController(SHp, SHi, SHd);
-    BottomPID = new PIDController(SHp, SHi, SHd);
-    TopPID.setTolerance(100);
-    BottomPID.setTolerance(100);
 
     // angle stuff
     double ARs = 0.0;
@@ -164,15 +164,12 @@ public class ShooterV2Hardware implements ShooterIO {
       boolean limitOff) {
 
     // Arm Calculations
-    double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
-    F_ArmMotor.setVoltage(ArmVolts);
+    //double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
+    //F_ArmMotor.setVoltage(ArmVolts);
+    F_ArmMotor.setControl(new MotionMagicVoltage(anglePosition));
     
-
-    // Shooter
-  //  double topVolts = TopFeedForward.calculate(TopVelocity) + TopPID.calculate(K_topShooter.getVelocity().getValueAsDouble()*60,TopVelocity);
-  //  double bottomVolts = BottomFeedForward.calculate(BottomVelocity) + BottomPID.calculate(K_bottomShooter.getVelocity().getValueAsDouble()*60,BottomVelocity);
-  //  K_topShooter.setVoltage(topVolts);
-  //  K_bottomShooter.setVoltage(bottomVolts);
+    K_bottomShooter.setControl(new VelocityVoltage(TopVelocity).withSlot(0));
+    K_topShooter.setControl(new VelocityVoltage(BottomVelocity).withSlot(0));
 
     HandlerSwitch.enableLimitSwitch(!limitOff);
     N_Handler.set(HandlerVelocity);
