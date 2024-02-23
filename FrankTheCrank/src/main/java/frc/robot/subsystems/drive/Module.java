@@ -29,6 +29,8 @@ public class Module {
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
 
+  private boolean TalonFx = true;
+
   private final SimpleMotorFeedforward driveFeedforward;
   private final PIDController driveFeedback;
   private final PIDController turnFeedback;
@@ -37,6 +39,7 @@ public class Module {
   private Double speedSetpoint = 0.0; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private double lastPositionMeters = 0.0; // Used for delta calculation
+
 
   public Module(ModuleIO io, int index) {
     this.io = io;
@@ -83,8 +86,13 @@ public class Module {
 
     // Run closed loop turn control
     if (angleSetpoint != null) {
-      io.setTurnVoltage(
-          turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
+      if (TalonFx == false) {
+        io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
+      } else {
+        io.setTurnPosition(angleSetpoint.getRotations());
+      }
+      
+      
 
       // Run closed loop drive control
       // Only allowed if closed loop turn control is running

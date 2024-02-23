@@ -18,13 +18,14 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -55,6 +56,9 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnVelocity;
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
+
+  private final PositionVoltage turnPositionControl =
+      new PositionVoltage(0);
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
   private final double DRIVE_GEAR_RATIO = 4;
@@ -100,9 +104,19 @@ public class ModuleIOTalonFX implements ModuleIO {
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 20.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    turnTalon.getConfigurator().apply(turnConfig);
+    turnConfig.Voltage.PeakForwardVoltage = 12.0;
+    turnConfig.Voltage.PeakReverseVoltage = -12.0;
+    // TUNE PID CONSTANTS
+    turnConfig.Slot0.kP = 7.0;
+    turnConfig.Slot0.kI = 0.0;
+    turnConfig.Slot0.kD = 0.0;
+    turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 30;
+    turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -30;
+    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
+    turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
+    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     setTurnBrakeMode(true);
 
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
@@ -169,6 +183,10 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveTalon.setControl(new VoltageOut(volts));
   }
 
+  @Override
+  public void setTurnPosition(double moduleAngle) {
+    turnTalon.setControl(turnPositionControl.withPosition(moduleAngle));
+  }
   @Override
   public void setTurnVoltage(double volts) {
     turnTalon.setControl(new VoltageOut(volts));
