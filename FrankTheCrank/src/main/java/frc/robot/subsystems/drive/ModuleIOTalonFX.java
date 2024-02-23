@@ -57,8 +57,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
 
-  private final PositionVoltage turnPositionControl =
-      new PositionVoltage(0);
+  private final PositionVoltage turnPositionControl = new PositionVoltage(0);
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
   private final double DRIVE_GEAR_RATIO = 4;
@@ -185,6 +184,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   @Override
   public void setTurnPosition(double moduleAngle) {
+    
     turnTalon.setControl(turnPositionControl.withPosition(moduleAngle));
   }
   @Override
