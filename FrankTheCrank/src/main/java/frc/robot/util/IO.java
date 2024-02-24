@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 /** Add your docs here. */
 public class IO {
   public XboxController op = new XboxController(1);
+  public XboxController dr = new XboxController(0);
 
   public IO() {}
 
@@ -39,5 +40,9 @@ public class IO {
 
   public void opRumble(double rumble) {
     op.setRumble(RumbleType.kBothRumble, rumble);
+  }
+
+  public void drRumble(double rumble) {
+    dr.setRumble(RumbleType.kRightRumble, rumble);
   }
 }

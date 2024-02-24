@@ -21,6 +21,8 @@ import com.revrobotics.SparkLimitSwitch;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class ShooterV2Hardware implements ShooterIO {
@@ -106,13 +108,13 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.MotionMagic.MotionMagicAcceleration = 160; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 80; // 160 rps/s acceleration (0.5 seconds)
     angleConfig.MotionMagic.MotionMagicJerk = 1600; // 1600 rps/s^2 jerk (0.1 seconds)
-    angleConfig.Feedback.FeedbackRemoteSensorID = ArmEncoder.getDeviceID();
-    angleConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    angleConfig.Feedback.SensorToMechanismRatio = 100;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.1388;
 
+    F_ArmMotor.getConfigurator().apply(new TalonFXConfiguration());
     F_ArmMotor.getConfigurator().apply(angleConfig);
 
     absolutePosition = ArmEncoder.getAbsolutePosition();
@@ -149,6 +151,8 @@ public class ShooterV2Hardware implements ShooterIO {
 
     inputs.anglePosition = absolutePosition.getValueAsDouble() * 360;
     inputs.angleVelocity = F_ArmMotor.getVelocity().getValueAsDouble()*60;
+
+    inputs.intakeLimit = HandlerSwitch.isPressed();
   }
 
   @Override
@@ -164,15 +168,25 @@ public class ShooterV2Hardware implements ShooterIO {
     // Arm Calculations
     //double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
     //F_ArmMotor.setVoltage(ArmVolts);
-    F_ArmMotor.setControl(new MotionMagicVoltage(anglePosition).withSlot(0).withOverrideBrakeDurNeutral(true));
+    F_ArmMotor.setControl(new MotionMagicVoltage(new Rotation2d(Units.degreesToRadians(anglePosition)).getRotations()).withSlot(0).withOverrideBrakeDurNeutral(true));
     
+    if (F_ArmMotor.getPosition().getValueAsDouble() > new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).minus(new Rotation2d(Units.degreesToRadians(0.5))).getRotations() && F_ArmMotor.getPosition().getValueAsDouble() < new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).plus(new Rotation2d(Units.degreesToRadians(0.5))).getRotations()) {
+
+    } else {
+      F_ArmMotor.setPosition(new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).getRotations());
+    }
+
     K_bottomShooter.setControl(new VelocityVoltage(TopVelocity).withSlot(0));
     K_topShooter.setControl(new VelocityVoltage(BottomVelocity).withSlot(0));
 
     HandlerSwitch.enableLimitSwitch(!limitOff);
     N_Handler.set(HandlerVelocity);
     f_Feeder.set(feederVelocity);
-
+    
+    if (HandlerSwitch.isPressed()) {
+       N_Intake.set(0);
+    } else {
     N_Intake.set(intakeVelocity);
+    }
   }
 }

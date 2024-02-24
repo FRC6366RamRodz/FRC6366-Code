@@ -17,6 +17,7 @@ public interface ShooterIO {
     public double anglePosition = 0.0;
     public double intakeVelocity = 0.0;
     public double feederVelocity = 0.0;
+    public boolean intakeLimit = false;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {

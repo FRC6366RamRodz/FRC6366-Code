@@ -147,6 +147,14 @@ public class Shooter {
     }
   }
 
+  public double IntakeRumble() {
+    if (inputs.intakeLimit) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
   public Rotation2d getAnlge() {
     return new Rotation2d(Units.degreesToRadians(inputs.anglePosition));
   }
