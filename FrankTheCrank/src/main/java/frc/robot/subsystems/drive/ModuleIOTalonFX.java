@@ -57,8 +57,6 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
 
-  private final PositionVoltage turnPositionControl = new PositionVoltage(0);
-
   // Gear ratios for SDS MK4i L2, adjust as necessary
   private final double DRIVE_GEAR_RATIO = 4;
   private final double TURN_GEAR_RATIO = 13.3714;
@@ -72,25 +70,25 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveTalon = new TalonFX(1, "Swerve");
         turnTalon = new TalonFX(11, "Swerve");
         cancoder = new CANcoder(1, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(1.824+ Math.PI); // MUST BE CALIBRATED
         break;
       case 1: // fr
         driveTalon = new TalonFX(2, "Swerve");
         turnTalon = new TalonFX(12, "Swerve");
         cancoder = new CANcoder(2, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(0.821 + Math.PI); // MUST BE CALIBRATED
         break;
       case 2: // bl
         driveTalon = new TalonFX(3, "Swerve");
         turnTalon = new TalonFX(13, "Swerve");
         cancoder = new CANcoder(3, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-0.779 + Math.PI); // MUST BE CALIBRATED
         break;
       case 3: // br
         driveTalon = new TalonFX(4, "Swerve");
         turnTalon = new TalonFX(14, "Swerve");
         cancoder = new CANcoder(4, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(0.0); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(1.585 + Math.PI); // MUST BE CALIBRATED
         break;
       default:
         throw new RuntimeException("Invalid module index");
@@ -108,17 +106,22 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 7.0;
+    turnConfig.Slot0.kP = 8.0;
     turnConfig.Slot0.kI = 0.0;
     turnConfig.Slot0.kD = 0.0;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 30;
     turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -30;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-    turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
     setTurnBrakeMode(true);
 
-    cancoder.getConfigurator().apply(new CANcoderConfiguration());
+    turnTalon.getConfigurator().apply(turnConfig);
+
+    var turnEncoder = new CANcoderConfiguration();
+    turnEncoder.MagnetSensor.MagnetOffset = -absoluteEncoderOffset.getRotations();
+
+    cancoder.getConfigurator().apply(turnEncoder);
 
     drivePosition = driveTalon.getPosition();
     driveVelocity = driveTalon.getVelocity();
@@ -168,7 +171,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
-            .minus(absoluteEncoderOffset);
+            .minus(new Rotation2d(0));
     inputs.turnPosition =
         Rotation2d.fromRotations(turnPosition.getValueAsDouble() / TURN_GEAR_RATIO);
     inputs.turnVelocityRadPerSec =
@@ -185,7 +188,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   @Override
   public void setTurnPosition(double moduleAngle) {
     
-    turnTalon.setControl(turnPositionControl.withPosition(moduleAngle));
+    turnTalon.setControl(new PositionVoltage(moduleAngle).withSlot(0).withOverrideBrakeDurNeutral(true));
   }
   @Override
   public void setTurnVoltage(double volts) {
