@@ -42,9 +42,9 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.6);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(20.5);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(24);
+  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(26.18);
+  private static final double TRACK_WIDTH_X = Units.inchesToMeters(28);
+  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(28);
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
@@ -152,8 +152,9 @@ public class Drive extends SubsystemBase {
       // The module returns the optimized state, useful for logging
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
-
-    checkVisionMeasurements();
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      checkVisionMeasurements();
+    }
 
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
