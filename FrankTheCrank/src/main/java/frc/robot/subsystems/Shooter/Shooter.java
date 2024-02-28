@@ -45,7 +45,7 @@ public class Shooter {
 
     if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
       ShootSpeed = 0.0;
-      IntakeSpeed = 1;
+      IntakeSpeed = 0.7;
       //FeedSpeed = 1;
       shooterAngle = -50;
       launchMode = false;
@@ -53,13 +53,13 @@ public class Shooter {
       ShootSpeed = 5300;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
-      shooterAngle = -8;
+      shooterAngle = -9;
       launchMode = true;
     } else if (speaker && wing) {
-      ShootSpeed = 4300;
+      ShootSpeed = 6000;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
-      shooterAngle = -5;
+      shooterAngle = -0.3;
       launchMode = true;
     } else if (speaker && !center && !wing) {
       ShootSpeed = 3400;
@@ -88,13 +88,13 @@ public class Shooter {
     }
 
     boolean limitOff;
-    if (LaunchPermision() == 1 && launch && (amp || speaker)) {
+    if (LaunchPermision() == 1 && launch && (amp || speaker || autoline)) {
       sideSpeed = 0.5;
       limitOff = true;
       FeedSpeed = 0.5;
     } else if (intake){
       sideSpeed = 0.0;
-      limitOff = true;
+      limitOff = false;
       FeedSpeed = 0.25;
     } else {
       sideSpeed = 0;
@@ -112,13 +112,13 @@ public class Shooter {
     x2 = getPose().getX();
     y2 = getPose().getY();
     height = 3.0;
-    double Distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 1));
+    double Distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
 
     double Target;
-    Target = Math.atan(2*(height/Distance));
+    Target = Math.atan(2*(height/Distance)-Math.tan(10));
     double velocity, finalAngle;
-    if (Target <= Units.degreesToRadians(50)) {
-      velocity = 1/Math.cos(Target) * Math.sqrt((9.8*Distance)/-Math.abs(Math.abs(Math.tan(Target))));
+    if (Target <= Units.degreesToRadians(51)) {
+      velocity = 1/Math.cos(Units.radiansToDegrees(Target)) * Math.sqrt((-9.8*Distance)/-Math.abs(Math.tan(Target)));
       finalAngle = Units.radiansToDegrees(-Target);
     } else {
       velocity = (2 * Math.PI * 0.0508 * 3400)/ 60;
@@ -140,7 +140,7 @@ public class Shooter {
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 100 && ShootSpeed > getAvrgShootSpd() - 100 && getArmSpd() > -2 && getArmSpd() < 2 && launchMode) {
+    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
       return 1;
     } else {
       return 0;
@@ -148,7 +148,7 @@ public class Shooter {
   }
 
   public double IntakeRumble() {
-    if (inputs.intakeLimit) {
+    if (inputs.intakeLimit && FeedSpeed > 0) {
       return 1;
     } else {
       return 0;

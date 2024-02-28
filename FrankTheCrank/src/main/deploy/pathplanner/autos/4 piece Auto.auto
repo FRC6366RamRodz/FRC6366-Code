@@ -1,12 +1,6 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 1.6279768172071953,
-      "y": 5.55
-    },
-    "rotation": 180.0
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
@@ -22,7 +16,7 @@
                 }
               },
               {
-                "type": "deadline",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
@@ -47,7 +41,7 @@
                 }
               },
               {
-                "type": "deadline",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
@@ -78,7 +72,7 @@
                 }
               },
               {
-                "type": "deadline",
+                "type": "parallel",
                 "data": {
                   "commands": [
                     {
@@ -97,15 +91,9 @@
                 }
               },
               {
-                "type": "path",
-                "data": {
-                  "pathName": "right-shot"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
-                  "name": "autoLineShot"
+                  "name": "stageShot"
                 }
               },
               {

@@ -42,7 +42,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(26.18);
+  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.7);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(28);
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(28);
   private static final double DRIVE_BASE_RADIUS =
@@ -315,11 +315,14 @@ public class Drive extends SubsystemBase {
     }
 
     // Add estimator trust using april tag area
-    double stdX = 0.13;
+    double stdX = 0.2;
     double stdY = stdX;
     if (tagArea < 0.5) {
-      stdY *= 50;
-      stdX *= 5;
+      stdY *= 70;
+      stdX *= 10;
+    } else if (tagArea < 0.6) {
+      stdY *= 55;
+      stdX *= 6;
     }
     //  poseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(stdX,
     // stdY, stdY*10));

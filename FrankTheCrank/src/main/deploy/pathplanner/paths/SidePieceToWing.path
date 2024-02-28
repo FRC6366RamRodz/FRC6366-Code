@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.3344936779319,
-        "y": 6.623242727701913
+        "x": 4.387797265623021,
+        "y": 6.759221267730286
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.50934826377703,
-        "y": 6.153300893363863
+        "x": 5.557212709867014,
+        "y": 6.373314171129768
       },
       "prevControl": {
-        "x": 4.158265490055131,
-        "y": 6.623242727701913
+        "x": 4.206129936145115,
+        "y": 6.843256005467818
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,11 +39,11 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -173.65980825409,
+    "rotation": -173.48019824834307,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "AmpSide3PiecePaths",
+  "folder": null,
   "previewStartingState": null,
   "useDefaultConstraints": false
 }

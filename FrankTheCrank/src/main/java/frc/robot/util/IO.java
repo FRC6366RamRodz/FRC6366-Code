@@ -38,6 +38,14 @@ public class IO {
     return op.getRightBumper();
   }
 
+  public boolean getOpRTrigger() {
+    if (op.getRightTriggerAxis() > 0.3) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public void opRumble(double rumble) {
     op.setRumble(RumbleType.kBothRumble, rumble);
   }

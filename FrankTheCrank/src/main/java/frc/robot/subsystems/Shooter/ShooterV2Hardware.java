@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -59,15 +60,11 @@ public class ShooterV2Hardware implements ShooterIO {
     N_Handler.clearFaults();
     f_Feeder.clearFaults();
 
-    // lazy motor
-    N_Intake.setControlFramePeriodMs(450);
-    f_Feeder.setControlFramePeriodMs(100);
-
     HandlerSwitch.enableLimitSwitch(true);
 
     N_Intake.setIdleMode(IdleMode.kCoast);
     N_Handler.setIdleMode(IdleMode.kBrake);
-    f_Feeder.setIdleMode(IdleMode.kBrake);
+    f_Feeder.setIdleMode(IdleMode.kCoast);
 
     N_Intake.enableVoltageCompensation(12);
     N_Handler.enableVoltageCompensation(12);
@@ -86,8 +83,8 @@ public class ShooterV2Hardware implements ShooterIO {
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    shooterConfig.Slot0.kV = 0.12; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
-    shooterConfig.Slot0.kP = 0.1;
+    shooterConfig.Slot0.kV = 0.118; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
+    shooterConfig.Slot0.kP = 0.12;
     shooterConfig.Slot0.kI = 0.0;
     shooterConfig.Slot0.kD = 0.0;
     shooterConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
@@ -100,15 +97,17 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    angleConfig.Slot0.kS = 0.0;
+    angleConfig.Slot0.kS = 0.27;
+    angleConfig.Slot0.kG = 0.4;
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 0.0;
+    angleConfig.Slot0.kP = 80.0;
     angleConfig.Slot0.kI = 0.0;
-    angleConfig.Slot0.kD = 0.0;
-    angleConfig.MotionMagic.MotionMagicAcceleration = 160; // 80 rps cruise velocity
-    angleConfig.MotionMagic.MotionMagicCruiseVelocity = 80; // 160 rps/s acceleration (0.5 seconds)
-    angleConfig.MotionMagic.MotionMagicJerk = 1600; // 1600 rps/s^2 jerk (0.1 seconds)
-    angleConfig.Feedback.SensorToMechanismRatio = 100;
+    angleConfig.Slot0.kD = 0.1;
+    angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    angleConfig.MotionMagic.MotionMagicAcceleration = 40; // 80 rps cruise velocity
+    angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
+    angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
+    angleConfig.Feedback.SensorToMechanismRatio = 125;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;
@@ -168,7 +167,7 @@ public class ShooterV2Hardware implements ShooterIO {
     // Arm Calculations
     //double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
     //F_ArmMotor.setVoltage(ArmVolts);
-    F_ArmMotor.setControl(new MotionMagicVoltage(new Rotation2d(Units.degreesToRadians(anglePosition)).getRotations()).withSlot(0).withOverrideBrakeDurNeutral(true));
+    F_ArmMotor.setControl(new MotionMagicVoltage(new Rotation2d(Units.degreesToRadians(anglePosition)).getRotations()).withSlot(0));
     
     if (F_ArmMotor.getPosition().getValueAsDouble() > new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).minus(new Rotation2d(Units.degreesToRadians(0.5))).getRotations() && F_ArmMotor.getPosition().getValueAsDouble() < new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).plus(new Rotation2d(Units.degreesToRadians(0.5))).getRotations()) {
 
@@ -176,8 +175,8 @@ public class ShooterV2Hardware implements ShooterIO {
       F_ArmMotor.setPosition(new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).getRotations());
     }
 
-    K_bottomShooter.setControl(new VelocityVoltage(TopVelocity).withSlot(0));
-    K_topShooter.setControl(new VelocityVoltage(BottomVelocity).withSlot(0));
+    K_bottomShooter.setControl(new VelocityVoltage(TopVelocity/60).withSlot(0));
+    K_topShooter.setControl(new VelocityVoltage(BottomVelocity/60).withSlot(0));
 
     HandlerSwitch.enableLimitSwitch(!limitOff);
     N_Handler.set(HandlerVelocity);

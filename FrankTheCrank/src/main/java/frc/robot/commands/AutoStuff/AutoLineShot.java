@@ -42,7 +42,7 @@ public class AutoLineShot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (shotTime.get() > 0.5) {
+    if (shotTime.get() > 0.4) {
       return true;
     } else {
       return false;

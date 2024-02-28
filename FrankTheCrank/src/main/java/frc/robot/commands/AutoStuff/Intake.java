@@ -32,6 +32,9 @@ public class Intake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if (RobotContainer.shooter.IntakeRumble() == 1) {
+      return true;
+    }
     return false;
   }
 }

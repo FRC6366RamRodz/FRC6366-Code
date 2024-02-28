@@ -58,8 +58,8 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnCurrent;
 
   // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double DRIVE_GEAR_RATIO = 4;
-  private final double TURN_GEAR_RATIO = 13.3714;
+  private final double DRIVE_GEAR_RATIO = 5.6; //4.0
+  private final double TURN_GEAR_RATIO = 11.1428; //13.37
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
@@ -106,7 +106,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 8.0;
+    turnConfig.Slot0.kP = 25.0;
     turnConfig.Slot0.kI = 0.0;
     turnConfig.Slot0.kD = 0.0;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 30;

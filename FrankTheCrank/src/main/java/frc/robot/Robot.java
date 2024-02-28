@@ -116,7 +116,11 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      RobotContainer.drive.updateOdoWithVision();
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -158,8 +162,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), false);
-
+    RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger());
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
   }
