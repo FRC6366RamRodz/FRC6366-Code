@@ -8,8 +8,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
+
+import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -26,6 +31,8 @@ public class Shooter {
   public double sideSpeed;
   public double shooterAngle;
   public boolean launchMode;
+  public double x1, y1, offset;
+  public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
 
   public Shooter(ShooterIO io) {
     this.io = io;
@@ -106,37 +113,31 @@ public class Shooter {
   }
 
   public void advancedShoot(boolean X) {
-    double x1, y1, x2, y2, height;
-    x1 = 16.45;
-    y1 = 5.5;
-    x2 = getPose().getX();
-    y2 = getPose().getY();
-    height = 3.0;
-    double Distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
+    shootMap.put(1.25, null);//distance, followed by shot angle
 
-    double Target;
-    Target = Math.atan(2*(height/Distance)-Math.tan(10));
-    double velocity, finalAngle;
-    if (Target <= Units.degreesToRadians(51)) {
-      velocity = 1/Math.cos(Units.radiansToDegrees(Target)) * Math.sqrt((-9.8*Distance)/-Math.abs(Math.tan(Target)));
-      finalAngle = Units.radiansToDegrees(-Target);
+    Optional<Alliance> ally = DriverStation.getAlliance();
+
+    if (ally.get() == Alliance.Blue){
+      x1 = 0; 
+      y1 = 5.5;
+      offset = Math.PI;
     } else {
-      velocity = (2 * Math.PI * 0.0508 * 3400)/ 60;
-      finalAngle = -35;
+      x1 = 16.45;
+      y1 = 5.5;
+      offset = 0;
+    }
+    double distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x1 - x2 = a
+    
+    
+    double shootAngle;
+    if (X) {
+      shootAngle = shootMap.get(distance);
+    } else {
+      shootAngle = -50;
     }
 
-    double Rpm = (30 * velocity) / Math.PI * 0.0508;
-    double finalRPM;
-    if (Rpm > 6000) {
-      finalRPM = 3400;
-    } else {
-      finalRPM = Rpm;
-    }
-    if(X) {
-    io.setMotors(finalRPM, finalRPM, 0, finalAngle, 0, 0, false);
-    } else {
-      io.setMotors(0, 0, 0, -50, 0, 0, false);
-    }
+    io.setMotors(0, 0, 0, shootAngle, 0, 0, false);
+    
   }
 
   public double LaunchPermision() {
