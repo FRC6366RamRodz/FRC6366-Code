@@ -75,7 +75,7 @@ public class DriveCommands {
             double x = x2 - x1;
             double y = y2 - y1;
             double theta = Math.atan(y/x);
-            try (PIDController error = new PIDController(1, 0.0, 0.0)) {
+            try (PIDController error = new PIDController(1.5 + linearMagnitude, 0.0, 0.0)) {
               omega = error.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
             }
 

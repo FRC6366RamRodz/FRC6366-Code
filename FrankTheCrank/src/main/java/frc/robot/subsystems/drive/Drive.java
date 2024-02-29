@@ -55,8 +55,7 @@ public class Drive extends SubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d lastGyroRotation = new Rotation2d();
 
-  private frc.robot.util.PoseEstimator poseEstimator =
-      new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+  private frc.robot.util.PoseEstimator poseEstimator = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
 
   public Drive(
       GyroIO gyroIO,
@@ -260,15 +259,23 @@ public class Drive extends SubsystemBase {
       limelightPoseDouble = limelightPoseDoubleTop;
       tagArea = 0;
     }
-
-    // Make pose from limelight translation and rotation
-    // April tag rotation accuracy is lower than pigeon
-    //            Pose2d limelightPose = new Pose2d(new Translation2d(limelightPoseDouble[0],
-    // limelightPoseDouble[1]), Rotation2d.fromDegrees(pigeon.getYaw()));
-    Pose2d limelightPose =
+    Pose2d limelightPose;
+    double[] limeLightID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
+    if (limeLightID.length >= 2) {
+      limelightPose =
         new Pose2d(
             new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
             Rotation2d.fromDegrees(limelightPoseDouble[5]));
+    } else {
+      limelightPose = new Pose2d(new Translation2d(limelightPoseDouble[0],
+     limelightPoseDouble[1]), gyroInputs.yawPosition);
+    
+    }
+
+
+    // Make pose from limelight translation and rotation
+    // April tag rotation accuracy is lower than pigeon
+                
     //            SmartDashboard.putString("DT/vision/limelight pose", limelightPose.toString());
     //            SmartDashboard.putNumber("DT/vision/limelight yaw", limelightPoseDouble[5]);
 
@@ -317,12 +324,15 @@ public class Drive extends SubsystemBase {
     // Add estimator trust using april tag area
     double stdX = 0.2;
     double stdY = stdX;
-    if (tagArea < 0.5) {
-      stdY *= 70;
-      stdX *= 10;
-    } else if (tagArea < 0.6) {
-      stdY *= 55;
-      stdX *= 6;
+    if (limeLightID.length >= 2) {
+      stdY *= 2;
+      stdX *= 1;
+    } else if (tagArea < 0.4) {
+      stdY *= 50;
+      stdX *= 5;
+    } else if (tagArea < 0.2) {
+      stdY *= 85;
+      stdX *= 20;
     }
     //  poseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(stdX,
     // stdY, stdY*10));
@@ -333,11 +343,7 @@ public class Drive extends SubsystemBase {
     double limelightLatency = limelightPoseDouble[6] / 1000;
 
     List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-    visionUpdates.add(
-        new TimestampedVisionUpdate(
-            Timer.getFPGATimestamp() - limelightLatency,
-            limelightPose,
-            VecBuilder.fill(stdX, stdY, stdY * 10)));
+    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - limelightLatency, limelightPose, VecBuilder.fill(stdX, stdY, stdY * 10)));
     if (topValid || bottomValid) {
       poseEstimator.addVisionData(visionUpdates);
     }

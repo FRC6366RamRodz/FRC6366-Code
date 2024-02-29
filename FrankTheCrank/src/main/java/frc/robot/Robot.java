@@ -163,6 +163,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger());
+    //RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX());
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
   }

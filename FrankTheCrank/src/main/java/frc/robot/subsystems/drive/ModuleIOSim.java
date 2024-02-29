@@ -29,7 +29,7 @@ public class ModuleIOSim implements ModuleIO {
   private static final double LOOP_PERIOD_SECS = 0.02;
 
   private DCMotorSim driveSim = new DCMotorSim(DCMotor.getKrakenX60(1), 5.60, 0.025);
-  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getFalcon500(1), 13.3714, 0.004);
+  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getFalcon500(1), 11.1428, 0.004);
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;

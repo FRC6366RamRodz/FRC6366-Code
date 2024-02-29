@@ -58,7 +58,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
 
-  // Gear ratios for SDS MK4i L2, adjust as necessary
+  // Gear ratios for WCP SwerveXFlipped X2 12t,(steering has a 12t instead of 10t) adjust as necessary
   private final double DRIVE_GEAR_RATIO = 5.6; //4.0
   private final double TURN_GEAR_RATIO = 11.1428; //13.37
 

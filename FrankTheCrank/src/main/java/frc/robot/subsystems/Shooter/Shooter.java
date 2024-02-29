@@ -8,14 +8,20 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.NoteVisualizer;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -23,9 +29,9 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter {
 
   private Pose3d angle = new Pose3d();
+
   private final ShooterIO io;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
-
   public double ShootSpeed;
   public double IntakeSpeed;
   public double FeedSpeed;
@@ -34,6 +40,8 @@ public class Shooter {
   public boolean launchMode;
   public double x1, y1, offset, oldX, oldY;;
   public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
+
+  private Command noteVisualizer = frc.robot.util.NoteVisualizer.shoot();
 
   public Shooter(ShooterIO io) {
     this.io = io;
@@ -45,10 +53,11 @@ public class Shooter {
     Logger.processInputs("Shooter", inputs);
     Logger.recordOutput("Angle", angle);
 
-    angle =
-        new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
-  }
+    angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
 
+    NoteVisualizer.setRobotPoseSupplier(() -> getPose());
+
+  }
   public void run3PointArm(boolean intake,boolean speaker,boolean amp,boolean launch,boolean center,boolean wing,boolean autoline) {
 
     if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
@@ -57,19 +66,19 @@ public class Shooter {
       //FeedSpeed = 1;
       shooterAngle = -50;
       launchMode = false;
-    } else if (speaker && center) {
+    } else if (speaker && center) {//3.054 Meters from target
       ShootSpeed = 5300;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
       shooterAngle = -9;
       launchMode = true;
-    } else if (speaker && wing) {
+    } else if (speaker && wing) {//5.6495 Meters from target
       ShootSpeed = 6000;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
       shooterAngle = -0.3;
       launchMode = true;
-    } else if (speaker && !center && !wing) {
+    } else if (speaker && !center && !wing) {//1.21 Meters from target
       ShootSpeed = 3400;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
@@ -81,7 +90,7 @@ public class Shooter {
       //FeedSpeed = 1;
       shooterAngle = 50;
       launchMode = true;
-    } else if (autoline) {
+    } else if (autoline) {//1.84 Meters from target
       ShootSpeed = 3800;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
@@ -111,10 +120,17 @@ public class Shooter {
     }
 
     io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff);
+
+    if (sideSpeed > 0.1) {
+      noteVisualizer.schedule();
+    }
   }
 
   public void advancedShoot(boolean X) {
-    shootMap.put(1.25, null);//distance, followed by shot angle
+    shootMap.put(1.25, -35.0);//distance, followed by shot angle
+    shootMap.put(1.84, -20.0);//distance, followed by shot angle
+    shootMap.put(3.054, -9.0);//distance, followed by shot angle
+    shootMap.put(5.6495, -0.3);//distance, followed by shot angle
 
     Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -127,7 +143,13 @@ public class Shooter {
       y1 = 5.5;
       offset = 0;
     }
-    double distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
+    double distance;
+    if (getPose() != null) {
+      distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
+    } else {
+      distance = 0.0;
+    }
+    
     
     
     double shootAngle;
