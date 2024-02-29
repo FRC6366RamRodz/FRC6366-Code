@@ -19,6 +19,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -97,6 +98,11 @@ public class ModuleIOTalonFX implements ModuleIO {
     var driveConfig = new TalonFXConfiguration();
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveConfig.Slot0.kV = 0.118; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
+    driveConfig.Slot0.kP = 0.12;
+    driveConfig.Slot0.kI = 0.0;
+    driveConfig.Slot0.kD = 0.0;
+    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
@@ -178,11 +184,20 @@ public class ModuleIOTalonFX implements ModuleIO {
         Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / TURN_GEAR_RATIO;
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
+
+    inputs.isTalon = true;
+
+    inputs.TalonError = turnTalon.getClosedLoopError().getValueAsDouble();
   }
 
   @Override
   public void setDriveVoltage(double volts) {
     driveTalon.setControl(new VoltageOut(volts));
+  }
+
+  @Override
+  public void setDriveVelocity(double velocity) {
+    driveTalon.setControl(new VelocityVoltage(velocity));
   }
 
   @Override

@@ -32,6 +32,7 @@ import edu.wpi.first.math.util.Units;
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
 public class ModuleIOSparkMax implements ModuleIO {
+  public static final Boolean isTalon = false;
   // Gear ratios for SDS MK4i L2, adjust as necessary
   private static final double DRIVE_GEAR_RATIO = 6.75;
   private static final double TURN_GEAR_RATIO = 13.3714;
@@ -133,6 +134,8 @@ public class ModuleIOSparkMax implements ModuleIO {
             / TURN_GEAR_RATIO;
     inputs.turnAppliedVolts = turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage();
     inputs.turnCurrentAmps = new double[] {turnSparkMax.getOutputCurrent()};
+
+    inputs.isTalon = false;
   }
 
   @Override
