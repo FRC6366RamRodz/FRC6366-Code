@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.RobotContainer;
 
@@ -31,7 +32,7 @@ public class Shooter {
   public double sideSpeed;
   public double shooterAngle;
   public boolean launchMode;
-  public double x1, y1, offset;
+  public double x1, y1, offset, oldX, oldY;;
   public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
 
   public Shooter(ShooterIO io) {
@@ -126,7 +127,7 @@ public class Shooter {
       y1 = 5.5;
       offset = 0;
     }
-    double distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x1 - x2 = a
+    double distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
     
     
     double shootAngle;
@@ -135,6 +136,17 @@ public class Shooter {
     } else {
       shootAngle = -50;
     }
+
+    Timer time = new Timer();
+    time.start();
+
+    if (time.get() > 0.5) {
+      oldX = getPose().getX();
+      oldY = getPose().getY();
+    } 
+    
+    double xSpeed = getPose().getX()- oldX;
+    double ySpeed = getPose().getY() - oldY;
 
     io.setMotors(0, 0, 0, shootAngle, 0, 0, false);
     
