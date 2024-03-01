@@ -8,9 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,7 +18,6 @@ import frc.robot.RobotContainer;
 import frc.robot.util.NoteVisualizer;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -40,6 +36,7 @@ public class Shooter {
   public boolean launchMode;
   public double x1, y1, offset, oldX, oldY;;
   public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
+  public static InterpolatingDoubleTreeMap speedMap = new InterpolatingDoubleTreeMap();
 
   private Command noteVisualizer = frc.robot.util.NoteVisualizer.shoot();
 
@@ -58,6 +55,8 @@ public class Shooter {
     NoteVisualizer.setRobotPoseSupplier(() -> getPose());
 
   }
+
+  @Deprecated
   public void run3PointArm(boolean intake,boolean speaker,boolean amp,boolean launch,boolean center,boolean wing,boolean autoline) {
 
     if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
@@ -126,11 +125,16 @@ public class Shooter {
     }
   }
 
-  public void advancedShoot(boolean X) {
+  public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire) {
     shootMap.put(1.25, -35.0);//distance, followed by shot angle
     shootMap.put(1.84, -20.0);//distance, followed by shot angle
     shootMap.put(3.054, -9.0);//distance, followed by shot angle
     shootMap.put(5.6495, -0.3);//distance, followed by shot angle
+
+    speedMap.put(1.25, 3400.0);//distance, followed by shot speed
+    speedMap.put(1.84, 3800.0);//distance, followed by shot speed
+    speedMap.put(3.054, 5300.0);//distance, followed by shot speed
+    speedMap.put(5.6495, 6000.0);//distance, followed by shot speed
 
     Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -151,13 +155,6 @@ public class Shooter {
     }
     
     
-    
-    double shootAngle;
-    if (X) {
-      shootAngle = shootMap.get(distance);
-    } else {
-      shootAngle = -50;
-    }
 
     Timer time = new Timer();
     time.start();
@@ -170,8 +167,67 @@ public class Shooter {
     double xSpeed = getPose().getX()- oldX;
     double ySpeed = getPose().getY() - oldY;
 
-    io.setMotors(0, 0, 0, shootAngle, 0, 0, false);
-    
+    double adjDistance = distance - xSpeed;
+
+    double shootAngle;
+    if (SWM && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !intake) {
+      shootAngle = shootMap.get(adjDistance);
+      launchMode = true;
+      ShootSpeed = shootMap.get(adjDistance);
+    } else if (Subwoof) {
+      shootAngle = -35;
+      launchMode = true;
+      ShootSpeed = 3400;
+    } else if (AutoLine){
+      shootAngle = -20;
+      launchMode = true;
+      ShootSpeed = 3800;
+    } else if (Stage) {
+      shootAngle = -9;
+      launchMode = true;
+      ShootSpeed = 5300;
+    } else if (Wing) {
+      shootAngle = -0.3;
+      launchMode = true;
+      ShootSpeed = 6000;
+    } else if(Amp) {
+      shootAngle = 89;
+      launchMode = true;
+      ShootSpeed = 1000;
+    } else if (intake && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !SWM) {
+      shootAngle = -50;
+      launchMode = false;
+      ShootSpeed = 0.0;
+    } else {
+      shootAngle = -50;
+      launchMode = false;
+      ShootSpeed = 0.0;
+    }
+
+    boolean limitOff;
+    if(LaunchPermision() == 1 && fire && launchMode) {
+      sideSpeed = 0.5;
+      FeedSpeed = 0.8;
+      limitOff = true;
+      IntakeSpeed = 0.0;
+    } else if (Amp && !fire) {
+      sideSpeed = -0.1;
+      limitOff = false;
+      FeedSpeed = 0.4;
+      IntakeSpeed = 0.0;
+    } else if (intake && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
+      sideSpeed = -0.1;
+      limitOff = false;
+      FeedSpeed = 0.4;
+      IntakeSpeed = 0.8;
+    }else {
+      sideSpeed = 0.0;
+      FeedSpeed = 0.0;
+      limitOff = false;
+      IntakeSpeed = 0.0;
+    }
+
+    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shootAngle, IntakeSpeed, sideSpeed, limitOff);
   }
 
   public double LaunchPermision() {

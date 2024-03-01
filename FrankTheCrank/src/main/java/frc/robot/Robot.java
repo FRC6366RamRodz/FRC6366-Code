@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.IO;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -162,8 +164,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger());
-    //RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX());
+    //RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger());
+    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), false, false, false, false, false, RobotContainer.io.getOpA(), RobotContainer.io.getOpY());
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
   }
