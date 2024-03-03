@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.AutoStuff.AutoAim;
 import frc.robot.commands.AutoStuff.AutoLineShot;
 import frc.robot.commands.AutoStuff.Intake;
 import frc.robot.commands.AutoStuff.StageShot;
@@ -60,6 +61,7 @@ public class RobotContainer {
   public Command wingShot = new WingShot();
   public Command doNothing = new doNothing();
   public Command stageShot = new StageShot();
+  public Command autoAim = new AutoAim();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -120,6 +122,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("WingShot", wingShot);
     NamedCommands.registerCommand("doNothing", doNothing);
     NamedCommands.registerCommand("StageShot", stageShot);
+    NamedCommands.registerCommand("AutoAim", autoAim);
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

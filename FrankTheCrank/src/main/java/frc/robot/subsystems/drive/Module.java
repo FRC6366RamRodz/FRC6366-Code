@@ -98,7 +98,7 @@ public class Module {
         if (inputs.isTalon == false) {
           adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
         } else {
-          adjustSpeedSetpoint = speedSetpoint * Math.cos(inputs.TalonError);
+          adjustSpeedSetpoint = speedSetpoint * Math.cos(Units.rotationsToRadians(inputs.TalonError));
         }
         
         // Run drive controller
@@ -106,7 +106,7 @@ public class Module {
         if (inputs.isTalon == false) {
           io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec) + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
         } else {
-          io.setDriveVelocity(Units.radiansToRotations(velocityRadPerSec));
+          io.setDriveVelocity(velocityRadPerSec);
         }
       }
     }

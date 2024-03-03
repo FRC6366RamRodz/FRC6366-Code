@@ -19,6 +19,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -95,14 +96,16 @@ public class ModuleIOTalonFX implements ModuleIO {
         throw new RuntimeException("Invalid module index");
     }
 
+    driveTalon.getConfigurator().apply(new TalonFXConfiguration());
     var driveConfig = new TalonFXConfiguration();
     driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    driveConfig.Slot0.kV = 0.118; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
-    driveConfig.Slot0.kP = 0.12;
+    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveConfig.Slot0.kV = 0.13; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
+    driveConfig.Slot0.kS = 0.2;
+    driveConfig.Slot0.kP = 0.1;
     driveConfig.Slot0.kI = 0.0;
     driveConfig.Slot0.kD = 0.0;
-    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
@@ -112,7 +115,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 30.0;
+    turnConfig.Slot0.kP = 35.0;
     turnConfig.Slot0.kI = 0.0;
     turnConfig.Slot0.kD = 0.0;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 30;
@@ -197,7 +200,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    driveTalon.setControl(new VelocityVoltage(velocity));
+    driveTalon.setControl(new VelocityVoltage(velocity).withSlot(0));
   }
 
   @Override

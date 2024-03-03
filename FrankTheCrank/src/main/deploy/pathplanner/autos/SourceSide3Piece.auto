@@ -1,12 +1,6 @@
 {
   "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7805585557503859,
-      "y": 4.53787583782681
-    },
-    "rotation": 120.96375653207352
-  },
+  "startingPose": null,
   "command": {
     "type": "sequential",
     "data": {
@@ -14,11 +8,11 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "AutoAim"
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
@@ -39,11 +33,11 @@
         {
           "type": "named",
           "data": {
-            "name": "StageShot"
+            "name": "AutoAim"
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
@@ -70,7 +64,7 @@
         {
           "type": "named",
           "data": {
-            "name": "StageShot"
+            "name": "AutoAim"
           }
         },
         {

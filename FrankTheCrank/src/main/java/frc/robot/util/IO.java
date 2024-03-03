@@ -46,11 +46,43 @@ public class IO {
     }
   }
 
+    public boolean getOpLTrigger() {
+    if (op.getLeftTriggerAxis() > 0.3) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public double getOpRightY() {
+    return op.getRightY();
+  }
+
+  public boolean getOPLYDown() {
+    if (op.getLeftY() > 0.5) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public void opRumble(double rumble) {
     op.setRumble(RumbleType.kBothRumble, rumble);
   }
 
   public void drRumble(double rumble) {
     dr.setRumble(RumbleType.kRightRumble, rumble);
+  }
+
+  public boolean getDrY() {
+   return dr.getYButton();
+  }
+
+  public boolean getDrRb() {
+    if (dr.getRightBumperPressed() || dr.getRightBumperReleased()) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

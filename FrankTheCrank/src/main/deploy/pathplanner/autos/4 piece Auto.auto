@@ -12,7 +12,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "shoot"
+                  "name": "AutoAim"
                 }
               },
               {
@@ -37,7 +37,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "autoLineShot"
+                  "name": "AutoAim"
                 }
               },
               {
@@ -60,15 +60,9 @@
                 }
               },
               {
-                "type": "path",
-                "data": {
-                  "pathName": "Left Shot"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
-                  "name": "autoLineShot"
+                  "name": "AutoAim"
                 }
               },
               {
@@ -93,7 +87,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "stageShot"
+                  "name": "AutoAim"
                 }
               },
               {

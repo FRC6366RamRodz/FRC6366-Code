@@ -322,17 +322,17 @@ public class Drive extends SubsystemBase {
     }
 
     // Add estimator trust using april tag area
-    double stdX = 0.2;
+    double stdX = 0.15;
     double stdY = stdX;
-    if (limeLightID.length >= 2) {
-      stdY *= 2;
-      stdX *= 1;
-    } else if (tagArea < 0.4) {
-      stdY *= 50;
-      stdX *= 5;
+    if (limeLightID.length >= 3) {
+      stdY *=5;
+      stdX *= 10;
+    } else if (tagArea < 0.6) {
+      stdY *= 100;
+      stdX *= 50;
     } else if (tagArea < 0.2) {
-      stdY *= 85;
-      stdX *= 20;
+      stdY *= 150;
+      stdX *= 90;
     }
     //  poseEstimator.setVisionMeasurementStdDevs(new MatBuilder<>(Nat.N3(), Nat.N1()).fill(stdX,
     // stdY, stdY*10));
@@ -406,7 +406,7 @@ public class Drive extends SubsystemBase {
     return MAX_ANGULAR_SPEED;
   }
 
-  public void updateOdoWithVision() {
+  public void updateOdoWithVision(boolean h) {
     double[] limelightPoseDouble =
         NetworkTableInstance.getDefault()
             .getTable("limelight")
@@ -417,8 +417,10 @@ public class Drive extends SubsystemBase {
             new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]),
             Rotation2d.fromDegrees(limelightPoseDouble[5]));
 
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1 && !h) {
       poseEstimator.resetPose(limeLightPose);
+    } else if (h && NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) {
+      poseEstimator.resetPose(new Pose2d(limeLightPose.getX(), limeLightPose.getY(), getRotation()));
     }
   }
 

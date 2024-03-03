@@ -146,7 +146,8 @@ public class ShooterV1Hardware implements ShooterIO {
       double anglePosition,
       double intakeVelocity,
       double feederVelocity,
-      boolean limitOff) {
+      boolean limitOff,
+      double climb) {
 
     // topShooterController.setReference(TopVelocity, ControlType.kVelocity);
     // bottomShooterController.setReference(BottomVelocity, ControlType.kVelocity);

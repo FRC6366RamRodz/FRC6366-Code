@@ -34,6 +34,7 @@ public class ShooterV2Hardware implements ShooterIO {
   public static CANSparkMax N_Intake = new CANSparkMax(5, MotorType.kBrushless);
   public static CANSparkMax N_Handler = new CANSparkMax(6, MotorType.kBrushless);
   public static CANSparkMax f_Feeder = new CANSparkMax(7, MotorType.kBrushless);
+  public static CANSparkMax N_Climber = new CANSparkMax(8, MotorType.kBrushless);
 
   // Controll Loops for Angle motor
   public static ArmFeedforward AngleFeedForward;
@@ -49,6 +50,9 @@ public class ShooterV2Hardware implements ShooterIO {
   public SparkLimitSwitch HandlerSwitch = N_Handler.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
 
   public ShooterV2Hardware() {
+    N_Climber.restoreFactoryDefaults();
+    N_Climber.setIdleMode(IdleMode.kBrake);
+    N_Climber.burnFlash();
 
     // Neo Stuff
     N_Intake.restoreFactoryDefaults();
@@ -99,7 +103,7 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.Slot0.kS = 0.27;
     angleConfig.Slot0.kG = 0.4;
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 80.0;
+    angleConfig.Slot0.kP = 75.0;
     angleConfig.Slot0.kI = 0.0;
     angleConfig.Slot0.kD = 0.1;
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
@@ -161,7 +165,8 @@ public class ShooterV2Hardware implements ShooterIO {
       double anglePosition,
       double intakeVelocity,
       double feederVelocity,
-      boolean limitOff) {
+      boolean limitOff,
+      double climb) {
 
     // Arm Calculations
     //double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
@@ -186,5 +191,7 @@ public class ShooterV2Hardware implements ShooterIO {
     } else {
     N_Intake.set(intakeVelocity);
     }
+
+    N_Climber.set(climb);
   }
 }

@@ -34,6 +34,7 @@ public class Shooter {
   public double sideSpeed;
   public double shooterAngle;
   public boolean launchMode;
+  public boolean autoAim;
   public double x1, y1, offset, oldX, oldY;;
   public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
   public static InterpolatingDoubleTreeMap speedMap = new InterpolatingDoubleTreeMap();
@@ -117,24 +118,29 @@ public class Shooter {
       limitOff = false;
       FeedSpeed = 0;
     }
+    double Climb = 0;
 
-    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff);
+    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, Climb);
 
     if (sideSpeed > 0.1) {
       noteVisualizer.schedule();
     }
   }
 
-  public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire) {
+  public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
     shootMap.put(1.25, -35.0);//distance, followed by shot angle
     shootMap.put(1.84, -20.0);//distance, followed by shot angle
     shootMap.put(3.054, -9.0);//distance, followed by shot angle
-    shootMap.put(5.6495, -0.3);//distance, followed by shot angle
+    shootMap.put(5.6495, -0.0);//distance, followed by shot angle
+    shootMap.put(3.6068, -7.0);
+    shootMap.put(4.0513, -2.8);
 
     speedMap.put(1.25, 3400.0);//distance, followed by shot speed
     speedMap.put(1.84, 3800.0);//distance, followed by shot speed
     speedMap.put(3.054, 5300.0);//distance, followed by shot speed
     speedMap.put(5.6495, 6000.0);//distance, followed by shot speed
+    speedMap.put(3.6068, 5400.0);
+    speedMap.put(4.0513, 6000.0);
 
     Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -159,49 +165,63 @@ public class Shooter {
     Timer time = new Timer();
     time.start();
 
-    if (time.get() > 0.5) {
+    if (time.get() > 0.02) {
       oldX = getPose().getX();
       oldY = getPose().getY();
+      time.stop();
+      time.reset();
     } 
     
-    double xSpeed = getPose().getX()- oldX;
-    double ySpeed = getPose().getY() - oldY;
+    double xSpeed = -getPose().getX() + oldX;
+    double ySpeed = -getPose().getY() + oldY;
 
-    double adjDistance = distance - xSpeed;
+    double adjDistance = Math.abs(distance); //+ xSpeed;
 
-    double shootAngle;
     if (SWM && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !intake) {
-      shootAngle = shootMap.get(adjDistance);
+      shooterAngle = shootMap.get(adjDistance);
       launchMode = true;
-      ShootSpeed = shootMap.get(adjDistance);
+      ShootSpeed = speedMap.get(adjDistance);
+      autoAim = true;
     } else if (Subwoof) {
-      shootAngle = -35;
+      shooterAngle = -35;
       launchMode = true;
       ShootSpeed = 3400;
+      autoAim = false;
     } else if (AutoLine){
-      shootAngle = -20;
+      shooterAngle = -20;
       launchMode = true;
       ShootSpeed = 3800;
+      autoAim = false;
     } else if (Stage) {
-      shootAngle = -9;
+      shooterAngle = -9;
       launchMode = true;
       ShootSpeed = 5300;
+      autoAim = false;
     } else if (Wing) {
-      shootAngle = -0.3;
+      shooterAngle = -0.3;
       launchMode = true;
       ShootSpeed = 6000;
+      autoAim = false;
     } else if(Amp) {
-      shootAngle = 89;
+      shooterAngle = 70;
       launchMode = true;
       ShootSpeed = 1000;
+      autoAim = false;
     } else if (intake && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !SWM) {
-      shootAngle = -50;
+      shooterAngle = -50;
       launchMode = false;
       ShootSpeed = 0.0;
-    } else {
-      shootAngle = -50;
+      autoAim = false;
+    } else if (shootClimb) {
+      shooterAngle = 30;
       launchMode = false;
       ShootSpeed = 0.0;
+      autoAim = false;
+    }else {
+      shooterAngle = -50;
+      launchMode = false;
+      ShootSpeed = 0.0;
+      autoAim = false;
     }
 
     boolean limitOff;
@@ -220,18 +240,20 @@ public class Shooter {
       limitOff = false;
       FeedSpeed = 0.4;
       IntakeSpeed = 0.8;
-    }else {
+    } else {
       sideSpeed = 0.0;
       FeedSpeed = 0.0;
       limitOff = false;
       IntakeSpeed = 0.0;
     }
 
-    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shootAngle, IntakeSpeed, sideSpeed, limitOff);
+    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climb);
   }
 
   public double LaunchPermision() {
-    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
+    if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode && autoAim && DriverStation.isTeleop()) {
+      return 1;
+    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
       return 1;
     } else {
       return 0;
@@ -239,7 +261,7 @@ public class Shooter {
   }
 
   public double IntakeRumble() {
-    if (inputs.intakeLimit && FeedSpeed > 0) {
+    if (inputs.intakeLimit && IntakeSpeed > 0) {
       return 1;
     } else {
       return 0;

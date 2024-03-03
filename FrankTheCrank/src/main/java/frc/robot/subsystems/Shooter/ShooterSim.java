@@ -55,7 +55,7 @@ public class ShooterSim implements ShooterIO {
   }
 
   @Override
-  public void setMotors(double TopVelocity, double BottomVelocity, double HandlerVelocity, double anglePosition, double intakeVelocity, double feederVelocity, boolean limitOff) {
+  public void setMotors(double TopVelocity, double BottomVelocity, double HandlerVelocity, double anglePosition, double intakeVelocity, double feederVelocity, boolean limitOff, double climb) {
 
     double angleVelocity = angleFeedForward.calculate(anglePosition, Units.degreesToRadians(anglePosition) - shooterAngle.getAngleRads()) + anglePID.calculate(Units.radiansToDegrees(shooterAngle.getAngleRads()), anglePosition);
     shooterAngle.setInputVoltage(angleVelocity);
