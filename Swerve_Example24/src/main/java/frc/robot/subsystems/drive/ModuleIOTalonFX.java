@@ -19,6 +19,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -33,8 +34,6 @@ import edu.wpi.first.math.util.Units;
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
  * CANcoder
  *
- * <p>NOTE: This implementation should be used as a starting point and adapted to different hardware
- * configurations (e.g. If using an analog encoder, copy from "ModuleIOSparkMax")
  *
  * <p>To calibrate the absolute encoder offsets, point the modules straight (such that forward
  * motion on the drive motor will propel the robot forward) and copy the reported values from the
@@ -57,9 +56,9 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
 
-  // Gear ratios for SDS MK4i L2, adjust as necessary
-  private final double DRIVE_GEAR_RATIO = 4;
-  private final double TURN_GEAR_RATIO = 13.3714;
+  // Gear ratios for WCP SwerveXFlipped X2 12t,(steering has a 12t instead of 10t) adjust as necessary
+  private final double DRIVE_GEAR_RATIO = 5.6; //4.0
+  private final double TURN_GEAR_RATIO = 11.1428; //13.37
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
@@ -94,9 +93,18 @@ public class ModuleIOTalonFX implements ModuleIO {
         throw new RuntimeException("Invalid module index");
     }
 
+    driveTalon.getConfigurator().apply(new TalonFXConfiguration());
     var driveConfig = new TalonFXConfiguration();
-    driveConfig.CurrentLimits.StatorCurrentLimit = 30.0;
+    driveConfig.CurrentLimits.StatorCurrentLimit = 80.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveConfig.Voltage.PeakForwardVoltage = 12.0;
+    driveConfig.Voltage.PeakReverseVoltage = -12.0;
+    driveConfig.Slot0.kV = 0.13; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
+    driveConfig.Slot0.kS = 0.2;
+    driveConfig.Slot0.kP = 0.1;
+    driveConfig.Slot0.kI = 0.0;
+    driveConfig.Slot0.kD = 0.0;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
@@ -106,7 +114,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 8.0;
+    turnConfig.Slot0.kP = 35.0;
     turnConfig.Slot0.kI = 0.0;
     turnConfig.Slot0.kD = 0.0;
     turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 30;
@@ -137,7 +145,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         100.0, drivePosition, turnPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        100.0,
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,
@@ -178,11 +186,20 @@ public class ModuleIOTalonFX implements ModuleIO {
         Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / TURN_GEAR_RATIO;
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
+
+    inputs.isTalon = true;
+
+    inputs.TalonError = turnTalon.getClosedLoopError().getValueAsDouble();
   }
 
   @Override
   public void setDriveVoltage(double volts) {
     driveTalon.setControl(new VoltageOut(volts));
+  }
+
+  @Override
+  public void setDriveVelocity(double velocity) {
+    driveTalon.setControl(new VelocityVoltage(velocity).withSlot(0));
   }
 
   @Override

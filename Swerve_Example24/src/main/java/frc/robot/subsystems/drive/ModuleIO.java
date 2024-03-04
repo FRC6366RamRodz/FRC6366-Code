@@ -29,6 +29,8 @@ public interface ModuleIO {
     public double turnVelocityRadPerSec = 0.0;
     public double turnAppliedVolts = 0.0;
     public double[] turnCurrentAmps = new double[] {};
+    public boolean isTalon = false; //must be real hardware for true
+    public double TalonError = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
@@ -47,4 +49,6 @@ public interface ModuleIO {
   public default void setTurnBrakeMode(boolean enable) {}
 
   public default void setTurnPosition(double moduleAngle) {}
+
+  public default void setDriveVelocity(double velocity) {}
 }

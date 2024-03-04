@@ -32,7 +32,8 @@ import edu.wpi.first.math.util.Units;
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
 public class ModuleIOSparkMax implements ModuleIO {
-  // Gear ratios for SDS MK4i L2, adjust as necessary
+  public static final Boolean isTalon = false;
+  //Gear ratios for WCP SwerveXFlipped X1 12t, adjust as necessary
   private static final double DRIVE_GEAR_RATIO = 6.75;
   private static final double TURN_GEAR_RATIO = 13.3714;
 
@@ -49,28 +50,28 @@ public class ModuleIOSparkMax implements ModuleIO {
 
   public ModuleIOSparkMax(int index) {
     switch (index) {
-      case 0:
+      case 0://fl
         driveSparkMax = new CANSparkMax(1, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(11, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(1);
         absoluteEncoderOffset = new Rotation2d(2.88); // MUST BE CALIBRATED AND POSITIVE
         isDriveInverted = false;
         break;
-      case 1:
+      case 1://fr
         driveSparkMax = new CANSparkMax(2, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(12, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(2);
         absoluteEncoderOffset = new Rotation2d(1.782); // MUST BE CALIBRATED AND POSITIVE
         isDriveInverted = false;
         break;
-      case 2:
+      case 2://bl
         driveSparkMax = new CANSparkMax(4, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(14, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(3);
         absoluteEncoderOffset = new Rotation2d(-0.873); // MUST BE CALIBRATED AND POSITIVE
         isDriveInverted = false;
         break;
-      case 3:
+      case 3://br
         driveSparkMax = new CANSparkMax(3, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(13, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(4);
@@ -133,6 +134,8 @@ public class ModuleIOSparkMax implements ModuleIO {
             / TURN_GEAR_RATIO;
     inputs.turnAppliedVolts = turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage();
     inputs.turnCurrentAmps = new double[] {turnSparkMax.getOutputCurrent()};
+
+    inputs.isTalon = false;
   }
 
   @Override

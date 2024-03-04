@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -161,7 +160,7 @@ public class Shooter {
     }
     
     
-
+/*  SWM stuff
     Timer time = new Timer();
     time.start();
 
@@ -174,7 +173,7 @@ public class Shooter {
     
     double xSpeed = -getPose().getX() + oldX;
     double ySpeed = -getPose().getY() + oldY;
-
+*/
     double adjDistance = Math.abs(distance); //+ xSpeed;
 
     if (SWM && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !intake) {
@@ -203,7 +202,7 @@ public class Shooter {
       ShootSpeed = 6000;
       autoAim = false;
     } else if(Amp) {
-      shooterAngle = 70;
+      shooterAngle = 50;
       launchMode = true;
       ShootSpeed = 1000;
       autoAim = false;

@@ -29,8 +29,6 @@ public class Module {
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
 
-  private boolean TalonFx = true;
-
   private final SimpleMotorFeedforward driveFeedforward;
   private final PIDController driveFeedback;
   private final PIDController turnFeedback;
@@ -82,13 +80,11 @@ public class Module {
 
     // Run closed loop turn control
     if (angleSetpoint != null) {
-      if (TalonFx == false) {
+      if (inputs.isTalon == false) {
         io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
       } else {
         io.setTurnPosition(angleSetpoint.getRotations());
       }
-      
-      
 
       // Run closed loop drive control
       // Only allowed if closed loop turn control is running
@@ -98,13 +94,20 @@ public class Module {
         // When the error is 90°, the velocity setpoint should be 0. As the wheel turns
         // towards the setpoint, its velocity should increase. This is achieved by
         // taking the component of the velocity in the direction of the setpoint.
-        double adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
-
+        double adjustSpeedSetpoint;
+        if (inputs.isTalon == false) {
+          adjustSpeedSetpoint = speedSetpoint * Math.cos(turnFeedback.getPositionError());
+        } else {
+          adjustSpeedSetpoint = speedSetpoint * Math.cos(Units.rotationsToRadians(inputs.TalonError));
+        }
+        
         // Run drive controller
         double velocityRadPerSec = adjustSpeedSetpoint / WHEEL_RADIUS;
-        io.setDriveVoltage(
-            driveFeedforward.calculate(velocityRadPerSec)
-                + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+        if (inputs.isTalon == false) {
+          io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec) + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+        } else {
+          io.setDriveVelocity(velocityRadPerSec);
+        }
       }
     }
   }

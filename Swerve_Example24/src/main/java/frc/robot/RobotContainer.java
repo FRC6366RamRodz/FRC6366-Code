@@ -29,6 +29,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSparkMax;
+import frc.robot.util.IO;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -40,6 +42,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   public static Drive drive;
+  public static IO io = new IO();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -96,10 +99,7 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up feedforward characterization
-    autoChooser.addOption(
-        "Drive FF Characterization",
-        new FeedForwardCharacterization(
-            drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    autoChooser.addOption( "Drive FF Characterization",new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -113,22 +113,9 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> (-controller.getLeftY()),
-            () -> (-controller.getLeftX()),
-            () -> -controller.getRightX(),
-            controller.y()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+        DriveCommands.joystickDrive(drive,() -> (-controller.getLeftY()),() -> (-controller.getLeftX()),() -> -controller.getRightX(),controller.leftBumper(), controller.rightBumper()));
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.b().onTrue(Commands.runOnce(() ->drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),drive).ignoringDisable(true));
   }
 
   /**
