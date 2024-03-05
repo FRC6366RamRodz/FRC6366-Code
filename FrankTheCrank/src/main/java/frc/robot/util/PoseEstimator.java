@@ -1,4 +1,4 @@
-// Copyright (c) 2023 FRC 6328
+// Copyright (c) 2024 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // Use of this source code is governed by an MIT-style
@@ -22,10 +22,12 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class PoseEstimator {
-  private static final double historyLengthSecs = 0.3;
+  private static final double historyLengthSecs = 0.4;
 
   private Pose2d basePose = new Pose2d();
+
   private Pose2d latestPose = new Pose2d();
+
   private final NavigableMap<Double, PoseUpdate> updates = new TreeMap<>();
   private final Matrix<N3, N1> q = new Matrix<>(Nat.N3(), Nat.N1());
 
@@ -35,7 +37,7 @@ public class PoseEstimator {
     }
   }
 
-  /** Returns the latest robot pose based on drive and vision data. */
+    /** Returns the latest robot pose based on drive and vision data. */
   public Pose2d getLatestPose() {
     return latestPose;
   }
@@ -76,14 +78,9 @@ public class PoseEstimator {
         }
 
         // Create partial twists (prev -> vision, vision -> next)
-        var twist0 =
-            GeomUtil.multiplyTwist(
-                nextUpdate.getValue().twist(),
-                (timestamp - prevUpdate.getKey()) / (nextUpdate.getKey() - prevUpdate.getKey()));
-        var twist1 =
-            GeomUtil.multiplyTwist(
-                nextUpdate.getValue().twist(),
-                (nextUpdate.getKey() - timestamp) / (nextUpdate.getKey() - prevUpdate.getKey()));
+        var twist0 =GeomUtil.multiplyTwist(nextUpdate.getValue().twist(), (timestamp - prevUpdate.getKey()) / (nextUpdate.getKey() - prevUpdate.getKey()));
+        
+        var twist1 = GeomUtil.multiplyTwist(nextUpdate.getValue().twist(), (nextUpdate.getKey() - timestamp) / (nextUpdate.getKey() - prevUpdate.getKey()));
 
         // Add new pose updates
         var newVisionUpdates = new ArrayList<VisionUpdate>();
@@ -119,7 +116,7 @@ public class PoseEstimator {
    * Represents a sequential update to a pose estimate, with a twist (drive movement) and list of
    * vision updates.
    */
-  private static record PoseUpdate(Twist2d twist, ArrayList<VisionUpdate> visionUpdates) {
+  private record PoseUpdate(Twist2d twist, ArrayList<VisionUpdate> visionUpdates) {
     public Pose2d apply(Pose2d lastPose, Matrix<N3, N1> q) {
       // Apply drive twist
       var pose = lastPose.exp(twist);
@@ -150,9 +147,7 @@ public class PoseEstimator {
             visionK.times(VecBuilder.fill(visionTwist.dx, visionTwist.dy, visionTwist.dtheta));
 
         // Apply twist
-        pose =
-            pose.exp(
-                new Twist2d(twistMatrix.get(0, 0), twistMatrix.get(1, 0), twistMatrix.get(2, 0)));
+        pose = pose.exp(new Twist2d(twistMatrix.get(0, 0), twistMatrix.get(1, 0), twistMatrix.get(2, 0)));
       }
 
       return pose;
@@ -160,7 +155,7 @@ public class PoseEstimator {
   }
 
   /** Represents a single vision pose with associated standard deviations. */
-  public static record VisionUpdate(Pose2d pose, Matrix<N3, N1> stdDevs) {
+  public record VisionUpdate(Pose2d pose, Matrix<N3, N1> stdDevs) {
     public static final Comparator<VisionUpdate> compareDescStdDev =
         (VisionUpdate a, VisionUpdate b) -> {
           return -Double.compare(
@@ -170,6 +165,5 @@ public class PoseEstimator {
   }
 
   /** Represents a single vision pose with a timestamp and associated standard deviations. */
-  public static record TimestampedVisionUpdate(
-      double timestamp, Pose2d pose, Matrix<N3, N1> stdDevs) {}
+  public record TimestampedVisionUpdate(double timestamp, Pose2d pose, Matrix<N3, N1> stdDevs) {}
 }

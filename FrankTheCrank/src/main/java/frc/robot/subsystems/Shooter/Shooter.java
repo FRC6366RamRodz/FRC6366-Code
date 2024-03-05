@@ -246,7 +246,14 @@ public class Shooter {
       IntakeSpeed = 0.0;
     }
 
-    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climb);
+    double climber;
+    if (RobotContainer.io.getDrAbutton()) {
+      climber = climb;
+    } else {
+      climber = 0;
+    }
+
+    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climber);
   }
 
   public double LaunchPermision() {

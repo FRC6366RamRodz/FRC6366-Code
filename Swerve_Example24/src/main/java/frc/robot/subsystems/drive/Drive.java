@@ -18,10 +18,16 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -38,6 +44,8 @@ import frc.robot.util.LocalADStarAK;
 import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -163,6 +171,18 @@ public class Drive extends SubsystemBase {
     double[] limelightTargetSpacePoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_targetspace").getDoubleArray(new double[] {0});
     double tagAreaTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
 
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, rearCam, robotToCam);
+    
+    photonPoseEstimator.setReferencePose(getPose());
+    Optional<EstimatedRobotPose> photonEstimator = photonPoseEstimator.update();
+    var result = rearCam.getLatestResult();
+    PhotonTrackedTarget target = result.getBestTarget();
+
+    double[] PhotonPose = new double[] {photonEstimator.get().estimatedPose.getX(),photonEstimator.get().estimatedPose.getY(),photonEstimator.get().estimatedPose.getZ(),0,target.getPitch(),target.getYaw(), result.getLatencyMillis()};
+    double[] PhotonPoseTargetSpace = new double[]{target.getBestCameraToTarget().getTranslation().getX(),target.getBestCameraToTarget().getTranslation().getY(), target.getBestCameraToTarget().getTranslation().getZ()};
+    double tagAreaPhoton = target.getArea();
     // Check if the limelight rejects the position because it is too far away
     // This has to be done with the targetspace pose instead of the wpilibblue pose, because
     // limelight still
@@ -171,15 +191,32 @@ public class Drive extends SubsystemBase {
     for (double value : limelightTargetSpacePoseDoubleTop) {
       sumTop += value;
     }
+    double sumBottom = 0;
+    for (double value : PhotonPoseTargetSpace){
+      sumBottom += value;
+    }
     boolean topInRange = sumTop != 0;
+    boolean rearInRange= sumBottom != 0;
     // Stop if limelight array is not full
     // Stop if translation X or Y is not in field
     // Stop if translation Z is negative
     double[] limelightPoseDouble;
     double tagArea;
     boolean topValid = topInRange && (limelightPoseDoubleTop.length > 5 && limelightPoseDoubleTop[0] > 0.75 && limelightPoseDoubleTop[0] < /*FIELD_LENGTH*/ 16.5 - 0.75 && limelightPoseDoubleTop[1] > 0.3 && limelightPoseDoubleTop[1] < /*FIELD_WIDTH*/ 8.20 - 0.3 && limelightPoseDoubleTop[2] >= 0);
+    boolean rearValid = rearInRange && (result.hasTargets() && photonEstimator.get().estimatedPose.getX() > 0.75 && photonEstimator.get().estimatedPose.getX() < /*FIELD_LENGTH*/ 16.5 - 0.75 && photonEstimator.get().estimatedPose.getY() > 0.3 && photonEstimator.get().estimatedPose.getY() < /*FIELD_WIDTH*/ 8.20 - 0.3 && photonEstimator.get().estimatedPose.getZ() >= 0);
 
-    if (topValid) {
+    if (rearValid && topValid) {
+       // Take the measurements from the top limelight, because that is the best
+       limelightPoseDouble = limelightPoseDoubleTop;
+       // Except for the x and y position, take the average of that
+       limelightPoseDouble[0] = (PhotonPose[0] + limelightPoseDoubleTop[0]) / 2;
+       limelightPoseDouble[1] = (PhotonPose[1] + limelightPoseDoubleTop[1]) / 2;
+       // Take the tag area of the top limelight
+       tagArea = (tagAreaTop + tagAreaPhoton)/2;
+    }else if (rearValid){
+      limelightPoseDouble = PhotonPose;
+      tagArea = tagAreaPhoton;
+    } else if (topValid) {
       limelightPoseDouble = limelightPoseDoubleTop;
       tagArea = tagAreaTop;
     } else {
@@ -187,15 +224,15 @@ public class Drive extends SubsystemBase {
       tagArea = 0;
     }
 
-    Pose2d limelightPose;
+    Pose2d CameraPose;
     double[] limeLightID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
-    if (limeLightID.length >= 2) {
-      limelightPose =
+    if (limeLightID.length + rearCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size() >= 2) {
+      CameraPose =
         new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), Rotation2d.fromDegrees(limelightPoseDouble[5]));
     } else {
-      limelightPose = new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), gyroInputs.yawPosition);
-    
+      CameraPose = new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), gyroInputs.yawPosition);
     }
+
     SmartDashboard.putNumberArray("DT/vision/LL-top pose", new Double[] {limelightPoseDoubleTop[0], limelightPoseDoubleTop[1], limelightPoseDoubleTop[5]});
     SmartDashboard.putNumberArray("DT/vision/LL final pose",new Double[] {limelightPoseDouble[0], limelightPoseDouble[1], limelightPoseDouble[5]});
 
@@ -213,7 +250,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Add estimator trust using april tag area (standard Deviations)
-    double stdX = 0.15 * ((1-tagArea) * 1000);
+    double stdX = 0.15 * ((1-tagArea) * 100);
     double stdY = stdX;
     SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
     SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
@@ -222,7 +259,7 @@ public class Drive extends SubsystemBase {
     double limelightLatency = limelightPoseDouble[6] / 1000;
 
     List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - limelightLatency, limelightPose, VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
+    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - limelightLatency, CameraPose, VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
     if (topValid) {
       poseEstimator.addVisionData(visionUpdates);
     }

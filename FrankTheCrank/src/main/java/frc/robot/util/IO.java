@@ -85,4 +85,8 @@ public class IO {
       return false;
     }
   }
+
+  public boolean getDrAbutton() {
+    return dr.getAButton();
+  }
 }

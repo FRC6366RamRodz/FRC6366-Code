@@ -34,8 +34,6 @@ import edu.wpi.first.math.util.Units;
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
  * CANcoder
  *
- * <p>NOTE: This implementation should be used as a starting point and adapted to different hardware
- * configurations (e.g. If using an analog encoder, copy from "ModuleIOSparkMax")
  *
  * <p>To calibrate the absolute encoder offsets, point the modules straight (such that forward
  * motion on the drive motor will propel the robot forward) and copy the reported values from the
@@ -100,6 +98,8 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveConfig.CurrentLimits.StatorCurrentLimit = 80.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveConfig.Voltage.PeakForwardVoltage = 12.0;
+    driveConfig.Voltage.PeakReverseVoltage = -12.0;
     driveConfig.Slot0.kV = 0.13; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
     driveConfig.Slot0.kS = 0.2;
     driveConfig.Slot0.kP = 0.1;
@@ -143,9 +143,9 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnCurrent = turnTalon.getStatorCurrent();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        100.0, drivePosition, turnPosition); // Required for odometry, use faster rate
+        250.0, drivePosition, turnPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        100.0,
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,

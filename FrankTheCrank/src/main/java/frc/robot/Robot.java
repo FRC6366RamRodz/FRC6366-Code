@@ -118,13 +118,16 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      RobotContainer.drive.updateOdoWithVision();
+    }
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
     if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.updateOdoWithVision(false);
+      RobotContainer.drive.updateOdoWithVision();
     }
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -153,7 +156,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
     if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.updateOdoWithVision(false);
+      RobotContainer.drive.updateOdoWithVision();
     }
   }
 
@@ -166,7 +169,7 @@ public class Robot extends LoggedRobot {
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
 
     if (RobotContainer.io.getDrY()) {
-      RobotContainer.drive.updateOdoWithVision(!RobotContainer.io.getDrY());
+      RobotContainer.drive.updateOdoWithVision();
     } else {}
   }
 
