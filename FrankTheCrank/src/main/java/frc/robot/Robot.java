@@ -38,7 +38,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
-  private Compressor kCompressor = new Compressor(PneumaticsModuleType.REVPH);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -107,7 +106,6 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    kCompressor.enableAnalog(20, 45);
     RobotContainer.shooter.ShooterPeriodic();
   }
 
@@ -118,9 +116,6 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.updateOdoWithVision();
-    }
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -141,7 +136,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {
     if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-     // RobotContainer.drive.checkVisionMeasurements();
+      RobotContainer.drive.checkVisionMeasurements(false);
     }
   }
 
@@ -171,6 +166,10 @@ public class Robot extends LoggedRobot {
     if (RobotContainer.io.getDrY()) {
       RobotContainer.drive.updateOdoWithVision();
     } else {}
+
+    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+      RobotContainer.drive.checkVisionMeasurements(false);
+    }
   }
 
   /** This function is called once when test mode is enabled. */
