@@ -297,7 +297,12 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateOdoWithVision() {
-    checkVisionMeasurements(true);
+    double[] limelightPoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[] {0});
+    Pose2d CameraPose;
+
+      CameraPose = new Pose2d(new Translation2d(limelightPoseDoubleTop[0], limelightPoseDoubleTop[1]), Rotation2d.fromDegrees(limelightPoseDoubleTop[5]));
+
+    poseEstimator.resetPose(CameraPose);
   }
 
   /** Returns an array of module translations. */
