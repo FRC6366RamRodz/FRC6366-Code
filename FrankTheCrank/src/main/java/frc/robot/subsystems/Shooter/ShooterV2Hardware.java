@@ -105,7 +105,7 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.Slot0.kV = 0.0;
     angleConfig.Slot0.kP = 75.0;
     angleConfig.Slot0.kI = 0.0;
-    angleConfig.Slot0.kD = 0.7;
+    angleConfig.Slot0.kD = 0.75;
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     angleConfig.MotionMagic.MotionMagicAcceleration = 40; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
