@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -100,6 +101,7 @@ public class RobotContainer {
 
     // Set up feedforward characterization
     autoChooser.addOption( "Drive FF Characterization",new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    autoChooser.addOption("Wheel Radius Calibration",new WheelRadiusCharacterization(drive));
 
     // Configure the button bindings
     configureButtonBindings();

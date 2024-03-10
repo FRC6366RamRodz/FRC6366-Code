@@ -139,6 +139,8 @@ public class PoseEstimator {
           }
         }
 
+        // get old estimate by applying odometryToSample Transform
+
         // Calculate twist between current and vision pose
         var visionTwist = pose.log(visionUpdate.pose());
 

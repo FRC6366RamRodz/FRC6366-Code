@@ -22,6 +22,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
+//modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Module {
   private static final double WHEEL_RADIUS = Units.inchesToMeters(2);
 
@@ -163,6 +164,10 @@ public class Module {
   /** Returns the current drive position of the module in meters. */
   public double getPositionMeters() {
     return inputs.drivePositionRad * WHEEL_RADIUS;
+  }
+
+  public double getPositionRad() {
+    return inputs.drivePositionRad;
   }
 
   /** Returns the current drive velocity of the module in meters per second. */

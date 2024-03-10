@@ -37,7 +37,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
-  private Compressor kCompressor = new Compressor(PneumaticsModuleType.REVPH);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -106,9 +105,6 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    if (kCompressor.getAnalogVoltage() != 0) {
-      kCompressor.enableAnalog(20, 45);
-    }
    
   }
 
@@ -119,17 +115,12 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.updateOdoWithVision(false);
-    }
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.updateOdoWithVision(false);
-    }
+
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -141,9 +132,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-     // RobotContainer.drive.checkVisionMeasurements();
-    }
+
   }
 
   /** This function is called once when teleop is enabled. */
@@ -156,17 +145,12 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.updateOdoWithVision(false);
-    }
+
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    if (RobotContainer.io.getDrY()) {
-      RobotContainer.drive.updateOdoWithVision(!RobotContainer.io.getDrY());
-    } else {}
   }
 
   /** This function is called once when test mode is enabled. */

@@ -16,6 +16,7 @@ package frc.robot.subsystems.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
+//modified from 6328's 2023 example so that it supports talon FX motorControllers
 public interface ModuleIO {
   @AutoLog
   public static class ModuleIOInputs {

@@ -21,8 +21,10 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -40,9 +42,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.PhotonAprilTags.CameraConstants;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,21 +58,24 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+//modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Drive extends SubsystemBase {
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.7);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(28);
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(28);
-  private static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
+  public static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
-  private final PhotonCamera rearCam = new PhotonCamera("photonvision");
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d lastGyroRotation = new Rotation2d();
 
   private frc.robot.util.PoseEstimator poseEstimator = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+
+
+
 
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO, ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
@@ -144,10 +151,6 @@ public class Drive extends SubsystemBase {
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
 
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      checkVisionMeasurements();
-    }
-
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
@@ -171,21 +174,57 @@ public class Drive extends SubsystemBase {
     stop();
   }
 
-  //this is a modified file from 4481s 2023 code release
-  public void checkVisionMeasurements() {
+
+  public void checkVisionMeasurements() {    
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    PoseStrategy strategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
+
+    PhotonCamera rearCam = new PhotonCamera("RearCam");
+    PhotonPoseEstimator rearPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.RearCam);
+
+    PhotonCamera frontCam = new PhotonCamera("RearCam");
+    PhotonPoseEstimator frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.FrontCam);
+
+    Pose3d rearEstimate = rearPose.update(rearCam.getLatestResult()).get().estimatedPose;
+    Pose3d frontEstimate = frontPose.update(frontCam.getLatestResult()).get().estimatedPose;
+
+    boolean rearValid = rearCam.getLatestResult().getBestTarget().getPoseAmbiguity() < 0.3;
+    boolean frontValid = frontCam.getLatestResult().getBestTarget().getPoseAmbiguity() < 0.3;
+
+    Pose3d estimatedPose;
+    double tagArea;
+    double latency;
+    if (rearValid && frontValid){
+      estimatedPose = new Pose3d((rearEstimate.getX()+frontEstimate.getX())/2, (rearEstimate.getY()+frontEstimate.getY())/2, (rearEstimate.getZ()+frontEstimate.getZ())/2, rearEstimate.getRotation().plus(frontEstimate.getRotation()).div(2));
+      tagArea = (rearCam.getLatestResult().getBestTarget().getArea() + frontCam.getLatestResult().getBestTarget().getArea())/2;
+      latency = Math.max(rearCam.getLatestResult().getLatencyMillis(), frontCam.getLatestResult().getLatencyMillis());
+    } else if (rearValid) {
+      estimatedPose = rearEstimate;
+      tagArea = rearCam.getLatestResult().getBestTarget().getArea();
+      latency = rearCam.getLatestResult().getLatencyMillis();
+    } else if (frontValid) {
+      estimatedPose = frontEstimate;
+      tagArea = frontCam.getLatestResult().getBestTarget().getArea();
+      latency = frontCam.getLatestResult().getLatencyMillis();
+    } else {
+      estimatedPose = new Pose3d();
+      tagArea = 0;
+      latency = 0;
+    }
+
+
     
-    // Add estimator trust using april tag area (standard Deviations)
-    double stdX = 0.15 * ((1-tagArea) * 100);
+    // Add estimator trust using april tag area (standard Deviations in mm)
+    double stdX = CameraConstants.xyStdDevCoefficient * ((1-tagArea) * 1000);
     double stdY = stdX;
     SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
     SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
 
     // Add limelight latency
-    double limelightLatency = limelightPoseDouble[6] / 1000;
 
     List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - limelightLatency, CameraPose, VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
-    if (topValid) {
+    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - (latency*60), estimatedPose.toPose2d(), VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
+    if (rearValid || frontValid) {
       poseEstimator.addVisionData(visionUpdates);
     }
   }
@@ -247,15 +286,31 @@ public class Drive extends SubsystemBase {
     return MAX_ANGULAR_SPEED;
   }
 
-  public void updateOdoWithVision(boolean h) {
-    double[] limelightPoseDouble = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[] {0});
-    Pose2d limeLightPose = new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), Rotation2d.fromDegrees(limelightPoseDouble[5]));
+  public void updateOdoWithVision() {
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    PoseStrategy strategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1 && !h) {
-      poseEstimator.resetPose(limeLightPose);
-    } else if (h && NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getDouble(0) == 1) {
-      poseEstimator.resetPose(new Pose2d(limeLightPose.getX(), limeLightPose.getY(), getRotation()));
+    PhotonCamera rearCam = new PhotonCamera("RearCam");
+    PhotonPoseEstimator rearPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.RearCam);
+
+    PhotonCamera frontCam = new PhotonCamera("RearCam");
+    PhotonPoseEstimator frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.FrontCam);
+
+    Pose3d rearEstimate = rearPose.update(rearCam.getLatestResult()).get().estimatedPose;
+    Pose3d frontEstimate = frontPose.update(frontCam.getLatestResult()).get().estimatedPose;
+
+    if (frontCam.getLatestResult().hasTargets()) {
+      poseEstimator.resetPose(frontEstimate.toPose2d());
+    } else if (rearCam.getLatestResult().hasTargets()) {
+      poseEstimator.resetPose(rearEstimate.toPose2d());
     }
+    
+
+  }
+
+  //for wheel clibration
+  public double[] getDrivePosition() {
+      return Arrays.stream(modules).mapToDouble(Module::getPositionRad).toArray();
   }
 
   /** Returns an array of module translations. */
