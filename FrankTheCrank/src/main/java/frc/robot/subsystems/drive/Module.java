@@ -38,7 +38,7 @@ public class Module {
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private double lastPositionMeters = 0.0; // Used for delta calculation
 
-
+//modified from 6328's 2023 example so that it supports talon FX motorControllers
   public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;

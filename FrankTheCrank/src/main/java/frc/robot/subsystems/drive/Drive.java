@@ -43,6 +43,7 @@ import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+//modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Drive extends SubsystemBase {
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.7);
   private static final double TRACK_WIDTH_X = Units.inchesToMeters(28);

@@ -39,6 +39,7 @@ public class DriveCommands {
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
+  //modified from 6328's 2023 example so that it supports auto aim.
   public static Command joystickDrive(Drive drive,DoubleSupplier xSupplier,DoubleSupplier ySupplier,DoubleSupplier omegaSupplier,BooleanSupplier point, BooleanSupplier speak) {
     return Commands.run( () -> {
           Optional<Alliance> ally = DriverStation.getAlliance();

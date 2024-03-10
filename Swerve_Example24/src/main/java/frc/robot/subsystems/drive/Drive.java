@@ -48,6 +48,11 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Drive extends SubsystemBase {
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.7);
@@ -58,6 +63,7 @@ public class Drive extends SubsystemBase {
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+  private final PhotonCamera rearCam = new PhotonCamera("photonvision");
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d lastGyroRotation = new Rotation2d();
@@ -167,88 +173,7 @@ public class Drive extends SubsystemBase {
 
   //this is a modified file from 4481s 2023 code release
   public void checkVisionMeasurements() {
-    double[] limelightPoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[] {0});
-    double[] limelightTargetSpacePoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_targetspace").getDoubleArray(new double[] {0});
-    double tagAreaTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
-
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    Transform3d robotToCam = new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0,0,0)); //Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-    PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, rearCam, robotToCam);
     
-    photonPoseEstimator.setReferencePose(getPose());
-    Optional<EstimatedRobotPose> photonEstimator = photonPoseEstimator.update();
-    var result = rearCam.getLatestResult();
-    PhotonTrackedTarget target = result.getBestTarget();
-
-    double[] PhotonPose = new double[] {photonEstimator.get().estimatedPose.getX(),photonEstimator.get().estimatedPose.getY(),photonEstimator.get().estimatedPose.getZ(),0,target.getPitch(),target.getYaw(), result.getLatencyMillis()};
-    double[] PhotonPoseTargetSpace = new double[]{target.getBestCameraToTarget().getTranslation().getX(),target.getBestCameraToTarget().getTranslation().getY(), target.getBestCameraToTarget().getTranslation().getZ()};
-    double tagAreaPhoton = target.getArea();
-    // Check if the limelight rejects the position because it is too far away
-    // This has to be done with the targetspace pose instead of the wpilibblue pose, because
-    // limelight still
-    // updates the wpilibblue pose when it shouldn't update according to the pipeline settings
-    double sumTop = 0;
-    for (double value : limelightTargetSpacePoseDoubleTop) {
-      sumTop += value;
-    }
-    double sumBottom = 0;
-    for (double value : PhotonPoseTargetSpace){
-      sumBottom += value;
-    }
-    boolean topInRange = sumTop != 0;
-    boolean rearInRange= sumBottom != 0;
-    // Stop if limelight array is not full
-    // Stop if translation X or Y is not in field
-    // Stop if translation Z is negative
-    double[] limelightPoseDouble;
-    double tagArea;
-    boolean topValid = topInRange && (limelightPoseDoubleTop.length > 5 && limelightPoseDoubleTop[0] > 0.75 && limelightPoseDoubleTop[0] < /*FIELD_LENGTH*/ 16.5 - 0.75 && limelightPoseDoubleTop[1] > 0.3 && limelightPoseDoubleTop[1] < /*FIELD_WIDTH*/ 8.20 - 0.3 && limelightPoseDoubleTop[2] >= 0);
-    boolean rearValid = rearInRange && (result.hasTargets() && photonEstimator.get().estimatedPose.getX() > 0.75 && photonEstimator.get().estimatedPose.getX() < /*FIELD_LENGTH*/ 16.5 - 0.75 && photonEstimator.get().estimatedPose.getY() > 0.3 && photonEstimator.get().estimatedPose.getY() < /*FIELD_WIDTH*/ 8.20 - 0.3 && photonEstimator.get().estimatedPose.getZ() >= 0);
-
-    if (rearValid && topValid) {
-       // Take the measurements from the top limelight, because that is the best
-       limelightPoseDouble = limelightPoseDoubleTop;
-       // Except for the x and y position, take the average of that
-       limelightPoseDouble[0] = (PhotonPose[0] + limelightPoseDoubleTop[0]) / 2;
-       limelightPoseDouble[1] = (PhotonPose[1] + limelightPoseDoubleTop[1]) / 2;
-       // Take the tag area of the top limelight
-       tagArea = (tagAreaTop + tagAreaPhoton)/2;
-    }else if (rearValid){
-      limelightPoseDouble = PhotonPose;
-      tagArea = tagAreaPhoton;
-    } else if (topValid) {
-      limelightPoseDouble = limelightPoseDoubleTop;
-      tagArea = tagAreaTop;
-    } else {
-      limelightPoseDouble = limelightPoseDoubleTop;
-      tagArea = 0;
-    }
-
-    Pose2d CameraPose;
-    double[] limeLightID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
-    if (limeLightID.length + rearCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size() >= 2) {
-      CameraPose =
-        new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), Rotation2d.fromDegrees(limelightPoseDouble[5]));
-    } else {
-      CameraPose = new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), gyroInputs.yawPosition);
-    }
-
-    SmartDashboard.putNumberArray("DT/vision/LL-top pose", new Double[] {limelightPoseDoubleTop[0], limelightPoseDoubleTop[1], limelightPoseDoubleTop[5]});
-    SmartDashboard.putNumberArray("DT/vision/LL final pose",new Double[] {limelightPoseDouble[0], limelightPoseDouble[1], limelightPoseDouble[5]});
-
-    try {
-      double[] limelightTagCorners = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tcornxy").getDoubleArray(new double[] {0});
-      double[] limelightTagCornersX = new double[4];
-      double[] limelightTagCornersY = new double[4];
-      for (int i = 0; i < 4; i++) {
-        limelightTagCornersX[i] = limelightTagCorners[i * 2];
-        limelightTagCornersY[i] = limelightTagCorners[i * 2 + 1];
-      }
-      SmartDashboard.putNumberArray("DT/vision/LL-top tag corners x", limelightTagCornersX);
-      SmartDashboard.putNumberArray("DT/vision/LL-top tag corners y", limelightTagCornersY);
-    } catch (Exception e) {
-    }
-
     // Add estimator trust using april tag area (standard Deviations)
     double stdX = 0.15 * ((1-tagArea) * 100);
     double stdY = stdX;
