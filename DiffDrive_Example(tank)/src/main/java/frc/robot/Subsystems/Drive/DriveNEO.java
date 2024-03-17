@@ -13,8 +13,11 @@ import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class DriveNEO implements DriveIO {
-  private static final double gearRatio =
-      13.0; // roughly 10ft a second with six inch wheels and dual neo per side
+  private static final double gearRatio = 13.0; // roughly 10ft a second with six inch wheels and dual neo per side
+  private static final double wheelRadius = Units.inchesToMeters(6/2);
+  private static final double wheelCircumferance = wheelRadius * 2 * Math.PI;
+  private static final double driveBaseWidth = Units.inchesToMeters(28);
+  private static final double driveBaseCircumferance = driveBaseWidth * Math.PI;
 
   private final CANSparkMax LEFT_FRONT = new CANSparkMax( 1,MotorType.kBrushless); // identify device type, set a call name, offer an ID # for that motor and motor type.
   private final CANSparkMax RIGHT_FRONT = new CANSparkMax(2, MotorType.kBrushless);
@@ -64,18 +67,14 @@ public class DriveNEO implements DriveIO {
 
   @Override
   public void updateInputs(DriveIOInputs inputs) { // logged values
-    inputs.leftPositionRad = Units.rotationsToDegrees(LEFT_ENCODER.getPosition() / gearRatio);
-    inputs.rightPositionRad = Units.rotationsToRadians(RIGHT_ENCODER.getPosition() / gearRatio);
+    inputs.leftPositionRad = Units.rotationsToRadians(LEFT_ENCODER.getPosition() / gearRatio) * wheelCircumferance;
+    inputs.rightPositionRad = Units.rotationsToRadians(RIGHT_ENCODER.getPosition() / gearRatio) * wheelCircumferance;
 
     inputs.leftAvgVolts = (LEFT_FRONT.getAppliedOutput() + LEFT_REAR.getAppliedOutput()) / 2;
     inputs.rightAvgVolts = (RIGHT_FRONT.getAppliedOutput() + RIGHT_REAR.getAppliedOutput()) / 2;
 
-    inputs.leftVelocity =
-        Units.rotationsPerMinuteToRadiansPerSecond(
-            LEFT_ENCODER.getVelocity()
-                / gearRatio); // divide by gear ratio to get wheel speed or dont to get motor speed.
-    inputs.rightVelocity =
-        Units.rotationsPerMinuteToRadiansPerSecond(RIGHT_ENCODER.getVelocity() / gearRatio);
+    inputs.leftVelocity = Units.rotationsPerMinuteToRadiansPerSecond((LEFT_ENCODER.getVelocity() / gearRatio) * wheelCircumferance); // divide by gear ratio to get wheel speed or dont to get motor speed.
+    inputs.rightVelocity = Units.rotationsPerMinuteToRadiansPerSecond((RIGHT_ENCODER.getVelocity() / gearRatio) * wheelCircumferance);
 
     inputs.leftAvgAmps = (LEFT_FRONT.getOutputCurrent() + LEFT_REAR.getOutputCurrent()) / 2;
     inputs.rightAvgAmps = (RIGHT_FRONT.getOutputCurrent() + RIGHT_REAR.getOutputCurrent()) / 2;
@@ -88,7 +87,8 @@ public class DriveNEO implements DriveIO {
      * inputs.gyroYaw = Rotation2d.fromDegrees(pigeon.getYaw);
      */
     // odometry workaround may need the signs swapped
-    inputs.gyroYaw = new Rotation2d(inputs.leftPositionRad - inputs.rightPositionRad);
+    
+    inputs.gyroYaw = new Rotation2d(((wheelRadius*2) * (inputs.leftPositionRad - inputs.rightPositionRad)) / driveBaseWidth);
   }
 
   @Override
