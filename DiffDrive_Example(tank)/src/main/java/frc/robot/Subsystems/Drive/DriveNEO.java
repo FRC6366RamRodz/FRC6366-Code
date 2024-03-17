@@ -5,8 +5,9 @@
 package frc.robot.Subsystems.Drive;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -15,12 +16,7 @@ public class DriveNEO implements DriveIO {
   private static final double gearRatio =
       13.0; // roughly 10ft a second with six inch wheels and dual neo per side
 
-  private final CANSparkMax LEFT_FRONT =
-      new CANSparkMax(
-          1,
-          MotorType
-              .kBrushless); // identify device type, set a call name, offer an ID # for that motor
-  // and motor type.
+  private final CANSparkMax LEFT_FRONT = new CANSparkMax( 1,MotorType.kBrushless); // identify device type, set a call name, offer an ID # for that motor and motor type.
   private final CANSparkMax RIGHT_FRONT = new CANSparkMax(2, MotorType.kBrushless);
   private final CANSparkMax LEFT_REAR = new CANSparkMax(3, MotorType.kBrushless);
   private final CANSparkMax RIGHT_REAR = new CANSparkMax(4, MotorType.kBrushless);
@@ -43,7 +39,7 @@ public class DriveNEO implements DriveIO {
     RIGHT_FRONT.setCANTimeout(250);
 
     LEFT_FRONT.setInverted(false); // set inverts and flowing
-    RIGHT_FRONT.setInverted(false);
+    RIGHT_FRONT.setInverted(true);
     LEFT_REAR.follow(LEFT_FRONT, false);
     RIGHT_REAR.follow(RIGHT_FRONT, false);
 

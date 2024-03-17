@@ -253,7 +253,7 @@ public class Shooter {
       climber = 0;
     }
 
-    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climber);
+    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climber);
   }
 
   public double LaunchPermision() {

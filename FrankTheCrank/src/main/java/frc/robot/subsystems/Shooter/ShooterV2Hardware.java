@@ -23,6 +23,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
 
 /** Add your docs here. */
 public class ShooterV2Hardware implements ShooterIO {
@@ -74,6 +75,7 @@ public class ShooterV2Hardware implements ShooterIO {
     f_Feeder.enableVoltageCompensation(12);
 
     N_Intake.setInverted(true);
+    f_Feeder.setInverted(true);
 
     N_Intake.burnFlash();
     N_Handler.burnFlash();
@@ -100,17 +102,18 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    angleConfig.Slot0.kS = 0.28;
-    angleConfig.Slot0.kG = 0.4;
+    angleConfig.Slot0.kS = 0.38;//0.28
+    angleConfig.Slot0.kG = 0.3;//0.4
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 75.0;
+    angleConfig.Slot0.kP = 80.0;//75
     angleConfig.Slot0.kI = 0.0;
-    angleConfig.Slot0.kD = 0.75;
+    angleConfig.Slot0.kD = 0.0;//0,75
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    angleConfig.MotionMagic.MotionMagicAcceleration = 40; // 80 rps cruise velocity
+    angleConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    angleConfig.MotionMagic.MotionMagicAcceleration = 80; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
     angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
-    angleConfig.Feedback.SensorToMechanismRatio = 125;
+    angleConfig.Feedback.SensorToMechanismRatio = -200;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;
@@ -139,6 +142,8 @@ public class ShooterV2Hardware implements ShooterIO {
     AnglePID.enableContinuousInput(-180, 180);
     
     AnglePID.setTolerance(2);
+
+    
   }
 
   @Override
@@ -184,7 +189,7 @@ public class ShooterV2Hardware implements ShooterIO {
 
     HandlerSwitch.enableLimitSwitch(!limitOff);
     N_Handler.set(HandlerVelocity);
-    f_Feeder.set(feederVelocity);
+   f_Feeder.set(feederVelocity);
     
     if (HandlerSwitch.isPressed()) {
        N_Intake.set(0);

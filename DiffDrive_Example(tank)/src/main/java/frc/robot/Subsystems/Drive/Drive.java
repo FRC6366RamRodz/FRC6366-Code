@@ -48,7 +48,7 @@ public class Drive {
 
     double left = MathUtil.clamp((xSpeed - zRotation * sens * forward), -1, 1);
     double right = MathUtil.clamp((xSpeed + zRotation * sens * forward), -1, 1);
-    io.setVoltage(left, right);
+    io.setVoltage(left*12, right*12);
   }
 
   public void driveArcade(double xSpeed, double zRotation) {
