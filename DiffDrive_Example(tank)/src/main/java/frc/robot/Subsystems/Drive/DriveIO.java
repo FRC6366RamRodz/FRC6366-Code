@@ -12,8 +12,8 @@ public interface DriveIO {
 
   @AutoLog
   public static class DriveIOInputs { // where logged inputs are created
-    public double leftPositionRad = 0.0;
-    public double rightPositionRad = 0.0;
+    public double leftPositionMeter = 0.0;
+    public double rightPositionMeter = 0.0;
 
     public double leftVelocity = 0.0;
     public double rightVelocity = 0.0;

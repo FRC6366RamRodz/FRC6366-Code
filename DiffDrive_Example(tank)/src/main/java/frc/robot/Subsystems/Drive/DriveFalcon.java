@@ -67,8 +67,8 @@ public class DriveFalcon implements DriveIO {
 
     BaseStatusSignal.refreshAll(leftPosition, leftVelocity, rightPosition, rightVelocity);
 
-    inputs.leftPositionRad = Units.rotationsToDegrees(leftPosition.getValueAsDouble() / gearRatio);
-    inputs.rightPositionRad =
+    inputs.leftPositionMeter = Units.rotationsToDegrees(leftPosition.getValueAsDouble() / gearRatio);
+    inputs.rightPositionMeter =
         Units.rotationsToRadians(rightPosition.getValueAsDouble() / gearRatio);
 
     inputs.leftAvgVolts =
@@ -103,7 +103,7 @@ public class DriveFalcon implements DriveIO {
      * inputs.gyroYaw = Rotation2d.fromDegrees(pigeon.getYaw);
      */
     // odometry workaround may need the signs swapped
-    inputs.gyroYaw = new Rotation2d(inputs.leftPositionRad - inputs.rightPositionRad);
+    inputs.gyroYaw = new Rotation2d(inputs.leftPositionMeter - inputs.rightPositionMeter);
   }
 
   @Override
