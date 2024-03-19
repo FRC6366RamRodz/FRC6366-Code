@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.WheelRadiusCharacterization;
 import frc.robot.commands.AutoStuff.AutoAim;
 import frc.robot.commands.AutoStuff.AutoLineShot;
 import frc.robot.commands.AutoStuff.Intake;
@@ -127,10 +128,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up feedforward characterization
-    autoChooser.addOption(
-        "Drive FF Characterization",
-        new FeedForwardCharacterization(
-            drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    autoChooser.addOption("Drive FF Characterization", new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    autoChooser.addOption("Wheel Radius Calibration",new WheelRadiusCharacterization(drive));
 
     // Configure the button bindings
     configureButtonBindings();

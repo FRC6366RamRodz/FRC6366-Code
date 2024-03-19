@@ -26,6 +26,7 @@ public class WheelRadiusCharacterization extends Command {
   /** Creates a new WheelRadiusCharacterization. */
   public WheelRadiusCharacterization(Drive drive) {
     this.drive = drive;
+    addRequirements(drive);
     // Use addRequiremen2ts() here to declare subsystem dependencies.
   }
 
@@ -42,7 +43,7 @@ public class WheelRadiusCharacterization extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  drive.runVelocity(new ChassisSpeeds(0, 0, omegaLimiter.calculate(omega * 0.1)));
+    drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0.1 * drive.getMaxAngularSpeedRadPerSec(), drive.getRotation()));
 
   // Get yaw and wheel positions
   accumGyroYawRads += MathUtil.angleModulus(drive.getRotation().getRadians() - lastGyro);

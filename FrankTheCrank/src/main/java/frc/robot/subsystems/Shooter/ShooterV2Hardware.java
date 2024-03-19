@@ -102,22 +102,22 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    angleConfig.Slot0.kS = 0.38;//0.28
+    angleConfig.Slot0.kS = 0.52;//0.28
     angleConfig.Slot0.kG = 0.3;//0.4
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 80.0;//75
+    angleConfig.Slot0.kP = 90.0;//75
     angleConfig.Slot0.kI = 0.0;
     angleConfig.Slot0.kD = 0.0;//0,75
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     angleConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    angleConfig.MotionMagic.MotionMagicAcceleration = 80; // 80 rps cruise velocity
+    angleConfig.MotionMagic.MotionMagicAcceleration = 160; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
     angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
-    angleConfig.Feedback.SensorToMechanismRatio = -200;
+    angleConfig.Feedback.SensorToMechanismRatio = -150;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;
-    angleConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.1388;
+    angleConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.143;
 
     F_ArmMotor.getConfigurator().apply(new TalonFXConfiguration());
     F_ArmMotor.getConfigurator().apply(angleConfig);

@@ -23,7 +23,7 @@ import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
-  private static final double WHEEL_RADIUS = Units.inchesToMeters(2);
+  private static final double WHEEL_RADIUS = Units.inchesToMeters(1.95);
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -163,6 +163,10 @@ public class Module {
   /** Returns the current drive position of the module in meters. */
   public double getPositionMeters() {
     return inputs.drivePositionRad * WHEEL_RADIUS;
+  }
+
+  public double getPositionRad() {
+    return inputs.drivePositionRad;
   }
 
   /** Returns the current drive velocity of the module in meters per second. */

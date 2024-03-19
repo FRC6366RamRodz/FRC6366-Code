@@ -90,10 +90,10 @@ public class Shooter {
       shooterAngle = 50;
       launchMode = true;
     } else if (autoline) {//1.84 Meters from target
-      ShootSpeed = 3800;
+      ShootSpeed = 3900;
       IntakeSpeed = 0.0;
       //FeedSpeed = 1;
-      shooterAngle = -20;
+      shooterAngle = -25;
       launchMode = true;
     } else {
       ShootSpeed = 0.0;
@@ -119,7 +119,7 @@ public class Shooter {
     }
     double Climb = 0;
 
-    io.setMotors(ShootSpeed, ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, Climb);
+    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, Climb);
 
     if (sideSpeed > 0.1) {
       noteVisualizer.schedule();
@@ -128,14 +128,12 @@ public class Shooter {
 
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
     shootMap.put(1.25, -35.0);//distance, followed by shot angle
-    shootMap.put(1.84, -20.0);//distance, followed by shot angle
-    shootMap.put(3.054, -9.0);//distance, followed by shot angle
-    shootMap.put(5.6495, -0.0);//distance, followed by shot angle
-    shootMap.put(3.6068, -7.0);
-    shootMap.put(4.0513, -2.8);
+    shootMap.put(1.84, -25.0);//distance, followed by shot angle
+    shootMap.put(3.054, -15.0);//distance, followed by shot angle
+    shootMap.put(5.6495, -5.0);//distance, followed by shot angle
 
-    speedMap.put(1.25, 3400.0);//distance, followed by shot speed
-    speedMap.put(1.84, 3800.0);//distance, followed by shot speed
+    speedMap.put(1.25, 3800.0);//distance, followed by shot speed
+    speedMap.put(1.84, 3900.0);//distance, followed by shot speed
     speedMap.put(3.054, 5300.0);//distance, followed by shot speed
     speedMap.put(5.6495, 6000.0);//distance, followed by shot speed
     speedMap.put(3.6068, 5400.0);
@@ -187,17 +185,17 @@ public class Shooter {
       ShootSpeed = 3800;
       autoAim = false;
     } else if (AutoLine){
-      shooterAngle = -20;
+      shooterAngle = -25;
       launchMode = true;
-      ShootSpeed = 3800;
+      ShootSpeed = 3900;
       autoAim = false;
     } else if (Stage) {
-      shooterAngle = -9;
+      shooterAngle = -15;
       launchMode = true;
       ShootSpeed = 5300;
       autoAim = false;
     } else if (Wing) {
-      shooterAngle = -0.3;
+      shooterAngle = -5;
       launchMode = true;
       ShootSpeed = 6000;
       autoAim = false;
@@ -235,7 +233,7 @@ public class Shooter {
       FeedSpeed = 0.4;
       IntakeSpeed = 0.0;
     } else if (intake && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
-      sideSpeed = -0.1;
+      sideSpeed = -0.3;
       limitOff = false;
       FeedSpeed = 0.4;
       IntakeSpeed = 0.8;
@@ -259,7 +257,7 @@ public class Shooter {
   public double LaunchPermision() {
     if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode && autoAim && DriverStation.isTeleop()) {
       return 1;
-    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && getArmSpd() > -0.3 && getArmSpd() < 0.3 && launchMode) {
+    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(0.3))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(0.3))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 20 && ShootSpeed > getAvrgShootSpd() - 20 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
       return 1;
     } else {
       return 0;
