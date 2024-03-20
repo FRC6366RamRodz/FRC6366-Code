@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.util.IO;
 import frc.robot.util.NoteVisualizer;
 
 import java.util.Optional;
@@ -251,6 +252,12 @@ public class Shooter {
       climber = 0;
     }
 
+    if(RobotContainer.io.getDpad() == 0) {
+      FeedSpeed = -1;
+    } else if (RobotContainer.io.getDpad() == 180) {
+      IntakeSpeed = -1;
+    }
+    
     io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climber);
   }
 

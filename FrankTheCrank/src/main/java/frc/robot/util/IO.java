@@ -66,6 +66,10 @@ public class IO {
     }
   }
 
+  public double getDpad() {
+    return op.getPOV();
+  }
+
   public void opRumble(double rumble) {
     op.setRumble(RumbleType.kBothRumble, rumble);
   }
