@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
   private Command autonomousCommand;
-
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -94,7 +93,6 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    
     CommandScheduler.getInstance().run();
 
     RobotContainer.drive.DrivePeriodic();

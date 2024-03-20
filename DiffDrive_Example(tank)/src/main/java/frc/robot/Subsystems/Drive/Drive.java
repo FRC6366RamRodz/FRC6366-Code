@@ -29,7 +29,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 public class Drive implements Subsystem {
   public static final double WHEEL_RADIUS = Units.inchesToMeters(3.0);
   public static final double MotorKV = 473;
-  public static final double GearRatio = 12.75;
+  public static final double GearRatio = 13;
 
   private final DriveIO io;
   private final DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
@@ -62,7 +62,7 @@ public class Drive implements Subsystem {
     //(473 * 12) * 0.0762 = M
     //12 = M / (473 * 0.0762)
     //manually divide by the max set speed to achieve percentage.
-    io.setVoltage(wheelSpeeds.leftMetersPerSecond* GearRatio/(MotorKV * WHEEL_RADIUS), wheelSpeeds.rightMetersPerSecond * GearRatio/(MotorKV * WHEEL_RADIUS));
+    io.setVoltage(wheelSpeeds.leftMetersPerSecond* GearRatio/(MotorKV * WHEEL_RADIUS*2), wheelSpeeds.rightMetersPerSecond * GearRatio/(MotorKV * WHEEL_RADIUS*2));
   }
 
   public void driveCurveDrive(double xSpeed, double zRotation, double sens) {

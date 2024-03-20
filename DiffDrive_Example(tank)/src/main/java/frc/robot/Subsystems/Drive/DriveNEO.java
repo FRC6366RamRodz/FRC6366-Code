@@ -69,8 +69,8 @@ public class DriveNEO implements DriveIO {
     inputs.leftAvgVolts = (LEFT_FRONT.getAppliedOutput() + LEFT_REAR.getAppliedOutput()) / 2;
     inputs.rightAvgVolts = (RIGHT_FRONT.getAppliedOutput() + RIGHT_REAR.getAppliedOutput()) / 2;
 
-    inputs.leftVelocity = ((LEFT_ENCODER.getVelocity() / Drive.GearRatio) * wheelCircumferance)/60; // divide by gear ratio to get wheel speed or dont to get motor speed.
-    inputs.rightVelocity = ((RIGHT_ENCODER.getVelocity() / Drive.GearRatio) * wheelCircumferance)/60;
+    inputs.leftVelocity = ((LEFT_ENCODER.getVelocity() / Drive.GearRatio) * 2 * Math.PI * Drive.WHEEL_RADIUS)/60; // divide by gear ratio to get wheel speed or dont to get motor speed.
+    inputs.rightVelocity = ((RIGHT_ENCODER.getVelocity() / Drive.GearRatio) * 2 * Math.PI * Drive.WHEEL_RADIUS)/60;
 
     inputs.leftAvgAmps = (LEFT_FRONT.getOutputCurrent() + LEFT_REAR.getOutputCurrent()) / 2;
     inputs.rightAvgAmps = (RIGHT_FRONT.getOutputCurrent() + RIGHT_REAR.getOutputCurrent()) / 2;
@@ -83,7 +83,7 @@ public class DriveNEO implements DriveIO {
      */
     // odometry workaround may need the signs swapped
     
-    inputs.gyroYaw = new Rotation2d(Units.rotationsToRadians((inputs.rightPositionMeter - inputs.leftPositionMeter) / (Units.inchesToMeters(28)*Math.PI)));
+    inputs.gyroYaw = new Rotation2d(Units.rotationsToRadians((inputs.rightPositionMeter - inputs.leftPositionMeter) / (Units.inchesToMeters(23)*2 * Math.PI)));
   }
 
   @Override
