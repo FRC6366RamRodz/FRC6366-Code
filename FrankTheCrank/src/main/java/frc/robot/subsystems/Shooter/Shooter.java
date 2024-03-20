@@ -181,7 +181,7 @@ public class Shooter {
       ShootSpeed = speedMap.get(adjDistance);
       autoAim = true;
     } else if (Subwoof) {
-      shooterAngle = -35;
+      shooterAngle = -39;
       launchMode = true;
       ShootSpeed = 3800;
       autoAim = false;
@@ -191,17 +191,17 @@ public class Shooter {
       ShootSpeed = 3900;
       autoAim = false;
     } else if (Stage) {
-      shooterAngle = -15;
+      shooterAngle = -16;
       launchMode = true;
       ShootSpeed = 5300;
       autoAim = false;
     } else if (Wing) {
-      shooterAngle = -5;
+      shooterAngle = -7;
       launchMode = true;
       ShootSpeed = 6000;
       autoAim = false;
     } else if(Amp) {
-      shooterAngle = 50;
+      shooterAngle = 30;
       launchMode = true;
       ShootSpeed = 1000;
       autoAim = false;
@@ -224,8 +224,8 @@ public class Shooter {
 
     boolean limitOff;
     if(LaunchPermision() == 1 && fire && launchMode) {
-      sideSpeed = 0.5;
-      FeedSpeed = 0.8;
+      sideSpeed = 1.0;
+      FeedSpeed = 1.1;
       limitOff = true;
       IntakeSpeed = 0.0;
     } else if (Amp && !fire) {
@@ -234,9 +234,9 @@ public class Shooter {
       FeedSpeed = 0.4;
       IntakeSpeed = 0.0;
     } else if (intake && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
-      sideSpeed = -0.3;
+      sideSpeed = -0.6;
       limitOff = false;
-      FeedSpeed = 0.4;
+      FeedSpeed = 0.2;
       IntakeSpeed = 0.8;
     } else {
       sideSpeed = 0.0;
@@ -264,7 +264,7 @@ public class Shooter {
   public double LaunchPermision() {
     if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode && autoAim && DriverStation.isTeleop()) {
       return 1;
-    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(0.3))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(0.3))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 20 && ShootSpeed > getAvrgShootSpd() - 20 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
+    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(0.7))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(0.7))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 50 && ShootSpeed > getAvrgShootSpd() - 50 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
       return 1;
     } else {
       return 0;

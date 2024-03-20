@@ -164,10 +164,6 @@ public class Robot extends LoggedRobot {
     if (RobotContainer.io.getDrY()) {
       RobotContainer.drive.updateOdoWithVision();
     } else {}
-
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      RobotContainer.drive.checkVisionMeasurements(false);
-    }
   }
 
   /** This function is called once when test mode is enabled. */

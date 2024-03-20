@@ -21,10 +21,8 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -62,6 +60,8 @@ public class Drive extends SubsystemBase {
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+  private PhotonCamera cam = new PhotonCamera("FrontLeft");
+  private PhotonPoseEstimator frontPose;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d lastGyroRotation = new Rotation2d();
@@ -171,123 +171,27 @@ public class Drive extends SubsystemBase {
 
   public void checkFrontVisionMeasurements() {    
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    PoseStrategy strategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
-    try (PhotonCamera rearCam = new PhotonCamera("FrontLeft"); PhotonCamera frontCam = new PhotonCamera("FrontRight");) {
-      PhotonPoseEstimator rearPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.RearCam);
-
-      
-      PhotonPoseEstimator frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.FrontCam);
-
-        Pose3d rearEstimate = rearPose.update(rearCam.getLatestResult()).get().estimatedPose;
-        Pose3d frontEstimate = frontPose.update(frontCam.getLatestResult()).get().estimatedPose;
-
-        boolean rearValid = rearCam.getLatestResult().getBestTarget().getPoseAmbiguity() < 0.3 && rearEstimate.getX() > 0.75 && rearEstimate.getX() < 16.5-0.75 && rearEstimate.getY() > 0.3 && rearEstimate.getY() < 8.20 - 0.3 && rearEstimate.getZ() >= 0;
-        boolean frontValid = frontCam.getLatestResult().getBestTarget().getPoseAmbiguity() < 0.3 && frontEstimate.getX() > 0.75 && frontEstimate.getX() < 16.5-0.75 && frontEstimate.getY() > 0.3 && frontEstimate.getY() < 8.20 - 0.3 && frontEstimate.getZ() >= 0 ;
-
-        Pose3d estimatedPose;
-        double tagArea;
-        double latency;
-        double numberOfTags;
-        if (rearValid && frontValid){
-          estimatedPose = new Pose3d((rearEstimate.getX()+frontEstimate.getX())/2, (rearEstimate.getY()+frontEstimate.getY())/2, (rearEstimate.getZ()+frontEstimate.getZ())/2, rearEstimate.getRotation().plus(frontEstimate.getRotation()).div(2));
-          tagArea = (rearCam.getLatestResult().getBestTarget().getArea() + frontCam.getLatestResult().getBestTarget().getArea())/2;
-          latency = Math.max(rearCam.getLatestResult().getLatencyMillis(), frontCam.getLatestResult().getLatencyMillis());
-          numberOfTags = (rearCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size() + frontCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size())/2;
-        } else if (rearValid) {
-          estimatedPose = rearEstimate;
-          tagArea = rearCam.getLatestResult().getBestTarget().getArea();
-          latency = rearCam.getLatestResult().getLatencyMillis();
-          numberOfTags = rearCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size();
-        } else if (frontValid) {
-          estimatedPose = frontEstimate;
-          tagArea = frontCam.getLatestResult().getBestTarget().getArea();
-          latency = frontCam.getLatestResult().getLatencyMillis();
-          numberOfTags = frontCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size();
-        } else {
-          estimatedPose = new Pose3d();
-          tagArea = 0;
-          latency = 0;
-          numberOfTags = 0;
-        }
-
-
-        
-        // Add estimator trust using april tag area (standard Deviations in mm)
-        double stdX = CameraConstants.xyStdDevCoefficient * ((1-MathUtil.clamp(tagArea * numberOfTags, 0, 1)) * 1000);
+    frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.FrontLeftCam);
+    if (cam.getLatestResult().hasTargets()) {
+    // Add estimator trust using april tag area (standard Deviations in mm)
+        double stdX = CameraConstants.xyStdDevCoefficient;
         double stdY = stdX;
         SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
         SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
 
         // Add limelight latency
 
-        List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - (latency*60), estimatedPose.toPose2d(), VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
-        if (rearValid || frontValid) {
-          poseEstimator.addVisionData(visionUpdates);
-        }   
+    List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
+    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp(), frontPose.update(cam.getLatestResult()).get().estimatedPose.toPose2d(), VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
+    
+    poseEstimator.addVisionData(visionUpdates);
     }
-  }
-
-  public void checkRearVisionMeasurements() {    
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    PoseStrategy strategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
-
-    try (PhotonCamera rearCam = new PhotonCamera("RearLeft"); PhotonCamera frontCam = new PhotonCamera("RearRight");) {
-      PhotonPoseEstimator rearPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.RearCam);
-
-      
-      PhotonPoseEstimator frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.FrontCam);
-
-        Pose3d rearEstimate = rearPose.update(rearCam.getLatestResult()).get().estimatedPose;
-        Pose3d frontEstimate = frontPose.update(frontCam.getLatestResult()).get().estimatedPose;
-
-        boolean rearValid = rearCam.getLatestResult().getBestTarget().getPoseAmbiguity() < 0.3 && rearEstimate.getX() > 0.75 && rearEstimate.getX() < 16.5-0.75 && rearEstimate.getY() > 0.3 && rearEstimate.getY() < 8.20 - 0.3 && rearEstimate.getZ() >= 0;
-        boolean frontValid = frontCam.getLatestResult().getBestTarget().getPoseAmbiguity() < 0.3 && frontEstimate.getX() > 0.75 && frontEstimate.getX() < 16.5-0.75 && frontEstimate.getY() > 0.3 && frontEstimate.getY() < 8.20 - 0.3 && frontEstimate.getZ() >= 0 ;
-
-        Pose3d estimatedPose;
-        double tagArea;
-        double latency;
-        double numberOfTags;
-        if (rearValid && frontValid){
-          estimatedPose = new Pose3d((rearEstimate.getX()+frontEstimate.getX())/2, (rearEstimate.getY()+frontEstimate.getY())/2, (rearEstimate.getZ()+frontEstimate.getZ())/2, rearEstimate.getRotation().plus(frontEstimate.getRotation()).div(2));
-          tagArea = (rearCam.getLatestResult().getBestTarget().getArea() + frontCam.getLatestResult().getBestTarget().getArea())/2;
-          latency = Math.max(rearCam.getLatestResult().getLatencyMillis(), frontCam.getLatestResult().getLatencyMillis());
-          numberOfTags = (rearCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size() + frontCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size())/2;
-        } else if (rearValid) {
-          estimatedPose = rearEstimate;
-          tagArea = rearCam.getLatestResult().getBestTarget().getArea();
-          latency = rearCam.getLatestResult().getLatencyMillis();
-          numberOfTags = rearCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size();
-        } else if (frontValid) {
-          estimatedPose = frontEstimate;
-          tagArea = frontCam.getLatestResult().getBestTarget().getArea();
-          latency = frontCam.getLatestResult().getLatencyMillis();
-          numberOfTags = frontCam.getLatestResult().getMultiTagResult().fiducialIDsUsed.size();
-        } else {
-          estimatedPose = new Pose3d();
-          tagArea = 0;
-          latency = 0;
-          numberOfTags = 0;
-        }
-
 
         
-        // Add estimator trust using april tag area (standard Deviations in mm)
-        double stdX = CameraConstants.xyStdDevCoefficient * ((1-MathUtil.clamp(tagArea * numberOfTags, 0, 1)) * 1000);
-        double stdY = stdX;
-        SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
-        SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
 
-        // Add limelight latency
-
-        List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - (latency*60), estimatedPose.toPose2d(), VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
-        if (rearValid || frontValid) {
-          poseEstimator.addVisionData(visionUpdates);
-        }   
-    }
   }
+
 
   /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
@@ -347,25 +251,13 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateOdoWithVision() {
+     cam = new PhotonCamera("FrontLeft");
     AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    PoseStrategy strategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
 
-    try (PhotonCamera rearCam = new PhotonCamera("RearCam"); PhotonCamera frontCam = new PhotonCamera("FrontCam")) {
-      PhotonPoseEstimator rearPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.RearCam);
-
-      
-      PhotonPoseEstimator frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, strategy, CameraConstants.FrontCam);
-
-      Pose3d rearEstimate = rearPose.update(rearCam.getLatestResult()).get().estimatedPose;
-      Pose3d frontEstimate = frontPose.update(frontCam.getLatestResult()).get().estimatedPose;
-
-      if (frontCam.getLatestResult().hasTargets()) {
-        poseEstimator.resetPose(frontEstimate.toPose2d());
-      } else if (rearCam.getLatestResult().hasTargets()) {
-        poseEstimator.resetPose(rearEstimate.toPose2d());
-      }
+    frontPose = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, CameraConstants.FrontLeftCam);
+    if (cam.getLatestResult().hasTargets()) {
+    poseEstimator.resetPose(frontPose.update(cam.getLatestResult()).get().estimatedPose.toPose2d());
     }
-    
 
   }
 

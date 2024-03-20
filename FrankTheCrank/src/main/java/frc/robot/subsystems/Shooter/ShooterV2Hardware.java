@@ -77,6 +77,10 @@ public class ShooterV2Hardware implements ShooterIO {
     N_Intake.setInverted(true);
     f_Feeder.setInverted(true);
 
+    N_Handler.setSmartCurrentLimit(80);
+    N_Intake.setSmartCurrentLimit(80);
+    f_Feeder.setSmartCurrentLimit(80);
+
     N_Intake.burnFlash();
     N_Handler.burnFlash();
     f_Feeder.burnFlash();
@@ -84,7 +88,7 @@ public class ShooterV2Hardware implements ShooterIO {
     // TalonFX stuff
     var shooterConfig = new TalonFXConfiguration();
     //config
-    shooterConfig.CurrentLimits.StatorCurrentLimit = 35;
+    shooterConfig.CurrentLimits.StatorCurrentLimit = 45;
     shooterConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -102,18 +106,18 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    angleConfig.Slot0.kS = 0.52;//0.28
+    angleConfig.Slot0.kS = 0.53;//0.28
     angleConfig.Slot0.kG = 0.3;//0.4
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 90.0;//75
+    angleConfig.Slot0.kP = 110.0;//75
     angleConfig.Slot0.kI = 0.0;
     angleConfig.Slot0.kD = 0.0;//0,75
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    angleConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    angleConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     angleConfig.MotionMagic.MotionMagicAcceleration = 160; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
     angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
-    angleConfig.Feedback.SensorToMechanismRatio = -150;
+    angleConfig.Feedback.SensorToMechanismRatio = 135;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.25;

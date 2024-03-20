@@ -142,12 +142,13 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-
+    RobotContainer.drive.updateOdoWithVision();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    RobotContainer.drive.checkFrontVisionMeasurements();
   }
 
   /** This function is called once when test mode is enabled. */
