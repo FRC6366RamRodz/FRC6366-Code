@@ -14,8 +14,12 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.WheelRadiusCharacterization;
+import frc.robot.subsystems.Vision.SoloCameraContainer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -43,6 +48,8 @@ public class RobotContainer {
   // Subsystems
   public static Drive drive;
   public static IO io = new IO();
+  public static AprilTagFieldLayout aprilTag = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+  public static SoloCameraContainer cam = new SoloCameraContainer("FrontLeft", new Transform3d(), aprilTag);
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
