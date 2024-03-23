@@ -22,9 +22,8 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
-//modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Module {
-  private static final double WHEEL_RADIUS = Units.inchesToMeters(2);
+  private static final double WHEEL_RADIUS = Units.inchesToMeters(1.988163209636191);
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -39,7 +38,7 @@ public class Module {
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private double lastPositionMeters = 0.0; // Used for delta calculation
 
-
+//modified from 6328's 2023 example so that it supports talon FX motorControllers
   public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;

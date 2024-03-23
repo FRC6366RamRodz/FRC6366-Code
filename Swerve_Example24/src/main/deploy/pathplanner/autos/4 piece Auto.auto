@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.6279768172071953,
-      "y": 5.55
+      "x": 1.3598400154591135,
+      "y": 5.5196408968316515
     },
     "rotation": 180.0
   },
@@ -16,6 +16,12 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
+                }
+              },
+              {
                 "type": "parallel",
                 "data": {
                   "commands": [
@@ -24,8 +30,20 @@
                       "data": {
                         "pathName": "speaker to center"
                       }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
+                      }
                     }
                   ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAim"
                 }
               },
               {
@@ -37,14 +55,20 @@
                       "data": {
                         "pathName": "center to left"
                       }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
+                      }
                     }
                   ]
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "Left Shot"
+                  "name": "AutoAim"
                 }
               },
               {
@@ -56,14 +80,26 @@
                       "data": {
                         "pathName": "LeftShot-right"
                       }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "intake"
+                      }
                     }
                   ]
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "right-shot"
+                  "name": "AutoAim"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "doNothing"
                 }
               }
             ]

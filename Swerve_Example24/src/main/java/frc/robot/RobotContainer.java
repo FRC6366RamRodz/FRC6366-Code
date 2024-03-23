@@ -29,10 +29,8 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkMax;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.util.IO;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -57,25 +55,23 @@ public class RobotContainer {
 
     switch (Constants.currentMode) {
       case REAL:
-        // Real robot, instantiate hardware IO implementations
-       // drive =
-       //     new Drive(
-       //         new GyroIOPigeon2(),
-       //         new ModuleIOSparkMax(0),
-       //         new ModuleIOSparkMax(1),
-       //         new ModuleIOSparkMax(2),
-       //         new ModuleIOSparkMax(3));
-         drive = new Drive(
-         new GyroIOPigeon2(),
-         new ModuleIOTalonFX(0),
-         new ModuleIOTalonFX(1),
-         new ModuleIOTalonFX(2),
-         new ModuleIOTalonFX(3));
-        // flywheel = new Flywheel(new FlywheelIOTalonFX());
+         //drive =
+         //   new Drive(
+         //       new GyroIOPigeon2(),
+         //       new ModuleIOSparkMax(0),
+         //       new ModuleIOSparkMax(1),
+         //       new ModuleIOSparkMax(2),
+         //       new ModuleIOSparkMax(3));
+        drive =
+           new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
         break;
 
       case SIM:
-        // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
                 new GyroIO() {},
@@ -96,12 +92,11 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
-
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up feedforward characterization
-    autoChooser.addOption( "Drive FF Characterization",new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    autoChooser.addOption("Drive FF Characterization", new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
     autoChooser.addOption("Wheel Radius Calibration",new WheelRadiusCharacterization(drive));
 
     // Configure the button bindings
@@ -116,9 +111,22 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(drive,() -> (-controller.getLeftY()),() -> (-controller.getLeftX()),() -> -controller.getRightX(),controller.leftBumper(), controller.rightBumper()));
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-        controller.b().onTrue(Commands.runOnce(() ->drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),drive).ignoringDisable(true));
+        DriveCommands.joystickDrive(
+            drive,
+            () -> (-controller.getLeftY()),
+            () -> (-controller.getLeftX()),
+            () -> -controller.getRightX(),
+            controller.leftBumper(), controller.rightBumper()));
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
   }
 
   /**

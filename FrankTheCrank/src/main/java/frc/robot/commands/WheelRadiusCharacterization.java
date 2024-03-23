@@ -20,7 +20,6 @@ public class WheelRadiusCharacterization extends Command {
   private double[] wheelStart;
   private final Drive drive;
   private final SlewRateLimiter omegaLimiter = new SlewRateLimiter(1.0);
-  private double omega = 1;
   private double currentEffectiveWheelRadius = 0.0;
 
   /** Creates a new WheelRadiusCharacterization. */

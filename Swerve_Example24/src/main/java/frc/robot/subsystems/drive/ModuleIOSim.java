@@ -25,8 +25,6 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
  * to a random value. The flywheel sims are not physically accurate, but provide a decent
  * approximation for the behavior of the module.
  */
-
- //modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class ModuleIOSim implements ModuleIO {
   private static final double LOOP_PERIOD_SECS = 0.02;
 

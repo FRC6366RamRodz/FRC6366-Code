@@ -97,7 +97,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     driveTalon.getConfigurator().apply(new TalonFXConfiguration());
     var driveConfig = new TalonFXConfiguration();
-    driveConfig.CurrentLimits.StatorCurrentLimit = 80.0;
+    driveConfig.CurrentLimits.StatorCurrentLimit = 50.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Voltage.PeakForwardVoltage = 12.0;
@@ -111,7 +111,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 28.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
@@ -145,7 +145,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnCurrent = turnTalon.getStatorCurrent();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        200.0, drivePosition, turnPosition); // Required for odometry, use faster rate
+        230.0, drivePosition, turnPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
         80.0,
         driveVelocity,

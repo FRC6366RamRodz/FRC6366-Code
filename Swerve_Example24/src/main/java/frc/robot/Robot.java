@@ -12,7 +12,6 @@
 // GNU General Public License for more details.
 
 package frc.robot;
-
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -102,12 +101,13 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-   
+
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -117,7 +117,9 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-
+    //if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+    //  RobotContainer.drive.updateOdoWithVision();
+    //}
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -129,7 +131,9 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-
+    //if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+    //  RobotContainer.drive.checkVisionMeasurements(false);
+    //}
   }
 
   /** This function is called once when teleop is enabled. */
@@ -142,13 +146,14 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-    RobotContainer.drive.updateOdoWithVision();
+   // if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
+   //   RobotContainer.drive.updateOdoWithVision();
+   // }
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.drive.checkFrontVisionMeasurements();
   }
 
   /** This function is called once when test mode is enabled. */

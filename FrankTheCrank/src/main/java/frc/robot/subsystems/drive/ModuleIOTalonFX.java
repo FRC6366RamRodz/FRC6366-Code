@@ -111,7 +111,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 28.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;

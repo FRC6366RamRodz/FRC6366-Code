@@ -39,6 +39,7 @@ public class DriveCommands {
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
+  //modified from 6328's 2023 example so that it supports auto aim.
   public static Command joystickDrive(Drive drive,DoubleSupplier xSupplier,DoubleSupplier ySupplier,DoubleSupplier omegaSupplier,BooleanSupplier point, BooleanSupplier speak) {
     return Commands.run( () -> {
           Optional<Alliance> ally = DriverStation.getAlliance();
@@ -75,7 +76,7 @@ public class DriveCommands {
             double x = x2 - x1;
             double y = y2 - y1;
             double theta = Math.atan(y/x);
-            try (PIDController error = new PIDController(1.4 + linearMagnitude * 0.4, 0.0, 0.0)) {
+            try (PIDController error = new PIDController(1.4 + linearMagnitude * 0.4, 0.0, 0.001)) {
               omega = error.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
             }
 

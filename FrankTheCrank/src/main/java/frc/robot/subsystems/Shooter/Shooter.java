@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.util.IO;
 import frc.robot.util.NoteVisualizer;
 
 import java.util.Optional;
@@ -128,12 +127,12 @@ public class Shooter {
   }
 
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
-    shootMap.put(1.25, -35.0);//distance, followed by shot angle
+    shootMap.put(1.25, -39.0);//distance, followed by shot angle
     shootMap.put(1.84, -25.0);//distance, followed by shot angle
-    shootMap.put(3.054, -15.0);//distance, followed by shot angle
-    shootMap.put(5.6495, -5.0);//distance, followed by shot angle
+    shootMap.put(3.054, -16.0);//distance, followed by shot angle
+    shootMap.put(5.6495, -7.0);//distance, followed by shot angle
 
-    speedMap.put(1.25, 3800.0);//distance, followed by shot speed
+    speedMap.put(1.25, 3900.0);//distance, followed by shot speed
     speedMap.put(1.84, 3900.0);//distance, followed by shot speed
     speedMap.put(3.054, 5300.0);//distance, followed by shot speed
     speedMap.put(5.6495, 6000.0);//distance, followed by shot speed
@@ -224,8 +223,8 @@ public class Shooter {
 
     boolean limitOff;
     if(LaunchPermision() == 1 && fire && launchMode) {
-      sideSpeed = 1.0;
-      FeedSpeed = 1.1;
+      sideSpeed = 0.9;
+      FeedSpeed = 0.8;
       limitOff = true;
       IntakeSpeed = 0.0;
     } else if (Amp && !fire) {
@@ -264,7 +263,7 @@ public class Shooter {
   public double LaunchPermision() {
     if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode && autoAim && DriverStation.isTeleop()) {
       return 1;
-    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(0.7))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(0.7))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 50 && ShootSpeed > getAvrgShootSpd() - 50 && getArmSpd() > -0.2 && getArmSpd() < 0.2 && launchMode) {
+    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 50 && ShootSpeed > getAvrgShootSpd() - 50 && getArmSpd() > -0.5 && getArmSpd() < 0.5&& launchMode) {
       return 1;
     } else {
       return 0;

@@ -23,7 +23,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableEntry;
 
 /** Add your docs here. */
 public class ShooterV2Hardware implements ShooterIO {
@@ -81,6 +80,9 @@ public class ShooterV2Hardware implements ShooterIO {
     N_Intake.setSmartCurrentLimit(80);
     f_Feeder.setSmartCurrentLimit(80);
 
+    N_Handler.setOpenLoopRampRate(0.5);
+    f_Feeder.setOpenLoopRampRate(0.5);
+
     N_Intake.burnFlash();
     N_Handler.burnFlash();
     f_Feeder.burnFlash();
@@ -93,7 +95,7 @@ public class ShooterV2Hardware implements ShooterIO {
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     shooterConfig.Slot0.kV = 0.118; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
-    shooterConfig.Slot0.kP = 0.12;
+    shooterConfig.Slot0.kP = 0.13;
     shooterConfig.Slot0.kI = 0.0;
     shooterConfig.Slot0.kD = 0.0;
     shooterConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
@@ -106,15 +108,15 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    angleConfig.Slot0.kS = 0.53;//0.28
+    angleConfig.Slot0.kS = 0.55;//0.28
     angleConfig.Slot0.kG = 0.3;//0.4
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 110.0;//75
+    angleConfig.Slot0.kP = 130.0;//75
     angleConfig.Slot0.kI = 0.0;
     angleConfig.Slot0.kD = 0.0;//0,75
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     angleConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    angleConfig.MotionMagic.MotionMagicAcceleration = 160; // 80 rps cruise velocity
+    angleConfig.MotionMagic.MotionMagicAcceleration = 180; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
     angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
     angleConfig.Feedback.SensorToMechanismRatio = 135;
