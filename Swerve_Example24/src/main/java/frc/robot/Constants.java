@@ -13,6 +13,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -34,4 +39,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static Transform3d frontLeftCamera = new Transform3d(Units.inchesToMeters(12.5), Units.inchesToMeters(6.5), Units.inchesToMeters(7), new Rotation3d(Units.degreesToRadians(18),Units.degreesToRadians(40), 0));
+  public static Transform3d frontRightCamera = new Transform3d(Units.inchesToMeters(12.5), Units.inchesToMeters(6.5), Units.inchesToMeters(-7), new Rotation3d(Units.degreesToRadians(-18),Units.degreesToRadians(40), 0));
 }

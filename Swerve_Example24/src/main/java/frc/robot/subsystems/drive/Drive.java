@@ -47,6 +47,7 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 //modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Drive extends SubsystemBase {
@@ -161,15 +162,15 @@ public class Drive extends SubsystemBase {
     stop();
   }
 
-  public void checkVisionMeasurements() {
+  public void checkFrontVision() {
 
-    if (RobotContainer.cam.getTargetData() != null) {
-      Optional<Pose2d> visionPose = RobotContainer.cam.getEstimatedPose();
-      double visionTimeStamp = RobotContainer.cam.getFilteredResult().getTimestampSeconds();
+    if (RobotContainer.frontCams.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
+      PhotonPipelineResult result = RobotContainer.frontCams.getFilteredResult();
 
-      if (visionPose.isPresent() && visionTimeStamp != 0) {
+      if (visionPose.isPresent()) {
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(visionTimeStamp, RobotContainer.cam.getEstimatedPose().get(), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
+        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), visionPose.get(), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
         poseEstimator.addVisionData(visionUpdates);
       }
     }

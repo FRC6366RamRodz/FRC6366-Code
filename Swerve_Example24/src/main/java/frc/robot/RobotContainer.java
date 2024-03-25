@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.WheelRadiusCharacterization;
+import frc.robot.subsystems.Vision.MultiCameraContainer;
 import frc.robot.subsystems.Vision.SoloCameraContainer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -49,7 +50,9 @@ public class RobotContainer {
   public static Drive drive;
   public static IO io = new IO();
   public static AprilTagFieldLayout aprilTag = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-  public static SoloCameraContainer cam = new SoloCameraContainer("FrontLeft", new Transform3d(), aprilTag);
+  public static SoloCameraContainer FrontLeftcam = new SoloCameraContainer("FrontLeft", Constants.frontLeftCamera, aprilTag);
+    public static SoloCameraContainer FrontRightcam = new SoloCameraContainer("FrontRight", Constants.frontRightCamera, aprilTag);
+  public static MultiCameraContainer frontCams = new MultiCameraContainer(FrontLeftcam,FrontRightcam);
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
