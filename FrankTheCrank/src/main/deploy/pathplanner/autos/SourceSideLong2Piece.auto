@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7912075672831623,
-      "y": 6.659723919510829
+      "x": 0.7326298288960215,
+      "y": 4.41249682499365
     },
-    "rotation": -120.96375653207352
+    "rotation": 120.37912601136833
   },
   "command": {
     "type": "sequential",
@@ -18,13 +18,13 @@
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AmpSidetoAmpPiece"
+                  "pathName": "SourceSideToLine"
                 }
               },
               {
@@ -39,38 +39,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SidePieceToWing"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoAim"
-          }
-        },
-        {
-          "type": "race",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "wingToMidPiece"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "intake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MidPieceToWing"
+            "pathName": "LineToStage"
           }
         },
         {
