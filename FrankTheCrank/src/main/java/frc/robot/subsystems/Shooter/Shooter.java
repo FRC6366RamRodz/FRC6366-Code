@@ -56,88 +56,16 @@ public class Shooter {
 
   }
 
-  @Deprecated
-  public void run3PointArm(boolean intake,boolean speaker,boolean amp,boolean launch,boolean center,boolean wing,boolean autoline) {
-
-    if (intake && getAnlge().getDegrees() > -52 && getAnlge().getDegrees() < -48) {
-      ShootSpeed = 0.0;
-      IntakeSpeed = 0.7;
-      //FeedSpeed = 1;
-      shooterAngle = -50;
-      launchMode = false;
-    } else if (speaker && center) {//3.054 Meters from target
-      ShootSpeed = 5300;
-      IntakeSpeed = 0.0;
-      //FeedSpeed = 1;
-      shooterAngle = -9;
-      launchMode = true;
-    } else if (speaker && wing) {//5.6495 Meters from target
-      ShootSpeed = 6000;
-      IntakeSpeed = 0.0;
-      //FeedSpeed = 1;
-      shooterAngle = -0.3;
-      launchMode = true;
-    } else if (speaker && !center && !wing) {//1.21 Meters from target
-      ShootSpeed = 3400;
-      IntakeSpeed = 0.0;
-      //FeedSpeed = 1;
-      shooterAngle = -35;
-      launchMode = true;
-    } else if (amp) {
-      ShootSpeed = 3400;
-      IntakeSpeed = 0.0;
-      //FeedSpeed = 1;
-      shooterAngle = 50;
-      launchMode = true;
-    } else if (autoline) {//1.84 Meters from target
-      ShootSpeed = 3900;
-      IntakeSpeed = 0.0;
-      //FeedSpeed = 1;
-      shooterAngle = -25;
-      launchMode = true;
-    } else {
-      ShootSpeed = 0.0;
-      IntakeSpeed = 0.0;
-      //FeedSpeed = 0.0;
-      shooterAngle = -50.0;
-      launchMode = false;
-    }
-
-    boolean limitOff;
-    if (LaunchPermision() == 1 && launch && (amp || speaker || autoline)) {
-      sideSpeed = 0.5;
-      limitOff = true;
-      FeedSpeed = 0.5;
-    } else if (intake){
-      sideSpeed = 0.0;
-      limitOff = false;
-      FeedSpeed = 0.25;
-    } else {
-      sideSpeed = 0;
-      limitOff = false;
-      FeedSpeed = 0;
-    }
-    double Climb = 0;
-
-    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, Climb);
-
-    if (sideSpeed > 0.1) {
-      noteVisualizer.schedule();
-    }
-  }
-
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
-    shootMap.put(1.25, -39.0);//distance, followed by shot angle
-    shootMap.put(1.84, -25.0);//distance, followed by shot angle
-    shootMap.put(3.054, -16.0);//distance, followed by shot angle
-    shootMap.put(5.6495, -7.0);//distance, followed by shot angle
+    shootMap.put(1.25, -39.0);//distance, followed by shot angle //subwoof 
+    shootMap.put(1.84, -25.0);//distance, followed by shot angle //auto line
+    shootMap.put(3.054, -16.0);//distance, followed by shot angle //stage
+    shootMap.put(5.6495, -7.0);//distance, followed by shot angle //wing
 
-    speedMap.put(1.25, 3900.0);//distance, followed by shot speed
-    speedMap.put(1.84, 3900.0);//distance, followed by shot speed
-    speedMap.put(3.054, 5300.0);//distance, followed by shot speed
-    speedMap.put(5.6495, 6000.0);//distance, followed by shot speed
-    speedMap.put(3.6068, 5400.0);
-    speedMap.put(4.0513, 6000.0);
+    speedMap.put(1.25, 3900.0);//distance, followed by shot speed //subwoof 
+    speedMap.put(1.84, 3900.0);//distance, followed by shot speed //auto line
+    speedMap.put(3.054, 5300.0);//distance, followed by shot speed //stage
+    speedMap.put(5.6495, 6000.0);//distance, followed by shot speed //wing
 
     Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -227,6 +155,7 @@ public class Shooter {
       FeedSpeed = 0.8;
       limitOff = true;
       IntakeSpeed = 0.0;
+      noteVisualizer.schedule();
     } else if (Amp && !fire) {
       sideSpeed = -0.1;
       limitOff = false;

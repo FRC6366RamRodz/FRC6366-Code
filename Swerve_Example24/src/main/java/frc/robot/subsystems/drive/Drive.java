@@ -13,7 +13,6 @@
 
 package frc.robot.subsystems.drive;
 
-import com.ctre.phoenix6.Timestamp;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -21,7 +20,6 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -235,12 +233,13 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateOdoWithVision() {
-    double[] limelightPoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[] {0});
-    Pose2d CameraPose;
+    if (RobotContainer.frontCams.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
 
-      CameraPose = new Pose2d(new Translation2d(limelightPoseDoubleTop[0], limelightPoseDoubleTop[1]), Rotation2d.fromDegrees(limelightPoseDoubleTop[5]));
-
-    poseEstimator.resetPose(CameraPose);
+      if (visionPose.isPresent()) {
+        poseEstimator.resetPose(visionPose.get());
+      }
+    }
   }
 
     //for wheel clibration

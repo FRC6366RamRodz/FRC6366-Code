@@ -28,16 +28,16 @@ public class shoot extends Command {
 
     if (RobotContainer.shooter.LaunchPermision() == 1) {
       shotTime.start();
-      RobotContainer.shooter.run3PointArm(false, true, false, true, false, false, false);
+      RobotContainer.shooter.advancedShoot(false, true, false, false, false, false, false, true, 0, false);
     } else {
-      RobotContainer.shooter.run3PointArm(false, true, false, false, false, false, false);
+      RobotContainer.shooter.advancedShoot(false, true, false, false, false, false, false, false, 0, false);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.shooter.run3PointArm(false, false, false, false, false, false, false);
+    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, false, false, 0, false);
   }
 
   // Returns true when the command should end.

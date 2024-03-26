@@ -20,7 +20,7 @@ public class doNothing extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.shooter.run3PointArm(false, false, false, false, false, false, false);
+    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, false, false, 0, false);
   }
 
   // Called once the command ends or is interrupted.

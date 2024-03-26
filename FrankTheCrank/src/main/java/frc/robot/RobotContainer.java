@@ -15,6 +15,9 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -36,6 +39,8 @@ import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIO;
 import frc.robot.subsystems.Shooter.ShooterSim;
 import frc.robot.subsystems.Shooter.ShooterV2Hardware;
+import frc.robot.subsystems.Vision.MultiCameraContainer;
+import frc.robot.subsystems.Vision.SoloCameraContainer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -56,6 +61,10 @@ public class RobotContainer {
   public static Drive drive;
   public static Shooter shooter;
   public static IO io = new IO();
+  public static AprilTagFieldLayout aprilTag = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+  public static SoloCameraContainer FrontLeftcam = new SoloCameraContainer("FrontLeft", Constants.frontLeftCamera, aprilTag);
+  public static SoloCameraContainer FrontRightcam = new SoloCameraContainer("FrontRight", Constants.frontRightCamera, aprilTag);
+  public static MultiCameraContainer frontCams = new MultiCameraContainer(FrontLeftcam,FrontRightcam); 
   public Command Intake = new Intake();
   public Command shoot = new shoot();
   public Command autoLineShot = new AutoLineShot();

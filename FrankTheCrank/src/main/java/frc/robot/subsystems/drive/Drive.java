@@ -29,20 +29,21 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 //modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Drive extends SubsystemBase {
@@ -133,11 +134,6 @@ public class Drive extends SubsystemBase {
       // The module returns the optimized state, useful for logging
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
-
-    if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-      checkVisionMeasurements(false);
-    }
-
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
@@ -161,82 +157,20 @@ public class Drive extends SubsystemBase {
     stop();
   }
 
-  //this is a modified file from 4481s 2023 code release
-  public void checkVisionMeasurements(boolean xis0) {
-    double[] limelightPoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[] {0});
-    double[] limelightTargetSpacePoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_targetspace").getDoubleArray(new double[] {0});
-    double tagAreaTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ta").getDouble(0);
-    
+  public void checkFrontVision() {
 
-    // Check if the limelight rejects the position because it is too far away
-    // This has to be done with the targetspace pose instead of the wpilibblue pose, because
-    // limelight still
-    // updates the wpilibblue pose when it shouldn't update according to the pipeline settings
-    double sumTop = 0;
-    for (double value : limelightTargetSpacePoseDoubleTop) {
-      sumTop += value;
-    }
-    boolean topInRange = sumTop != 0;
-   // boolean rearInRange= sumBottom != 0;
-    // Stop if limelight array is not full
-    // Stop if translation X or Y is not in field
-    // Stop if translation Z is negative
-    double[] limelightPoseDouble;
-    double tagArea;
-    boolean topValid = topInRange && (limelightPoseDoubleTop.length > 5 && limelightPoseDoubleTop[0] > 0.75 && limelightPoseDoubleTop[0] < /*FIELD_LENGTH*/ 16.5 - 0.75 && limelightPoseDoubleTop[1] > 0.3 && limelightPoseDoubleTop[1] < /*FIELD_WIDTH*/ 8.20 - 0.3 && limelightPoseDoubleTop[2] >= 0);
-    if (topValid) {
-      limelightPoseDouble = limelightPoseDoubleTop;
-      tagArea = tagAreaTop;
-    } else {
-      limelightPoseDouble = limelightPoseDoubleTop;
-      tagArea = 0;
-    }
+    if (RobotContainer.frontCams.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
+      PhotonPipelineResult result = RobotContainer.frontCams.getFilteredResult();
 
-    Pose2d CameraPose;
-    double[] limeLightID = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getDoubleArray(new double[6]);
-    if (limeLightID.length >= 2) {
-      CameraPose =
-        new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), Rotation2d.fromDegrees(limelightPoseDouble[5]));
-    } else {
-      CameraPose = new Pose2d(new Translation2d(limelightPoseDouble[0], limelightPoseDouble[1]), gyroInputs.yawPosition);
-    }
-
-    SmartDashboard.putNumberArray("DT/vision/LL-top pose", new Double[] {limelightPoseDoubleTop[0], limelightPoseDoubleTop[1], limelightPoseDoubleTop[5]});
-    SmartDashboard.putNumberArray("DT/vision/LL final pose",new Double[] {limelightPoseDouble[0], limelightPoseDouble[1], limelightPoseDouble[5]});
-
-    try {
-      double[] limelightTagCorners = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tcornxy").getDoubleArray(new double[] {0});
-      double[] limelightTagCornersX = new double[4];
-      double[] limelightTagCornersY = new double[4];
-      for (int i = 0; i < 4; i++) {
-        limelightTagCornersX[i] = limelightTagCorners[i * 2];
-        limelightTagCornersY[i] = limelightTagCorners[i * 2 + 1];
+      if (visionPose.isPresent()) {
+        double tagArea = result.getBestTarget().getArea();
+        double stdX = 0.15 * ((1-tagArea)*0.8);
+        double stdY = stdX;
+        List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
+        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), visionPose.get(), VecBuilder.fill(stdX, stdY, stdX)));//stdx stdy stdRotation
+        poseEstimator.addVisionData(visionUpdates);
       }
-      SmartDashboard.putNumberArray("DT/vision/LL-top tag corners x", limelightTagCornersX);
-      SmartDashboard.putNumberArray("DT/vision/LL-top tag corners y", limelightTagCornersY);
-    } catch (Exception e) {
-    }
-
-    // Add estimator trust using april tag area (standard Deviations)
-    double stdX;
-    double stdY;
-    if (xis0) {
-      stdX = 0;
-      stdY = 0;
-    } else {
-      stdX = 0.15 * ((1-tagArea)*0.8);
-      stdY = stdX;
-    }
-    SmartDashboard.putNumber("DT/vision/april tag std X", stdX);
-    SmartDashboard.putNumber("DT/vision/april tag std Y", stdY);
-
-    // Add limelight latency
-    double limelightLatency = (limelightPoseDouble[6] / 1000);
-
-    List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-    visionUpdates.add(new TimestampedVisionUpdate(Timer.getFPGATimestamp() - limelightLatency, CameraPose, VecBuilder.fill(stdX, stdY, stdY * 10)));//stdx stdy stdRotation
-    if (topValid) {
-      poseEstimator.addVisionData(visionUpdates);
     }
   }
 
@@ -298,12 +232,13 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateOdoWithVision() {
-    double[] limelightPoseDoubleTop = NetworkTableInstance.getDefault().getTable("limelight").getEntry("botpose_wpiblue").getDoubleArray(new double[] {0});
-    Pose2d CameraPose;
+    if (RobotContainer.frontCams.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
 
-      CameraPose = new Pose2d(new Translation2d(limelightPoseDoubleTop[0], limelightPoseDoubleTop[1]), Rotation2d.fromDegrees(limelightPoseDoubleTop[5]));
-
-    poseEstimator.resetPose(CameraPose);
+      if (visionPose.isPresent()) {
+        poseEstimator.resetPose(visionPose.get());
+      }
+    }
   }
 
     //for wheel clibration

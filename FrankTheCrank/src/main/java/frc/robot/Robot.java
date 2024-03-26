@@ -118,23 +118,20 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    //if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-    //  RobotContainer.drive.updateOdoWithVision();
-    //}
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    RobotContainer.drive.updateOdoWithVision();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    //if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-    //  RobotContainer.drive.checkVisionMeasurements(false);
-    //}
+    RobotContainer.drive.checkFrontVision();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -147,22 +144,18 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-   // if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-   //   RobotContainer.drive.updateOdoWithVision();
-   // }
+
+   RobotContainer.drive.updateOdoWithVision();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //RobotContainer.shooter.run3PointArm(RobotContainer.io.getOpA(), RobotContainer.io.getOpX(), RobotContainer.io.getOPB(), RobotContainer.io.getOpY(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger());
     RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYDown());
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
 
-    if (RobotContainer.io.getDrY()) {
-      RobotContainer.drive.updateOdoWithVision();
-    } else {}
+    RobotContainer.drive.updateOdoWithVision();
   }
 
   /** This function is called once when test mode is enabled. */
