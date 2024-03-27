@@ -18,6 +18,8 @@ public interface ShooterIO {
     public double intakeVelocity = 0.0;
     public double feederVelocity = 0.0;
     public boolean intakeLimit = false;
+    public double ArmResetCount = 0.0;
+    public double intakeAmps = 0.0;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {

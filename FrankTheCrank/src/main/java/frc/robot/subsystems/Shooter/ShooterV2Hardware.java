@@ -19,8 +19,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkLimitSwitch;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -35,10 +33,7 @@ public class ShooterV2Hardware implements ShooterIO {
   public static CANSparkMax N_Handler = new CANSparkMax(6, MotorType.kBrushless);
   public static CANSparkMax f_Feeder = new CANSparkMax(7, MotorType.kBrushless);
   public static CANSparkMax N_Climber = new CANSparkMax(8, MotorType.kBrushless);
-
-  // Controll Loops for Angle motor
-  public static ArmFeedforward AngleFeedForward;
-  public static PIDController AnglePID;
+  public double armResetCount;
 
   // Encoders
   public static CANcoder ArmEncoder = new CANcoder(5);
@@ -118,7 +113,7 @@ public class ShooterV2Hardware implements ShooterIO {
     angleConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     angleConfig.MotionMagic.MotionMagicAcceleration = 180; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
-    angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
+    angleConfig.MotionMagic.MotionMagicJerk = 1600; // 1600 rps/s^2 jerk (0.1 seconds)
     angleConfig.Feedback.SensorToMechanismRatio = 135;
     angleConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     angleConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
@@ -133,22 +128,7 @@ public class ShooterV2Hardware implements ShooterIO {
     BaseStatusSignal.setUpdateFrequencyForAll(250, absolutePosition);
     ArmEncoder.optimizeBusUtilization();
 
-    // angle stuff
-    double ARs = 0.0;
-    double ARg = 0.4;
-    double ARv = 0.0;
-    AngleFeedForward = new ArmFeedforward(ARs, ARg, ARv);
-
-
-    double ARp = 0.15;//0.15
-    double ARi = 0.18;//0.2
-    double ARd = 0.000;
-    AnglePID = new PIDController(ARp, ARi, ARd);
-
-    AnglePID.enableContinuousInput(-180, 180);
-    
-    AnglePID.setTolerance(2);
-
+    armResetCount = 0.0;
     
   }
 
@@ -166,6 +146,9 @@ public class ShooterV2Hardware implements ShooterIO {
     inputs.angleVelocity = F_ArmMotor.getVelocity().getValueAsDouble()*60;
 
     inputs.intakeLimit = HandlerSwitch.isPressed();
+
+    inputs.ArmResetCount = armResetCount;
+    inputs.intakeAmps = N_Intake.getOutputCurrent();
   }
 
   @Override
@@ -188,6 +171,7 @@ public class ShooterV2Hardware implements ShooterIO {
 
     } else {
       F_ArmMotor.setPosition(new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).getRotations());
+      armResetCount += 1;
     }
 
     K_bottomShooter.setControl(new VelocityVoltage(TopVelocity/60).withSlot(0));

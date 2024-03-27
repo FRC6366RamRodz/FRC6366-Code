@@ -164,15 +164,13 @@ public class Drive extends SubsystemBase {
       PhotonPipelineResult result = RobotContainer.frontCams.getFilteredResult();
 
       if (visionPose.isPresent()) {
-        double tagArea = result.getBestTarget().getArea();
-        double stdX = 0.15 * ((1-tagArea)*0.8);
-        double stdY = stdX;
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), visionPose.get(), VecBuilder.fill(stdX, stdY, stdX)));//stdx stdy stdRotation
+        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), visionPose.get(), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
         poseEstimator.addVisionData(visionUpdates);
       }
     }
   }
+
 
   /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
