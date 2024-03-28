@@ -39,6 +39,6 @@ public final class Constants {
     REPLAY
   }
 
-  public static Transform3d frontLeftCamera = new Transform3d(0.4, 0.083, 0.33, new Rotation3d(0,Units.degreesToRadians(-42), Units.degreesToRadians(-45)));
-  public static Transform3d frontRightCamera = new Transform3d(0.4,-0.083,0.33, new Rotation3d(0, Units.degreesToRadians(-42), Units.degreesToRadians(45)));
+  public static Transform3d frontLeftCamera = new Transform3d(0.4, 0.083, 0.33, new Rotation3d(Units.degreesToRadians(-15),Units.degreesToRadians(-37), Units.degreesToRadians(23)));
+  public static Transform3d frontRightCamera = new Transform3d(0.4,-0.083,0.33, new Rotation3d(Units.degreesToRadians(165), Units.degreesToRadians(-37), Units.degreesToRadians(-23)));
 }

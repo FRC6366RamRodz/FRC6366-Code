@@ -44,7 +44,7 @@ public class SoloCameraContainer implements CameraContainer {
       if (target.getPoseAmbiguity() > 0.3)
         continue;
       if (Math
-          .abs(target.getBestCameraToTarget().getX()) > 1.0)
+          .abs(target.getBestCameraToTarget().getX()) > 3.0)
         continue;
 
       filteredTargets.add(target);

@@ -155,7 +155,7 @@ public class Robot extends LoggedRobot {
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
 
-    RobotContainer.drive.updateOdoWithVision();
+    RobotContainer.drive.checkFrontVision();
   }
 
   /** This function is called once when test mode is enabled. */
