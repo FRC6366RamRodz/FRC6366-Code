@@ -23,6 +23,11 @@ public interface ShooterIO {
     public double LedPwmPulse = 0.0;
     public double ArmPositionError = 0.0;
     public double ArmSecondaryPosition = 0.0;
+    public double ArmSetPoint = 0.0;
+
+    public boolean ArmIsOK = false;
+    public boolean TopShooterIsOk = false;
+    public boolean BottomShooterIsOk = false;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {

@@ -35,6 +35,7 @@ public class ShooterV3Hardware implements ShooterIO {
   public static CANSparkMax N_Climber = new CANSparkMax(8, MotorType.kBrushless);
   public static CANSparkMax N_FrontRoller = new CANSparkMax(9,MotorType.kBrushless);
   public double armResetCount;
+  public double armSetPoint = 0.0;
 
   // Encoders
   public static CANcoder ArmEncoder = new CANcoder(5);
@@ -167,6 +168,12 @@ public class ShooterV3Hardware implements ShooterIO {
     inputs.ArmSecondaryPosition = F_ArmMotor.getPosition().getValueAsDouble();
 
     inputs.LedPwmPulse = LedBlinkin.getPwmHandle();
+
+    inputs.ArmIsOK = F_ArmMotor.isAlive();
+    inputs.TopShooterIsOk = K_topShooter.isAlive();
+    inputs.BottomShooterIsOk = K_bottomShooter.isAlive();
+
+    inputs.ArmSetPoint = armSetPoint;
   }
 
   @Override
@@ -208,5 +215,7 @@ public class ShooterV3Hardware implements ShooterIO {
     } else {
       LedBlinkin.set(0.61);
     }
+
+    armSetPoint = anglePosition;
   }
 }

@@ -57,7 +57,7 @@ public class Shooter {
   }
 
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
-    shootMap.put(1.25, -37.5);//distance, followed by shot angle //subwoof 
+    shootMap.put(1.25, -37.0);//distance, followed by shot angle //subwoof 
     shootMap.put(1.84, -20.0);//distance, followed by shot angle //auto line
     shootMap.put(2.7, -12.5);//distance, followed by shot angle //stage
     shootMap.put(5.6495, -1.0);//distance, followed by shot angle //wing
@@ -112,7 +112,7 @@ public class Shooter {
       ShootSpeed = speedMap.get(adjDistance);
       autoAim = true;
     } else if (Subwoof) {
-      shooterAngle = -37.5;//-38
+      shooterAngle = -37;//-38
       launchMode = true;
       ShootSpeed = 3800;
       autoAim = false;

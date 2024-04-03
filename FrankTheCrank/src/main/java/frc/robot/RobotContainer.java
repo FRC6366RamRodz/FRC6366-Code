@@ -38,7 +38,6 @@ import frc.robot.commands.AutoStuff.shoot;
 import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIO;
 import frc.robot.subsystems.Shooter.ShooterSim;
-import frc.robot.subsystems.Shooter.ShooterV2Hardware;
 import frc.robot.subsystems.Shooter.ShooterV3Hardware;
 import frc.robot.subsystems.Vision.MultiCameraContainer;
 import frc.robot.subsystems.Vision.SoloCameraContainer;
