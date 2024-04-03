@@ -57,14 +57,18 @@ public class Shooter {
   }
 
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
-    shootMap.put(1.25, -39.0);//distance, followed by shot angle //subwoof 
-    shootMap.put(1.84, -25.0);//distance, followed by shot angle //auto line
-    shootMap.put(3.054, -16.0);//distance, followed by shot angle //stage
-    shootMap.put(5.6495, -7.0);//distance, followed by shot angle //wing
+    shootMap.put(1.25, -37.5);//distance, followed by shot angle //subwoof 
+    shootMap.put(1.84, -20.0);//distance, followed by shot angle //auto line
+    shootMap.put(2.7, -12.5);//distance, followed by shot angle //stage
+    shootMap.put(5.6495, -1.0);//distance, followed by shot angle //wing
 
-    speedMap.put(1.25, 3900.0);//distance, followed by shot speed //subwoof 
-    speedMap.put(1.84, 3900.0);//distance, followed by shot speed //auto line
-    speedMap.put(3.054, 5300.0);//distance, followed by shot speed //stage
+    shootMap.put(3.1, -10.2);
+    shootMap.put(3.56, -9.2);
+    shootMap.put(1.74, -31.0);
+
+    speedMap.put(1.25, 4000.0);//distance, followed by shot speed //subwoof 
+    speedMap.put(1.84, 4200.0);//distance, followed by shot speed //auto line
+    speedMap.put(3.054, 5200.0);//distance, followed by shot speed //stage
     speedMap.put(5.6495, 6000.0);//distance, followed by shot speed //wing
 
     Optional<Alliance> ally = DriverStation.getAlliance();
@@ -108,27 +112,27 @@ public class Shooter {
       ShootSpeed = speedMap.get(adjDistance);
       autoAim = true;
     } else if (Subwoof) {
-      shooterAngle = -39;
+      shooterAngle = -37.5;//-38
       launchMode = true;
       ShootSpeed = 3800;
       autoAim = false;
     } else if (AutoLine){
-      shooterAngle = -25;
+      shooterAngle = -20;
       launchMode = true;
       ShootSpeed = 3900;
       autoAim = false;
     } else if (Stage) {
-      shooterAngle = -16;
+      shooterAngle = -11;//-10
       launchMode = true;
-      ShootSpeed = 5300;
+      ShootSpeed = 5000;
       autoAim = false;
     } else if (Wing) {
-      shooterAngle = -7;
+      shooterAngle = -1;
       launchMode = true;
       ShootSpeed = 6000;
       autoAim = false;
     } else if(Amp) {
-      shooterAngle = 30;
+      shooterAngle = 35;
       launchMode = true;
       ShootSpeed = 1000;
       autoAim = false;
@@ -162,7 +166,7 @@ public class Shooter {
       FeedSpeed = 0.4;
       IntakeSpeed = 0.0;
     } else if (intake && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
-      sideSpeed = -0.6;
+      sideSpeed = -0.3;
       limitOff = false;
       FeedSpeed = 0.2;
       IntakeSpeed = 0.8;

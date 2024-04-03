@@ -39,6 +39,7 @@ import frc.robot.subsystems.Shooter.Shooter;
 import frc.robot.subsystems.Shooter.ShooterIO;
 import frc.robot.subsystems.Shooter.ShooterSim;
 import frc.robot.subsystems.Shooter.ShooterV2Hardware;
+import frc.robot.subsystems.Shooter.ShooterV3Hardware;
 import frc.robot.subsystems.Vision.MultiCameraContainer;
 import frc.robot.subsystems.Vision.SoloCameraContainer;
 import frc.robot.subsystems.drive.Drive;
@@ -64,7 +65,9 @@ public class RobotContainer {
   public static AprilTagFieldLayout aprilTag = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
   public static SoloCameraContainer FrontLeftcam = new SoloCameraContainer("FrontLeft", Constants.frontLeftCamera, aprilTag);
   public static SoloCameraContainer FrontRightcam = new SoloCameraContainer("FrontRight", Constants.frontRightCamera, aprilTag);
-  public static MultiCameraContainer frontCams = new MultiCameraContainer(FrontLeftcam,FrontRightcam); 
+  public static SoloCameraContainer BackRightcam = new SoloCameraContainer("BackRight", Constants.BackRightCamera, aprilTag);
+  public static SoloCameraContainer BackLeftcam = new SoloCameraContainer("BackLeft", Constants.BackLeftCamera, aprilTag);
+  public static MultiCameraContainer frontCams = new MultiCameraContainer(FrontLeftcam,FrontRightcam,BackRightcam,BackLeftcam); 
   public Command Intake = new Intake();
   public Command shoot = new shoot();
   public Command autoLineShot = new AutoLineShot();
@@ -85,7 +88,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        shooter = new Shooter(new ShooterV2Hardware());
+        shooter = new Shooter(new ShooterV3Hardware());
          //drive =
          //   new Drive(
          //       new GyroIOPigeon2(),

@@ -16,6 +16,7 @@ package frc.robot;
 import frc.robot.Util.Constants;
 import frc.robot.Util.IO;
 import frc.robot.Util.RobotContainer;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -23,6 +24,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -35,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
   private Command autonomousCommand;
+  private Timer time = new Timer();
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -107,11 +110,22 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+    time.reset();
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    time.start();
+    if (time.get() < 1.0 ) {
+      RobotContainer.drive.drivePercent(-0.3, -0.3);
+    } else if (time.get() < 2.0) {
+      RobotContainer.drive.drivePercent(0.3, 0.3);
+       }else {
+      RobotContainer.drive.drivePercent(-0.0, -0.0);
+      time.stop();
+    }
   }
 
   /** This function is called once when teleop is enabled. */

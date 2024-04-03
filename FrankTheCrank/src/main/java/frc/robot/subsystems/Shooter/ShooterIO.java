@@ -20,6 +20,9 @@ public interface ShooterIO {
     public boolean intakeLimit = false;
     public double ArmResetCount = 0.0;
     public double intakeAmps = 0.0;
+    public double LedPwmPulse = 0.0;
+    public double ArmPositionError = 0.0;
+    public double ArmSecondaryPosition = 0.0;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {

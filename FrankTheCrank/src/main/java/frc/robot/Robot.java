@@ -125,13 +125,12 @@ public class Robot extends LoggedRobot {
       autonomousCommand.schedule();
     }
 
-    RobotContainer.drive.updateOdoWithVision();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    RobotContainer.drive.checkFrontVision();
+    //RobotContainer.drive.checkFrontVision();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -145,7 +144,6 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
 
-   RobotContainer.drive.updateOdoWithVision();
   }
 
   /** This function is called periodically during operator control. */

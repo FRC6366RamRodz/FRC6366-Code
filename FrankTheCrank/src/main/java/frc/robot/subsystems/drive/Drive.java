@@ -165,7 +165,7 @@ public class Drive extends SubsystemBase {
 
       if (visionPose.isPresent()) {
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), visionPose.get(), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
+        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), lastGyroRotation), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
         poseEstimator.addVisionData(visionUpdates);
       }
     }
