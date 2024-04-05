@@ -208,9 +208,9 @@ public class ShooterV3Hardware implements ShooterIO {
 
     N_Climber.set(climb);
 
-    if(N_Intake.getOutputCurrent() > 30 || N_FrontRoller.getOutputCurrent() >30) {
+    if(N_Intake.getOutputCurrent() > 27 || N_FrontRoller.getOutputCurrent() > 27) {
       LedBlinkin.set(0.69);
-    } else if (HandlerSwitch.isPressed() || N_Handler.getOutputCurrent() > 11) {
+    } else if (HandlerSwitch.isPressed() || N_Handler.getOutputCurrent() > 13) {
       LedBlinkin.set(0.87);
     } else {
       LedBlinkin.set(0.61);

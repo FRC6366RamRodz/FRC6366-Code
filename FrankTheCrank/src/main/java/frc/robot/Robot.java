@@ -103,6 +103,13 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
     RobotContainer.shooter.ShooterPeriodic();
+
+    Logger.recordOutput("BackLeftCamAlive", RobotContainer.BackLeftcam.isCameraConnected());
+    Logger.recordOutput("BackRightCamAlive", RobotContainer.BackRightcam.isCameraConnected());
+    Logger.recordOutput("FrontRightCamAlive", RobotContainer.FrontRightcam.isCameraConnected());
+    Logger.recordOutput("FrontLeftCamAlive", RobotContainer.FrontLeftcam.isCameraConnected());
+
+
   }
 
   /** This function is called once when the robot is disabled. */
@@ -130,7 +137,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    //RobotContainer.drive.checkFrontVision();
+    RobotContainer.drive.checkFrontVision();
   }
 
   /** This function is called once when teleop is enabled. */

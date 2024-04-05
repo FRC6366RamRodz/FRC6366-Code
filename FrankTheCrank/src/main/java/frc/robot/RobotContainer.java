@@ -66,7 +66,7 @@ public class RobotContainer {
   public static SoloCameraContainer FrontRightcam = new SoloCameraContainer("FrontRight", Constants.frontRightCamera, aprilTag);
   public static SoloCameraContainer BackRightcam = new SoloCameraContainer("BackRight", Constants.BackRightCamera, aprilTag);
   public static SoloCameraContainer BackLeftcam = new SoloCameraContainer("BackLeft", Constants.BackLeftCamera, aprilTag);
-  public static MultiCameraContainer frontCams = new MultiCameraContainer(FrontLeftcam,FrontRightcam,BackRightcam,BackLeftcam); 
+  public static MultiCameraContainer cameras = new MultiCameraContainer(FrontLeftcam,FrontRightcam,BackRightcam,BackLeftcam); 
   public Command Intake = new Intake();
   public Command shoot = new shoot();
   public Command autoLineShot = new AutoLineShot();

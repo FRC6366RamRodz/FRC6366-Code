@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
@@ -43,6 +44,7 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 //modified from 6328's 2023 example so that it supports talon FX motorControllers
@@ -59,7 +61,10 @@ public class Drive extends SubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d lastGyroRotation = new Rotation2d();
 
-  private frc.robot.util.PoseEstimator poseEstimator = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+  private frc.robot.util.PoseEstimator combinedOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002)); 
+  private frc.robot.util.PoseEstimator visionOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+  private frc.robot.util.PoseEstimator wheelOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+
 
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO, ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
@@ -113,8 +118,9 @@ public class Drive extends SubsystemBase {
       // with the change in angle since the last loop cycle.
       twist = new Twist2d(twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()); lastGyroRotation = gyroInputs.yawPosition;
     }
-    poseEstimator.addDriveData(Timer.getFPGATimestamp(), twist);
+    combinedOdometry.addDriveData(Timer.getFPGATimestamp(), twist);
     // Apply the twist (change since last loop cycle) to the current pose
+    wheelOdometry.addDriveData(Timer.getFPGATimestamp(), twist);
   }
 
   /**
@@ -159,14 +165,16 @@ public class Drive extends SubsystemBase {
 
   public void checkFrontVision() {
 
-    if (RobotContainer.frontCams.getTargetData() != null) {
-      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
-      PhotonPipelineResult result = RobotContainer.frontCams.getFilteredResult();
+    if (RobotContainer.cameras.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.cameras.getEstimatedPose();
+      PhotonPipelineResult result = RobotContainer.cameras.getFilteredResult();
 
       if (visionPose.isPresent()) {
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
         visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), lastGyroRotation), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
-        poseEstimator.addVisionData(visionUpdates);
+        
+        visionOdometry.resetPose(visionPose.get());;
+        combinedOdometry.addVisionData(visionUpdates);
       }
     }
   }
@@ -200,22 +208,33 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return poseEstimator.getLatestPose();
+    return combinedOdometry.getLatestPose();
+  }
+
+    @AutoLogOutput(key = "Odometry/RobotMech")
+  public Pose2d getMechanicalPose() {
+    return wheelOdometry.getLatestPose();
+  }
+
+    @AutoLogOutput(key = "Odometry/RobotVision")
+  public Pose2d getVisionPose() {
+    return visionOdometry.getLatestPose();
   }
 
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
-    return poseEstimator.getLatestPose().getRotation();
+    return combinedOdometry.getLatestPose().getRotation();
   }
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPose(pose);
+    combinedOdometry.resetPose(pose);
+    wheelOdometry.resetPose(pose);
   }
 
   /** Adds vision data to the pose esimation. */
   public void addVisionData(List<TimestampedVisionUpdate> visionData) {
-    poseEstimator.addVisionData(visionData);
+    combinedOdometry.addVisionData(visionData);
   }
 
   /** Returns the maximum linear speed in meters per sec. */
@@ -229,11 +248,11 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateOdoWithVision() {
-    if (RobotContainer.frontCams.getTargetData() != null) {
-      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
+    if (RobotContainer.cameras.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.cameras.getEstimatedPose();
 
       if (visionPose.isPresent()) {
-        poseEstimator.resetPose(visionPose.get());
+        combinedOdometry.resetPose(visionPose.get());
       }
     }
   }

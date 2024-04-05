@@ -41,10 +41,10 @@ public class SoloCameraContainer implements CameraContainer {
     List<PhotonTrackedTarget> filteredTargets = new ArrayList<>();
 
     for (PhotonTrackedTarget target : result.getTargets()) {
-      if (target.getPoseAmbiguity() > 0.3)
+      if (target.getPoseAmbiguity() > 0.4)
         continue;
       if (Math
-          .abs(target.getBestCameraToTarget().getX()) > 3.0)
+          .abs(target.getBestCameraToTarget().getX()) > 4.0)
         continue;
 
       filteredTargets.add(target);
@@ -93,5 +93,9 @@ public class SoloCameraContainer implements CameraContainer {
     List<EntechTargetData> data = new ArrayList<>();
     data.add(new EntechTargetData(targetIds, camera.getName()));
     return data;
+  }
+
+  public boolean isCameraConnected() {
+    return camera.isConnected();
   }
 }
