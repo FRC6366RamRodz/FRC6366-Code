@@ -58,9 +58,9 @@ public class Shooter {
 
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
     shootMap.put(1.25, -35.5);//distance, followed by shot angle //subwoof 
-    shootMap.put(1.84, -20.0);//distance, followed by shot angle //auto line
+    shootMap.put(1.84, -21.0);//distance, followed by shot angle //auto line
     shootMap.put(2.7, -11.0);//distance, followed by shot angle //stage
-    shootMap.put(5.6495, -2.0);//distance, followed by shot angle //wing
+    shootMap.put(5.6495, -3.0);//distance, followed by shot angle //wing
 
     speedMap.put(1.25, 4000.0);//distance, followed by shot speed //subwoof 
     speedMap.put(1.84, 4200.0);//distance, followed by shot speed //auto line
@@ -202,6 +202,14 @@ public class Shooter {
   public double IntakeRumble() {
     if (inputs.intakeLimit && IntakeSpeed > 0) {
       return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  public double lightRumble() {
+    if(inputs.intakeAmps > 27) {
+      return 0.5;
     } else {
       return 0;
     }

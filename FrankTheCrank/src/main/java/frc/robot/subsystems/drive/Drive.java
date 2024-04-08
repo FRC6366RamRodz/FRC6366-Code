@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
@@ -44,7 +43,6 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 //modified from 6328's 2023 example so that it supports talon FX motorControllers
@@ -171,7 +169,7 @@ public class Drive extends SubsystemBase {
 
       if (visionPose.isPresent()) {
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), lastGyroRotation), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
+        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), lastGyroRotation), VecBuilder.fill(0.05, 0.05, 0.2 * 10)));//stdx stdy stdRotation
         
         visionOdometry.resetPose(visionPose.get());;
         combinedOdometry.addVisionData(visionUpdates);

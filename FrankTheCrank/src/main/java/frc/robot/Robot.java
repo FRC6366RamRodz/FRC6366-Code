@@ -12,10 +12,14 @@
 // GNU General Public License for more details.
 
 package frc.robot;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import java.util.Optional;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -137,7 +141,12 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    RobotContainer.drive.checkFrontVision();
+    Optional<Alliance> ally = DriverStation.getAlliance();
+    
+    if (ally.isPresent()) {
+      if (ally.get() == Alliance.Red)
+      RobotContainer.drive.checkFrontVision();
+    }
   }
 
   /** This function is called once when teleop is enabled. */
@@ -159,6 +168,7 @@ public class Robot extends LoggedRobot {
     RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYDown());
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
+    RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());
 
     RobotContainer.drive.checkFrontVision();
   }

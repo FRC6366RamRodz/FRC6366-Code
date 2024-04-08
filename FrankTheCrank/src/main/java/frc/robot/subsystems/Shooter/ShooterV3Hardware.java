@@ -163,7 +163,7 @@ public class ShooterV3Hardware implements ShooterIO {
     inputs.intakeLimit = HandlerSwitch.isPressed();
 
     inputs.ArmResetCount = armResetCount;
-    inputs.intakeAmps = N_Intake.getOutputCurrent();
+    inputs.intakeAmps = Math.max(N_Intake.getOutputCurrent(), N_FrontRoller.getOutputCurrent());
     inputs.ArmPositionError = F_ArmMotor.getClosedLoopError().getValueAsDouble();
     inputs.ArmSecondaryPosition = F_ArmMotor.getPosition().getValueAsDouble();
 
