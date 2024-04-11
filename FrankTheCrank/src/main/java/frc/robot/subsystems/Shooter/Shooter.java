@@ -107,22 +107,22 @@ public class Shooter {
       launchMode = true;
       ShootSpeed = speedMap.get(adjDistance);
       autoAim = true;
-    } else if (Subwoof) {
+    } else if (Subwoof && SWM) {
       shooterAngle = -35.5;//-38
       launchMode = true;
       ShootSpeed = 3800;
       autoAim = false;
-    } else if (AutoLine){
+    } else if (AutoLine && SWM){
       shooterAngle = -20;
       launchMode = true;
       ShootSpeed = 3900;
       autoAim = false;
-    } else if (Stage) {
+    } else if (Stage && SWM) {
       shooterAngle = -11;//-10
       launchMode = true;
       ShootSpeed = 5000;
       autoAim = false;
-    } else if (Wing) {
+    } else if (Wing && SWM) {
       shooterAngle = -1;
       launchMode = true;
       ShootSpeed = 6000;
@@ -132,15 +132,25 @@ public class Shooter {
       launchMode = true;
       ShootSpeed = 1000;
       autoAim = false;
+    } else if (Amp && AutoLine) {
+      shooterAngle = -48;
+      launchMode = true;
+      ShootSpeed = 890;
+      autoAim = false;
+    } else if (Amp && AutoLine && fire) {
+      shooterAngle = -46;
+      launchMode = true;
+      ShootSpeed = 890;
+      autoAim = false;
     } else if (intake && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !SWM) {
       shooterAngle = -50;
       launchMode = false;
       ShootSpeed = 0.0;
       autoAim = false;
     } else if (shootClimb) {
-      shooterAngle = 30;
-      launchMode = false;
-      ShootSpeed = 0.0;
+      shooterAngle = -30;
+      launchMode = true;
+      ShootSpeed = 4500;
       autoAim = false;
     }else {
       shooterAngle = -50;

@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7419585748262406,
+      "y": 6.670053340106681
+    },
+    "rotation": -118.52311860631201
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAim"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpSideToAmpNote"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAim"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AmpShotToMidline"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidlineToAmpShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "doNothing"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

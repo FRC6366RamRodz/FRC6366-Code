@@ -63,6 +63,7 @@ public class Drive extends SubsystemBase {
   private frc.robot.util.PoseEstimator visionOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
   private frc.robot.util.PoseEstimator wheelOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
 
+  public  SwerveModulePosition[] wheelDeltas;
 
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO, ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
@@ -81,7 +82,9 @@ public class Drive extends SubsystemBase {
     PathPlannerLogging.setLogActivePathCallback((activePath) -> {Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));});
     
     PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);});
+     
   }
+
 
   public void periodic() {
     gyroIO.updateInputs(gyroInputs);
@@ -103,7 +106,7 @@ public class Drive extends SubsystemBase {
     }
 
     // Update odometry
-    SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
+    wheelDeltas = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
       wheelDeltas[i] = modules[i].getPositionDelta();
     }
@@ -119,7 +122,10 @@ public class Drive extends SubsystemBase {
     combinedOdometry.addDriveData(Timer.getFPGATimestamp(), twist);
     // Apply the twist (change since last loop cycle) to the current pose
     wheelOdometry.addDriveData(Timer.getFPGATimestamp(), twist);
+    
   }
+
+  
 
   /**
    * Runs the drive at the desired velocity.
@@ -141,6 +147,8 @@ public class Drive extends SubsystemBase {
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+
+
   }
 
   /** Stops the drive. */
@@ -171,8 +179,8 @@ public class Drive extends SubsystemBase {
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
         visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), lastGyroRotation), VecBuilder.fill(0.05, 0.05, 0.2 * 10)));//stdx stdy stdRotation
         
-        visionOdometry.resetPose(visionPose.get());;
-        combinedOdometry.addVisionData(visionUpdates);
+        visionOdometry.resetPose(visionPose.get());
+        combinedOdometry.addVisionObservation(visionUpdates);
       }
     }
   }
@@ -245,15 +253,6 @@ public class Drive extends SubsystemBase {
     return MAX_ANGULAR_SPEED;
   }
 
-  public void updateOdoWithVision() {
-    if (RobotContainer.cameras.getTargetData() != null) {
-      Optional<Pose2d> visionPose = RobotContainer.cameras.getEstimatedPose();
-
-      if (visionPose.isPresent()) {
-        combinedOdometry.resetPose(visionPose.get());
-      }
-    }
-  }
 
     //for wheel clibration
   public double[] getDrivePosition() {

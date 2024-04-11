@@ -61,6 +61,7 @@ public class Robot extends LoggedRobot {
       default:
         Logger.recordMetadata("GitDirty", "Unknown");
         break;
+
     }
 
     // Set up data receivers & replay source
@@ -95,6 +96,7 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+
   }
 
   /** This function is called periodically during all modes. */
@@ -113,17 +115,18 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("FrontRightCamAlive", RobotContainer.FrontRightcam.isCameraConnected());
     Logger.recordOutput("FrontLeftCamAlive", RobotContainer.FrontLeftcam.isCameraConnected());
 
-
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+  
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -147,6 +150,8 @@ public class Robot extends LoggedRobot {
       if (ally.get() == Alliance.Red)
       RobotContainer.drive.checkFrontVision();
     }
+
+
   }
 
   /** This function is called once when teleop is enabled. */
@@ -171,6 +176,8 @@ public class Robot extends LoggedRobot {
     RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());
 
     RobotContainer.drive.checkFrontVision();
+
+
   }
 
   /** This function is called once when test mode is enabled. */
