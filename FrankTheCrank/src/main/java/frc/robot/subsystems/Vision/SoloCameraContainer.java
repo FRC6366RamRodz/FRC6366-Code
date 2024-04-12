@@ -41,11 +41,12 @@ public class SoloCameraContainer implements CameraContainer {
     List<PhotonTrackedTarget> filteredTargets = new ArrayList<>();
 
     for (PhotonTrackedTarget target : result.getTargets()) {
-      if (target.getPoseAmbiguity() > 0.4)
+      if (target.getPoseAmbiguity() > 0.02)
         continue;
       if (Math
-          .abs(target.getBestCameraToTarget().getX()) > 6.0)
-        continue;
+        .abs(target.getBestCameraToTarget().getX()) > 4.0)
+      continue;
+
 
       filteredTargets.add(target);
     }

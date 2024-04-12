@@ -57,17 +57,18 @@ public class DriveCommands {
           }
 
           double omega;
-          if (NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tv").getDouble(0) == 1 && point.getAsBoolean() && NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tl").getDouble(0)!= 0) {
-            omega = (NetworkTableInstance.getDefault().getTable("limelight-two").getEntry("tx").getDouble(0) / -26)* 0.3 + (linearMagnitude * 0.2);
+          PIDController pid = new PIDController(0.01, 0, 0);
+          if (point.getAsBoolean()) {
+            omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), 48);
           } else if(speak.getAsBoolean()){
             double x1, y1, offset;
             if (ally.get() == Alliance.Blue){
               x1 = 0; 
-              y1 = 5.4;
+              y1 = 5.5;
               offset = Math.PI;
             } else {
               x1 = 16.45;
-              y1 = 5.6;
+              y1 = 5.5;
               offset = 0;
             }
            
