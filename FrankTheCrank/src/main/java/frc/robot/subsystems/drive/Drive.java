@@ -177,10 +177,10 @@ public class Drive extends SubsystemBase {
 
       if (visionPose.isPresent()) {
         List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), gyroInputs.yawPosition), VecBuilder.fill(0.001, 0.001, 100000.001 * 10)));//stdx stdy stdRotation
+        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), gyroInputs.yawPosition), VecBuilder.fill(0.3, 0.3, 100000.001 * 1000)));//stdx stdy stdRotation
         
         visionOdometry.resetPose(visionPose.get());
-        combinedOdometry.addVisionData(visionUpdates);
+        combinedOdometry.addVisionObservation(visionUpdates);
       }
     }
   }

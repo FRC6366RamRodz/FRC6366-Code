@@ -20,7 +20,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +32,7 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
+  private static PIDController pid = new PIDController(0.01, 0, 0);
 
   private DriveCommands() {}
 
@@ -57,17 +57,17 @@ public class DriveCommands {
           }
 
           double omega;
-          PIDController pid = new PIDController(0.01, 0, 0);
+          
           if (point.getAsBoolean()) {
             omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), 48);
           } else if(speak.getAsBoolean()){
             double x1, y1, offset;
             if (ally.get() == Alliance.Blue){
-              x1 = 0; 
+              x1 = 0.0762; 
               y1 = 5.5;
               offset = Math.PI;
             } else {
-              x1 = 16.45;
+              x1 = 16.45 - 0.0762;
               y1 = 5.5;
               offset = 0;
             }

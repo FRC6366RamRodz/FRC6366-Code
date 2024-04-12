@@ -163,7 +163,7 @@ public class PoseEstimator {
 
     // Recalculate current estimate by applying scaled transform to old estimate
     // then replaying odometry data
-    latestPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
+    resetPose(estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform));
   }
 
   /** Clears old data and calculates the latest pose. */
