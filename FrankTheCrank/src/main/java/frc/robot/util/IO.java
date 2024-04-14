@@ -70,6 +70,10 @@ public class IO {
     return op.getPOV();
   }
 
+  public boolean DriveLTPressed() {
+    return dr.getLeftTriggerAxis() > 0.8;
+  }
+
   public void opRumble(double rumble) {
     op.setRumble(RumbleType.kBothRumble, rumble);
   }

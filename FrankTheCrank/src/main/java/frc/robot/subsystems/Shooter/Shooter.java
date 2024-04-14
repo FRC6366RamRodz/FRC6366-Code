@@ -59,12 +59,13 @@ public class Shooter {
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
     shootMap.put(1.25, -35.5);//distance, followed by shot angle //subwoof 
     shootMap.put(1.84, -21.0);//distance, followed by shot angle //auto line
-    shootMap.put(2.7, -11.0);//distance, followed by shot angle //stage
-    shootMap.put(5.6495, 2.1);//distance, followed by shot angle //wing
+    shootMap.put(2.7, -11.5);//distance, followed by shot angle //stage
+    shootMap.put(5.6495, 3.0);//distance, followed by shot angle //wing
+    shootMap.put(3.7338, -4.0);//distance, followed by shot angle //wing
 
     speedMap.put(1.25, 2000.0);//distance, followed by shot speed //subwoof 
-    speedMap.put(1.84, 3200.0);//distance, followed by shot speed //auto line
-    speedMap.put(3.054, 4200.0);//distance, followed by shot speed //stage
+    speedMap.put(1.84, 3000.0);//distance, followed by shot speed //auto line
+    speedMap.put(3.054, 4500.0);//distance, followed by shot speed //stage
     speedMap.put(5.6495, 5000.0);//distance, followed by shot speed //wing
 
     Optional<Alliance> ally = DriverStation.getAlliance();
@@ -143,9 +144,9 @@ public class Shooter {
       ShootSpeed = 0.0;
       autoAim = false;
     } else if (shootClimb) {
-      shooterAngle = -30;
+      shooterAngle = -30;//-30
       launchMode = true;
-      ShootSpeed = 2900;
+      ShootSpeed = 2900;//2900
       autoAim = false;
     }else {
       shooterAngle = -50;

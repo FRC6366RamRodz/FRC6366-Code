@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.32,
-        "y": 7.52
+        "x": 1.932024832710634,
+        "y": 3.2509749349983035
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.964232110282402,
-        "y": 7.304408063361582
+        "x": 2.7192072796111395,
+        "y": 3.1728193911658487
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.408155725402359,
-        "y": 6.865957004641282
+        "x": 5.101140686611857,
+        "y": 3.6485761860412613
       },
       "prevControl": {
-        "x": 5.602235204470409,
-        "y": 7.052531923245665
+        "x": 4.34393533232871,
+        "y": 3.421414579756317
+      },
+      "nextControl": {
+        "x": 6.153614586431451,
+        "y": 3.9643183559871398
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.211785768300881,
+        "y": 4.139730672623739
+      },
+      "prevControl": {
+        "x": 7.042370324056887,
+        "y": 4.081259900411539
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +49,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.5,
+      "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +57,7 @@
             {
               "type": "named",
               "data": {
-                "name": "AutoAim"
+                "name": "intake"
               }
             }
           ]
@@ -57,13 +73,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -162.61803703330247,
+    "rotation": 178.6677801461304,
     "rotateFast": true
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -179.14408721404973,
+    "rotation": 138.91824886406738,
     "velocity": 0
   },
   "useDefaultConstraints": true

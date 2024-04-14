@@ -144,12 +144,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    Optional<Alliance> ally = DriverStation.getAlliance();
-    
-    if (ally.isPresent()) {
-      if (ally.get() == Alliance.Red)
+
       RobotContainer.drive.checkFrontVision();
-    }
 
 
   }

@@ -181,6 +181,7 @@ public class Drive extends SubsystemBase {
         
         visionOdometry.resetPose(visionPose.get());
         combinedOdometry.addVisionObservation(visionUpdates);
+        combinedOdometry.resetPose(getPose().interpolate(new Pose2d(visionPose.get().getX(),visionPose.get().getY(), getRotation()), 0.18));
       }
     }
   }

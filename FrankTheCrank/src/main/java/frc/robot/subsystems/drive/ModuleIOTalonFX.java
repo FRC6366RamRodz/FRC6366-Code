@@ -104,24 +104,24 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveConfig.Voltage.PeakReverseVoltage = -12.0;
     driveConfig.Slot0.kV = 0.0; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
     driveConfig.Slot0.kS = 0.0;
-    driveConfig.Slot0.kP = 3.0;
+    driveConfig.Slot0.kP = 1.9;
     driveConfig.Slot0.kI = 0.0;
     driveConfig.Slot0.kD = 0.0;
-    driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80;
-    driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = 80;
+    driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = 70;
+    driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = 70;
     driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 28.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 20.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
     turnConfig.Slot0.kP = 35.0;
     turnConfig.Slot0.kI = 0.0;
-    turnConfig.Slot0.kD = 0.0;
+    turnConfig.Slot0.kD = 0.01;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();

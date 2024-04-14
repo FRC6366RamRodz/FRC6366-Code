@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7419585748262406,
-      "y": 6.670053340106681
+      "x": 0.7392210795817603,
+      "y": 4.420390379242297
     },
-    "rotation": -118.52311860631201
+    "rotation": 122.38067770656923
   },
   "command": {
     "type": "sequential",
@@ -18,21 +18,16 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "AmpSideToAmpNote"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoAim"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AmpShotToMidline"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "SourceToInside"
+                }
+              }
+            ]
           }
         },
         {
@@ -44,7 +39,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MidlineToAmpShot"
+            "pathName": "InsideToShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAim"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SourceShotToMid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidSourceShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAim"
           }
         },
         {

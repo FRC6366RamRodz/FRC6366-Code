@@ -32,7 +32,8 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static PIDController pid = new PIDController(0.01, 0, 0);
+  private static PIDController pid = new PIDController(0.017, 0, 0);
+  
 
   private DriveCommands() {}
 
@@ -57,10 +58,26 @@ public class DriveCommands {
           }
 
           double omega;
-          
+          pid.enableContinuousInput(-180, 180);
           if (point.getAsBoolean()) {
-            omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), 48);
-          } else if(speak.getAsBoolean()){
+            double setpoint;
+             if (ally.get() == Alliance.Blue){
+              setpoint = 180-48;
+            } else {
+              setpoint = 48;
+            }
+            omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), setpoint);
+          } else if (RobotContainer.io.DriveLTPressed()) {
+
+            double setpoint;
+             if (ally.get() == Alliance.Blue){
+              setpoint = 90;
+            } else {
+              setpoint = 90;
+            }
+              omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), setpoint);
+            
+          }else if(speak.getAsBoolean()){
             double x1, y1, offset;
             if (ally.get() == Alliance.Blue){
               x1 = 0.0762; 
@@ -77,7 +94,7 @@ public class DriveCommands {
             double x = x2 - x1;
             double y = y2 - y1;
             double theta = Math.atan(y/x);
-            try (PIDController error = new PIDController(1.4 + linearMagnitude * 0.4, 0.0, 0.001)) {
+            try (PIDController error = new PIDController(1.2 + linearMagnitude * 0.4, 0.0, 0.001)) {
               omega = error.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
             }
 

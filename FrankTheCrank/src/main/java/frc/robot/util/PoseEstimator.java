@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
@@ -110,32 +111,23 @@ public class PoseEstimator {
   }
 
    public void addVisionObservation(List<TimestampedVisionUpdate> observation) {
+    for (var timestampedVisionUpdate : observation) {
     // If measurement is old enough to be outside the pose buffer's timespan, skip.
-    try {
-      if (poseBuffer.getInternalBuffer().lastKey() - poseBufferSizeSeconds
-          > observation.get(1).timestamp) {
-        return;
-      }
-    } catch (NoSuchElementException ex) {
-      return;
-    }
     // Get odometry based pose at timestamp
-    var sample = poseBuffer.getSample(observation.get(1).timestamp);
+    var sample = poseBuffer.getSample(timestampedVisionUpdate.timestamp());
     if (sample.isEmpty()) {
       // exit if not there
       return;
     }
 
     // sample --> odometryPose transform and backwards of that
-    var sampleToOdometryTransform = new Transform2d(sample.get(), getLatestPose());
-    var odometryToSampleTransform = new Transform2d(getLatestPose(), sample.get());
     // get old estimate by applying odometryToSample Transform
-    Pose2d estimateAtTime = estimatedPose.plus(odometryToSampleTransform);
+    Pose2d estimateAtTime = getLatestPose();
 
     // Calculate 3 x 3 vision matrix
     var r = new double[3];
     for (int i = 0; i < 3; ++i) {
-      r[i] = observation.get(3).stdDevs.get(i, 0) * observation.get(3).stdDevs.get(i, 0);
+      r[i] = timestampedVisionUpdate.stdDevs().get(i, 0) * timestampedVisionUpdate.stdDevs().get(i, 0);
     }
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
     // and C = I. See wpimath/algorithms.md.
@@ -149,7 +141,7 @@ public class PoseEstimator {
       }
     }
     // difference between estimate and vision pose
-    Transform2d transform = new Transform2d(estimateAtTime, observation.get(2).pose);
+    Transform2d transform = new Transform2d(getLatestPose(), timestampedVisionUpdate.pose());
     // scale transform by visionK
     var kTimesTransform =
         visionK.times(
@@ -163,7 +155,8 @@ public class PoseEstimator {
 
     // Recalculate current estimate by applying scaled transform to old estimate
     // then replaying odometry data
-    resetPose(estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform));
+    estimateAtTime.plus(transform);
+  }
   }
 
   /** Clears old data and calculates the latest pose. */
