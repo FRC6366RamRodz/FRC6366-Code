@@ -146,7 +146,7 @@ public class Shooter {
     } else if (shootClimb) {
       shooterAngle = -30;//-30
       launchMode = true;
-      ShootSpeed = 2900;//2900
+      ShootSpeed = 2700;//2900
       autoAim = false;
     }else {
       shooterAngle = -50;
