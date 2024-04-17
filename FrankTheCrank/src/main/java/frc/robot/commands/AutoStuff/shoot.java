@@ -28,9 +28,9 @@ public class shoot extends Command {
 
     if (RobotContainer.shooter.LaunchPermision() == 1) {
       shotTime.start();
-      RobotContainer.shooter.advancedShoot(false, true, false, false, false, false, false, true, 0, false);
+      RobotContainer.shooter.advancedShoot(true, true, false, false, false, false, false, true, 0, false);
     } else {
-      RobotContainer.shooter.advancedShoot(false, true, false, false, false, false, false, false, 0, false);
+      RobotContainer.shooter.advancedShoot(true, true, false, false, false, false, false, false, 0, false);
     }
   }
 
