@@ -12,14 +12,12 @@
 // GNU General Public License for more details.
 
 package frc.robot;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-import java.util.Optional;
+import frc.robot.commands.DriveCommands;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,6 +26,8 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -38,6 +38,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private Timer isPressed = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -161,17 +162,31 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
 
+      autonomousCommand = AutoBuilder.buildAuto("DriveToAmp");
+
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYDown());
+    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYDown(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()));
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
     RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());
 
     RobotContainer.drive.checkFrontVision();
+
+
+    
+ 
+    if (RobotContainer.io.DriveLTPressed() && isPressed.get() < 0.1) {
+      isPressed.start();
+      autonomousCommand.schedule();
+    } else if (!RobotContainer.io.DriveLTPressed()) {
+      autonomousCommand.cancel();
+      isPressed.stop();
+      isPressed.reset();
+    }
 
 
   }

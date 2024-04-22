@@ -48,6 +48,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.util.IO;
+import frc.robot.util.LocalADStarAK;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -61,6 +63,7 @@ public class RobotContainer {
   public static Drive drive;
   public static Shooter shooter;
   public static IO io = new IO();
+  public static LocalADStarAK localADstar = new LocalADStarAK();
   public static AprilTagFieldLayout aprilTag = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
   public static SoloCameraContainer FrontLeftcam = new SoloCameraContainer("FrontLeft", Constants.frontLeftCamera, aprilTag);
   public static SoloCameraContainer FrontRightcam = new SoloCameraContainer("FrontRight", Constants.frontRightCamera, aprilTag);
@@ -73,13 +76,13 @@ public class RobotContainer {
   public Command wingShot = new WingShot();
   public Command doNothing = new doNothing();
   public Command stageShot = new StageShot();
-  public Command autoAim = new AutoAim();
-
+  public Command autoAim = new AutoAim(); 
+  
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  public final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -144,6 +147,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    
   }
 
   /**
@@ -159,7 +163,7 @@ public class RobotContainer {
             () -> (-controller.getLeftY()),
             () -> (-controller.getLeftX()),
             () -> -controller.getRightX(),
-            controller.leftBumper(), controller.rightBumper()));
+            controller.rightBumper(), controller.leftBumper()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     controller
         .b()

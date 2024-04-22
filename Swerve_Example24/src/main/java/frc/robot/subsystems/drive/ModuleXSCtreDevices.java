@@ -13,20 +13,24 @@
 
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -42,9 +46,11 @@ import edu.wpi.first.math.util.Units;
  */
 
  //modified from 6328's 2023 example so that it supports talon FX motorControllers
-public class ModuleIOTalonFX implements ModuleIO {
+ //This is untested but should serve as a starting place for brushless drive, brushed steer modules.
+ //wiring looks like a tun of fun. Drive motors and encoder are on canivore. steer motor on regular can.
+public class ModuleXSCtreDevices implements ModuleIO {
   private final TalonFX driveTalon;
-  private final TalonFX turnTalon;
+  private final TalonSRX turnTalon;
   private final CANcoder cancoder;
 
   private final StatusSignal<Double> drivePosition;
@@ -55,39 +61,39 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnAbsolutePosition;
   private final StatusSignal<Double> turnPosition;
   private final StatusSignal<Double> turnVelocity;
-  private final StatusSignal<Double> turnAppliedVolts;
-  private final StatusSignal<Double> turnCurrent;
 
-  // Gear ratios for WCP SwerveXFlipped X2 12t,(steering has a 12t instead of 10t) adjust as necessary
-  private final double DRIVE_GEAR_RATIO = 5.6; //4.0
-  private final double TURN_GEAR_RATIO = 11.1428; //13.37
+  // Gear ratios for WCP Swerve XS X2 14t
+  private final double DRIVE_GEAR_RATIO = 4.71; //4.0
+  private final double TURN_GEAR_RATIO = 41.25; //13.37
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
 
-  public ModuleIOTalonFX(int index) {
+  private PIDController turnMotorPID = new PIDController(0.1, 0, 0);//untuned
+
+  public ModuleXSCtreDevices(int index) {
     switch (index) {
       case 0: // fl
         driveTalon = new TalonFX(1, "Swerve");
-        turnTalon = new TalonFX(11, "Swerve");
+        turnTalon = new TalonSRX(11);
         cancoder = new CANcoder(1, "Swerve");
         absoluteEncoderOffset = new Rotation2d(-1.358); // MUST BE CALIBRATED
         break;
       case 1: // fr
         driveTalon = new TalonFX(2, "Swerve");
-        turnTalon = new TalonFX(12, "Swerve");
+        turnTalon = new TalonSRX(12);
         cancoder = new CANcoder(2, "Swerve");
         absoluteEncoderOffset = new Rotation2d(2.324+Math.PI); // MUST BE CALIBRATED
         break;
       case 2: // bl
         driveTalon = new TalonFX(3, "Swerve");
-        turnTalon = new TalonFX(13, "Swerve");
+        turnTalon = new TalonSRX(13);
         cancoder = new CANcoder(3, "Swerve");
         absoluteEncoderOffset = new Rotation2d(0.851); // MUST BE CALIBRATED
         break;
       case 3: // br
         driveTalon = new TalonFX(4, "Swerve");
-        turnTalon = new TalonFX(14, "Swerve");
+        turnTalon = new TalonSRX(14);
         cancoder = new CANcoder(4, "Swerve");
         absoluteEncoderOffset = new Rotation2d(1.578+Math.PI); // MUST BE CALIBRATED
         break;
@@ -112,21 +118,18 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
-    var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 80.0;
-    turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    turnConfig.Voltage.PeakForwardVoltage = 12.0;
-    turnConfig.Voltage.PeakReverseVoltage = -12.0;
-    // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 80.0;
-    turnConfig.Slot0.kI = 0.0;
-    turnConfig.Slot0.kD = 0.1;
-    turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
-    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
+    var turnConfig = new TalonSRXConfiguration();
+    turnConfig.peakCurrentLimit = 30;
+    turnConfig.voltageCompSaturation = 12;
     setTurnBrakeMode(true);
+    if (isTurnMotorInverted) {
+      turnTalon.setInverted(InvertType.InvertMotorOutput);
+    } else {
+      turnTalon.setInverted(InvertType.None);
+    }
+    
 
-    turnTalon.getConfigurator().apply(turnConfig);
+    turnTalon.configAllSettings(turnConfig);
 
     var turnEncoder = new CANcoderConfiguration();
     turnEncoder.MagnetSensor.MagnetOffset = -absoluteEncoderOffset.getRotations();
@@ -140,10 +143,8 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveCurrent = driveTalon.getStatorCurrent();
 
     turnAbsolutePosition = cancoder.getAbsolutePosition();
-    turnPosition = turnTalon.getPosition();
-    turnVelocity = turnTalon.getVelocity();
-    turnAppliedVolts = turnTalon.getMotorVoltage();
-    turnCurrent = turnTalon.getStatorCurrent();
+    turnPosition = cancoder.getAbsolutePosition();
+    turnVelocity = cancoder.getVelocity();
 
     turnAbsolutePosition.setUpdateFrequency(350);
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -153,11 +154,10 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,
-        turnVelocity,
-        turnAppliedVolts,
-        turnCurrent);
+        turnVelocity
+        );
     driveTalon.optimizeBusUtilization();
-    turnTalon.optimizeBusUtilization();
+    cancoder.optimizeBusUtilization();
   }
 
   @Override
@@ -169,9 +169,8 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveCurrent,
         turnAbsolutePosition,
         turnPosition,
-        turnVelocity,
-        turnAppliedVolts,
-        turnCurrent);
+        turnVelocity
+        );
 
     inputs.drivePositionRad =
         Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
@@ -187,12 +186,12 @@ public class ModuleIOTalonFX implements ModuleIO {
         Rotation2d.fromRotations(turnPosition.getValueAsDouble() / TURN_GEAR_RATIO);
     inputs.turnVelocityRadPerSec =
         Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / TURN_GEAR_RATIO;
-    inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
-    inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
+    inputs.turnAppliedVolts = turnTalon.getMotorOutputVoltage();
+    inputs.turnCurrentAmps = new double[] {turnTalon.getStatorCurrent()};
 
     inputs.isTalon = true;
 
-    inputs.TalonError = turnTalon.getClosedLoopError().getValueAsDouble();
+    inputs.TalonError = turnMotorPID.getPositionError();
   }
 
   @Override
@@ -207,13 +206,13 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   @Override
   public void setTurnPosition(double moduleAngle) {
-    
-    turnTalon.setControl(new PositionVoltage(moduleAngle).withSlot(0).withOverrideBrakeDurNeutral(true));
-
+    double volts = turnMotorPID.calculate(cancoder.getAbsolutePosition().getValueAsDouble(), moduleAngle);
+    turnTalon.set(TalonSRXControlMode.PercentOutput, volts/12);
   }
+
   @Override
   public void setTurnVoltage(double volts) {
-    turnTalon.setControl(new VoltageOut(volts));
+    turnTalon.set(TalonSRXControlMode.PercentOutput, volts/12);
   }
 
   @Override
@@ -226,12 +225,10 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   @Override
   public void setTurnBrakeMode(boolean enable) {
-    var config = new MotorOutputConfigs();
-    config.Inverted =
-        isTurnMotorInverted
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
-    config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    turnTalon.getConfigurator().apply(config);
+    if (!enable) {
+      turnTalon.setNeutralMode(NeutralMode.Coast);
+    } else {
+      turnTalon.setNeutralMode(NeutralMode.Brake);
+    }
   }
 }

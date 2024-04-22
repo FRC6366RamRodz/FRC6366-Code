@@ -28,16 +28,16 @@ public class WingShot extends Command {
   public void execute() {
     if (RobotContainer.shooter.LaunchPermision() == 1) {
       shotTime.start();
-      RobotContainer.shooter.advancedShoot(false, false, false, false, true, false, false, true, 0, false);
+      RobotContainer.shooter.advancedShoot(false, false, false, false, true, false, false, true, 0, false, false, 0);
     } else {
-      RobotContainer.shooter.advancedShoot(false, false, false, false, true, false, false, false, 0, false);
+      RobotContainer.shooter.advancedShoot(false, false, false, false, true, false, false, false, 0, false, false, 0);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, false, false, 0, false);
+    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, false, false, 0, false, false, 0);
   }
 
   // Returns true when the command should end.

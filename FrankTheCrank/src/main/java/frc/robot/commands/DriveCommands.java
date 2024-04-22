@@ -32,7 +32,7 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  private static PIDController pid = new PIDController(0.012, 0, 0);
+  public static PIDController pid = new PIDController(1, 0, 0);
   
 
   private DriveCommands() {}
@@ -60,24 +60,25 @@ public class DriveCommands {
           double omega;
           pid.enableContinuousInput(-180, 180);
           if (point.getAsBoolean()) {
-            double setpoint;
-             if (ally.get() == Alliance.Blue){
-              setpoint = 180-48;
+            double x1, y1, offset;
+            if (ally.get() == Alliance.Blue){
+              x1 = 0.62; 
+              y1 = 7.33;
+              offset = Math.PI;
             } else {
-              setpoint = 48;
+              x1 = 15.83;
+              y1 = 7.53;
+              offset = 0;
             }
-            omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), setpoint);
-          } else if (RobotContainer.io.DriveLTPressed()) {
+           
 
-            double setpoint;
-             if (ally.get() == Alliance.Blue){
-              setpoint = 90;
-            } else {
-              setpoint = 90;
-            }
-              omega = pid.calculate(RobotContainer.drive.getRotation().getDegrees(), setpoint);
+            double x2 = getPose().getX(), y2 = getPose().getY();
+            double x = x2 - x1;
+            double y = y2 - y1;
+            double theta = Math.atan(y/x);
+              omega = pid.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
             
-          }else if(speak.getAsBoolean()){
+          } else if(speak.getAsBoolean()){
             double x1, y1, offset;
             if (ally.get() == Alliance.Blue){
               x1 = 0.0762; 
@@ -94,9 +95,7 @@ public class DriveCommands {
             double x = x2 - x1;
             double y = y2 - y1;
             double theta = Math.atan(y/x);
-            try (PIDController error = new PIDController(1.2 + linearMagnitude * 0.4, 0.0, 0.001)) {
-              omega = error.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
-            }
+              omega = pid.calculate(getPose().getRotation().minus(new Rotation2d(offset)).getRadians(), theta);
 
            
           }else {

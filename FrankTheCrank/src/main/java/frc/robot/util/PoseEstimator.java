@@ -11,13 +11,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
@@ -25,19 +21,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NavigableMap;
-import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 public class PoseEstimator {
-  private static final double historyLengthSecs = 0.2;
-  private static final double poseBufferSizeSeconds = 2.0;
-  private Pose2d estimatedPose = new Pose2d();
+  private static final double historyLengthSecs = 0.5;
   private final Matrix<N3, N1> qStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
 
   private Pose2d basePose = new Pose2d();
 
   private Pose2d latestPose = new Pose2d();
-    private final TimeInterpolatableBuffer<Pose2d> poseBuffer = TimeInterpolatableBuffer.createBuffer(poseBufferSizeSeconds);
 
   private final NavigableMap<Double, PoseUpdate> updates = new TreeMap<>();
   private final Matrix<N3, N1> q = new Matrix<>(Nat.N3(), Nat.N1());
@@ -108,55 +100,6 @@ public class PoseEstimator {
 
     // Recalculate latest pose once
     update();
-  }
-
-   public void addVisionObservation(List<TimestampedVisionUpdate> observation) {
-    for (var timestampedVisionUpdate : observation) {
-    // If measurement is old enough to be outside the pose buffer's timespan, skip.
-    // Get odometry based pose at timestamp
-    var sample = poseBuffer.getSample(timestampedVisionUpdate.timestamp());
-    if (sample.isEmpty()) {
-      // exit if not there
-      return;
-    }
-
-    // sample --> odometryPose transform and backwards of that
-    // get old estimate by applying odometryToSample Transform
-    Pose2d estimateAtTime = getLatestPose();
-
-    // Calculate 3 x 3 vision matrix
-    var r = new double[3];
-    for (int i = 0; i < 3; ++i) {
-      r[i] = timestampedVisionUpdate.stdDevs().get(i, 0) * timestampedVisionUpdate.stdDevs().get(i, 0);
-    }
-    // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
-    Matrix<N3, N3> visionK = new Matrix<>(Nat.N3(), Nat.N3());
-    for (int row = 0; row < 3; ++row) {
-      double stdDev = qStdDevs.get(row, 0);
-      if (stdDev == 0.0) {
-        visionK.set(row, row, 0.0);
-      } else {
-        visionK.set(row, row, stdDev / (stdDev + Math.sqrt(stdDev * r[row])));
-      }
-    }
-    // difference between estimate and vision pose
-    Transform2d transform = new Transform2d(getLatestPose(), timestampedVisionUpdate.pose());
-    // scale transform by visionK
-    var kTimesTransform =
-        visionK.times(
-            VecBuilder.fill(
-                transform.getX(), transform.getY(), transform.getRotation().getRadians()));
-    Transform2d scaledTransform =
-        new Transform2d(
-            kTimesTransform.get(0, 0),
-            kTimesTransform.get(1, 0),
-            Rotation2d.fromRadians(kTimesTransform.get(2, 0)));
-
-    // Recalculate current estimate by applying scaled transform to old estimate
-    // then replaying odometry data
-    estimateAtTime.plus(transform);
-  }
   }
 
   /** Clears old data and calculates the latest pose. */

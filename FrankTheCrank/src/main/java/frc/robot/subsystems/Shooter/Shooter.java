@@ -8,9 +8,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
@@ -37,6 +42,7 @@ public class Shooter {
   public double x1, y1, offset, oldX, oldY;;
   public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
   public static InterpolatingDoubleTreeMap speedMap = new InterpolatingDoubleTreeMap();
+  public Timer oneLaunch = new Timer();
 
   private Command noteVisualizer = frc.robot.util.NoteVisualizer.shoot();
 
@@ -53,10 +59,11 @@ public class Shooter {
     angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
 
     NoteVisualizer.setRobotPoseSupplier(() -> getPose());
-
+    NoteVisualizer.launcherTransform =  new Transform3d(0.35, 0, 0.8, new Rotation3d(0.0, Units.degreesToRadians(getAnlge().getDegrees()), 0.0));
+    NoteVisualizer.shotSpeed = (2 * Math.PI * 0.0508 * Math.abs(inputs.TopVelocity)) / 60;
   }
 
-  public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean shootClimb) {
+  public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean pass, boolean autoShoot, double error) {
     shootMap.put(1.25, -35.5);//distance, followed by shot angle //subwoof 
     shootMap.put(1.84, -21.0);//distance, followed by shot angle //auto line
     shootMap.put(2.7, -11.5);//distance, followed by shot angle //stage
@@ -143,11 +150,16 @@ public class Shooter {
       launchMode = false;
       ShootSpeed = 0.0;
       autoAim = false;
-    } else if (shootClimb) {
+    } else if (pass) {
       shooterAngle = -30;//-30
       launchMode = true;
       ShootSpeed = 2700;//2900
       autoAim = false;
+    } else if (autoShoot) {
+       shooterAngle = shootMap.get(adjDistance);
+      launchMode = true;
+      ShootSpeed = speedMap.get(adjDistance);
+      autoAim = true;
     }else {
       shooterAngle = -50;
       launchMode = false;
@@ -161,7 +173,11 @@ public class Shooter {
       FeedSpeed = 0.8;
       limitOff = true;
       IntakeSpeed = 0.0;
-      noteVisualizer.schedule();
+      oneLaunch.start();
+      if (oneLaunch.get() < 0.1) {
+        noteVisualizer.schedule();
+      }
+      
     } else if (Amp && !fire) {
       sideSpeed = -0.1;
       limitOff = false;
@@ -172,11 +188,22 @@ public class Shooter {
       limitOff = false;
       FeedSpeed = 0.6;
       IntakeSpeed = 0.8;
-    } else {
+    } else if (autoShoot && error < Units.degreesToRadians(3) && LaunchPermision() == 1) {
+      sideSpeed = 0.9;
+      FeedSpeed = 0.8;
+      limitOff = true;
+      IntakeSpeed = 0.0;
+      oneLaunch.start();
+      if (oneLaunch.get() < 0.1) {
+        noteVisualizer.schedule();
+      }
+    }else {
       sideSpeed = 0.0;
       FeedSpeed = 0.0;
       limitOff = false;
       IntakeSpeed = 0.0;
+      oneLaunch.stop();
+      oneLaunch.reset();
     }
 
     double climber;

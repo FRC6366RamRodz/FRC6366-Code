@@ -5,6 +5,7 @@
 package frc.robot.commands.AutoStuff;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
 public class Intake extends Command {
@@ -20,19 +21,19 @@ public class Intake extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, true, false, 0, false);
+    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, true, false, 0, false, false, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, false, false, 0, false);
+    RobotContainer.shooter.advancedShoot(false, false, false, false, false, false, false, false, 0, false, false, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (RobotContainer.shooter.IntakeRumble() == 1) {
+    if (RobotContainer.shooter.IntakeRumble() == 1 || Constants.currentMode.equals(Constants.currentMode.SIM) ) {
       return true;
     }
     return false;

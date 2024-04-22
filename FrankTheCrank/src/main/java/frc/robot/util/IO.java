@@ -101,4 +101,8 @@ public class IO {
   public boolean getDrAbutton() {
     return dr.getAButton();
   }
+
+  public boolean getDrLeftBumper() {
+    return dr.getLeftBumper();
+  }
 }
