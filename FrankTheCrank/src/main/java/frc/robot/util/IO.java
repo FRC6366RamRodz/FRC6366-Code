@@ -79,7 +79,7 @@ public class IO {
   }
 
   public void drRumble(double rumble) {
-    dr.setRumble(RumbleType.kLeftRumble, rumble);
+    dr.setRumble(RumbleType.kBothRumble, rumble);
   }
 
   public void drLightRumble(double rumble) {

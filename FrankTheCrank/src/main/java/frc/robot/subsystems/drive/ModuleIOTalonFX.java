@@ -104,7 +104,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveConfig.Voltage.PeakReverseVoltage = -12.0;
     driveConfig.Slot0.kV = 0.0; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
     driveConfig.Slot0.kS = 0.0;
-    driveConfig.Slot0.kP = 1.9;
+    driveConfig.Slot0.kP = 2.0;
     driveConfig.Slot0.kI = 0.0;
     driveConfig.Slot0.kD = 0.0;
     driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = 70;
@@ -114,14 +114,14 @@ public class ModuleIOTalonFX implements ModuleIO {
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 20.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 80.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 35.0;
+    turnConfig.Slot0.kP = 80.0;
     turnConfig.Slot0.kI = 0.0;
-    turnConfig.Slot0.kD = 0.01;
+    turnConfig.Slot0.kD = 0.1;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
@@ -131,6 +131,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     var turnEncoder = new CANcoderConfiguration();
     turnEncoder.MagnetSensor.MagnetOffset = -absoluteEncoderOffset.getRotations();
+    
 
     cancoder.getConfigurator().apply(turnEncoder);
 
@@ -145,6 +146,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnAppliedVolts = turnTalon.getMotorVoltage();
     turnCurrent = turnTalon.getStatorCurrent();
 
+    turnAbsolutePosition.setUpdateFrequency(350);
     BaseStatusSignal.setUpdateFrequencyForAll(
         230.0, drivePosition, turnPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -152,7 +154,6 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,
-        turnAbsolutePosition,
         turnVelocity,
         turnAppliedVolts,
         turnCurrent);
@@ -209,6 +210,7 @@ public class ModuleIOTalonFX implements ModuleIO {
   public void setTurnPosition(double moduleAngle) {
     
     turnTalon.setControl(new PositionVoltage(moduleAngle).withSlot(0).withOverrideBrakeDurNeutral(true));
+
   }
   @Override
   public void setTurnVoltage(double volts) {

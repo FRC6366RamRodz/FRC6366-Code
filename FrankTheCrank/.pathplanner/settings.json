@@ -8,9 +8,9 @@
     "SourceSide"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 4.2,
-  "defaultMaxAccel": 3.0,
-  "defaultMaxAngVel": 540.0,
-  "defaultMaxAngAccel": 720.0,
-  "maxModuleSpeed": 5.69976
+  "defaultMaxVel": 4.5,
+  "defaultMaxAccel": 2.5,
+  "defaultMaxAngVel": 530.0,
+  "defaultMaxAngAccel": 600.0,
+  "maxModuleSpeed": 5.69
 }

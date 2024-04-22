@@ -60,11 +60,11 @@ public class Shooter {
     shootMap.put(1.25, -35.5);//distance, followed by shot angle //subwoof 
     shootMap.put(1.84, -21.0);//distance, followed by shot angle //auto line
     shootMap.put(2.7, -11.5);//distance, followed by shot angle //stage
-    shootMap.put(5.6495, 3.0);//distance, followed by shot angle //wing
+    shootMap.put(5.6495, 2.8);//distance, followed by shot angle //wing
     shootMap.put(3.7338, -4.0);//distance, followed by shot angle //wing
 
     speedMap.put(1.25, 2000.0);//distance, followed by shot speed //subwoof 
-    speedMap.put(1.84, 3000.0);//distance, followed by shot speed //auto line
+    speedMap.put(1.84, 2900.0);//distance, followed by shot speed //auto line
     speedMap.put(3.054, 4500.0);//distance, followed by shot speed //stage
     speedMap.put(5.6495, 5000.0);//distance, followed by shot speed //wing
 
@@ -215,7 +215,7 @@ public class Shooter {
 
   public double lightRumble() {
     if(inputs.intakeAmps > 27) {
-      return 0.5;
+      return 0.25;
     } else {
       return 0;
     }

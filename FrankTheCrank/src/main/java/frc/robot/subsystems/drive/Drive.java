@@ -180,6 +180,7 @@ public class Drive extends SubsystemBase {
         visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), new Pose2d(visionPose.get().getX(),visionPose.get().getY(), gyroInputs.yawPosition), VecBuilder.fill(0.3, 0.3, 100000.001 * 1000)));//stdx stdy stdRotation
         
         visionOdometry.resetPose(visionPose.get());
+        
         combinedOdometry.resetPose(getPose().interpolate(new Pose2d(visionPose.get().getX(),visionPose.get().getY(), getRotation()), 0.18));
       }
     }
