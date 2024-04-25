@@ -23,7 +23,7 @@ import frc.robot.Constants;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
-  private static final double WHEEL_RADIUS = Units.inchesToMeters(2.0);
+  private static final double WHEEL_RADIUS = Units.inchesToMeters(2.0); //RADIUS not diameter
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -32,8 +32,7 @@ public class Module {
   private final SimpleMotorFeedforward driveFeedforward;
   private final PIDController driveFeedback;
   private final PIDController turnFeedback;
-  private Rotation2d angleSetpoint =
-      new Rotation2d(0.0); // Setpoint for closed loop control, null for open loop
+  private Rotation2d angleSetpoint = new Rotation2d(0.0); // Setpoint for closed loop control, null for open loop
   private Double speedSetpoint = 0.0; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
   private double lastPositionMeters = 0.0; // Used for delta calculation
@@ -47,29 +46,29 @@ public class Module {
     // separate robot with different tuning)
     switch (Constants.currentMode) {
       case REAL:
-      case REPLAY:
+      case REPLAY://PID for replays
         driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
         driveFeedback = new PIDController(0.05, 0.0, 0.0);
         turnFeedback = new PIDController(7.0, 0.0, 0.0);
         break;
-      case SIM:
+      case SIM://PID for sim
         driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
         driveFeedback = new PIDController(0.1, 0.0, 0.0);
         turnFeedback = new PIDController(10.0, 0.0, 0.0);
         break;
-      default:
+      default://fallback PID
         driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
         driveFeedback = new PIDController(0.0, 0.0, 0.0);
         turnFeedback = new PIDController(0.0, 0.0, 0.0);
         break;
     }
 
-    turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
-    setBrakeMode(false);
+    turnFeedback.enableContinuousInput(-Math.PI, Math.PI);//tell PID the point it will reset to the other
+    setBrakeMode(false); //should be false for Talons
   }
 
-  public void periodic() {
-    io.updateInputs(inputs);
+  public void periodic() {//happens the etire time robot is on
+    io.updateInputs(inputs);//update inputs
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // On first cycle, reset relative turn encoder
@@ -81,9 +80,9 @@ public class Module {
     // Run closed loop turn control
     if (angleSetpoint != null) {
       if (inputs.isTalon == false) {
-        io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
+        io.setTurnVoltage(turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));//RIO for NEO
       } else {
-        io.setTurnPosition(angleSetpoint.getRotations());
+        io.setTurnPosition(angleSetpoint.getRotations());//motor controller for Talon
       }
 
       // Run closed loop drive control
@@ -104,9 +103,9 @@ public class Module {
         // Run drive controller
         double velocityRadPerSec = adjustSpeedSetpoint / WHEEL_RADIUS;
         if (inputs.isTalon == false) {
-          io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec) + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+          io.setDriveVoltage(driveFeedforward.calculate(velocityRadPerSec) + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec)); //RIO for NEO
         } else {
-          io.setDriveVelocity(velocityRadPerSec);
+          io.setDriveVelocity(velocityRadPerSec);// motor controller for talon
         }
       }
     }

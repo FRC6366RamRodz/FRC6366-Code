@@ -4,14 +4,12 @@
 
 package frc.robot.subsystems.Shooter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -39,9 +37,11 @@ public class Shooter {
   public double shooterAngle;
   public boolean launchMode;
   public boolean autoAim;
-  public double x1, y1, offset, oldX, oldY;;
+  public double x1, y1, offset, oldX, oldY, distance, PassDIstance;
   public static InterpolatingDoubleTreeMap shootMap = new InterpolatingDoubleTreeMap();
+  public static InterpolatingDoubleTreeMap PassMap = new InterpolatingDoubleTreeMap();
   public static InterpolatingDoubleTreeMap speedMap = new InterpolatingDoubleTreeMap();
+  public static InterpolatingDoubleTreeMap PassSPedMap = new InterpolatingDoubleTreeMap();
   public Timer oneLaunch = new Timer();
 
   private Command noteVisualizer = frc.robot.util.NoteVisualizer.shoot();
@@ -58,22 +58,31 @@ public class Shooter {
 
     angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
 
-    NoteVisualizer.setRobotPoseSupplier(() -> getPose());
-    NoteVisualizer.launcherTransform =  new Transform3d(0.35, 0, 0.8, new Rotation3d(0.0, Units.degreesToRadians(getAnlge().getDegrees()), 0.0));
-    NoteVisualizer.shotSpeed = (2 * Math.PI * 0.0508 * Math.abs(inputs.TopVelocity)) / 60;
+    NoteVisualizer.setRobotPoseSupplier(() -> getPose()); //optional visualizer for testing.
+    NoteVisualizer.launcherTransform =  new Transform3d(0.35, 0, 0.8, new Rotation3d(0.0, Units.degreesToRadians(getAnlge().getDegrees()), 0.0));//adjust origin point of notes here
+    NoteVisualizer.shotSpeed = (2 * Math.PI * 0.0508 * Math.abs(inputs.TopVelocity)) / 60; //speed the shot should be at (2*PI*WheelRadius*RPM)/60 also known as the tip speed equation.
+
+    Logger.recordOutput("Shooter/ShootDistance", distance);//log distance to speaker
+    Logger.recordOutput("Shooter/PassDistance", PassDIstance);//log distance to Pass Target
   }
 
   public void advancedShoot(boolean SWM, boolean Subwoof, boolean AutoLine, boolean Stage, boolean Wing, boolean Amp, boolean intake, boolean fire, double climb, boolean pass, boolean autoShoot, double error) {
+    //interpolation map, used to create setpoints on the fly, (Shoot From Anywhere) more data points means more acuracy. If a shot from a certian region is consistantly bad, add a point in that region.
     shootMap.put(1.25, -35.5);//distance, followed by shot angle //subwoof 
     shootMap.put(1.84, -21.0);//distance, followed by shot angle //auto line
     shootMap.put(2.7, -11.5);//distance, followed by shot angle //stage
     shootMap.put(5.6495, 2.8);//distance, followed by shot angle //wing
     shootMap.put(3.7338, -4.0);//distance, followed by shot angle //wing
 
+    //if shots are bouncing out lower the relevant shot speed
     speedMap.put(1.25, 2000.0);//distance, followed by shot speed //subwoof 
     speedMap.put(1.84, 2900.0);//distance, followed by shot speed //auto line
     speedMap.put(3.054, 4500.0);//distance, followed by shot speed //stage
     speedMap.put(5.6495, 5000.0);//distance, followed by shot speed //wing
+
+    PassMap.put(10.2, -30.0);
+
+    PassSPedMap.put(10.2, 2700.0);
 
     Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -86,15 +95,28 @@ public class Shooter {
       y1 = 5.5;
       offset = 0;
     }
-    double distance;
     if (getPose() != null) {
       distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
     } else {
       distance = 0.0;
     }
+
+    double x1p, y1p;
+            if (ally.get() == Alliance.Blue){
+              x1p = 0.62; 
+              y1p = 7.33;
+            } else {
+              x1p = 15.83;
+              y1p = 7.53;
+            }
+    if (getPose() != null) {
+      PassDIstance = Math.sqrt((Math.pow(getPose().getX() - x1p, 2)) + Math.pow(getPose().getY() - y1p, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
+    } else {
+      PassDIstance = 0.0;
+    }
     
     
-/*  SWM stuff
+/*  SWM stuff //doesnt work needs redone
     Timer time = new Timer();
     time.start();
 
@@ -110,85 +132,91 @@ public class Shooter {
 */
     double adjDistance = Math.abs(distance); //+ xSpeed;
 
-    if (SWM && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !intake) {
-      shooterAngle = shootMap.get(adjDistance);
-      launchMode = true;
+    //primary if loop for all logic in this subsystem
+    if (SWM && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !intake) {//logic for SWM, needs !case, (Not True) to prevent ruining existing call order
+      shooterAngle = shootMap.get(adjDistance);//shootMap.get(adjDistance) translates to get shoot map, interpolated to distance of adjDistance.
+      launchMode = true;//a protections case for shooting statements
       ShootSpeed = speedMap.get(adjDistance);
-      autoAim = true;
-    } else if (Subwoof && SWM) {
-      shooterAngle = -35.5;//-38
+      autoAim = true; //launch permision needed to be sligthly altered for automated aiming.
+    } else if (Subwoof) {
+      shooterAngle = -35.5;//fallback setpoints
       launchMode = true;
       ShootSpeed = 2800;
       autoAim = false;
-    } else if (AutoLine && SWM){
+    } else if (AutoLine){
       shooterAngle = -20;
       launchMode = true;
       ShootSpeed = 2900;
       autoAim = false;
-    } else if (Stage && SWM) {
-      shooterAngle = -11;//-10
+    } else if (Stage) {
+      shooterAngle = -11;
       launchMode = true;
       ShootSpeed = 4000;
       autoAim = false;
-    } else if (Wing && SWM) {
+    } else if (Wing) {
       shooterAngle = 2.0;
       launchMode = true;
       ShootSpeed = 5000;
-      autoAim = false;
-    } else if (Amp && AutoLine) {
-      shooterAngle = -48;
-      launchMode = true;
-      ShootSpeed = 635;
       autoAim = false;
     } else if(Amp) {
       shooterAngle = 35;
       launchMode = true;
       ShootSpeed = 1000;
       autoAim = false;
-    } else if (intake && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !SWM) {
+    } else if ((intake || RobotContainer.io.getDrRTrigger()) && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !SWM) {
       shooterAngle = -50;
       launchMode = false;
       ShootSpeed = 0.0;
       autoAim = false;
     } else if (pass) {
-      shooterAngle = -30;//-30
+      shooterAngle = -30;
       launchMode = true;
-      ShootSpeed = 2700;//2900
+      ShootSpeed = 2700;
       autoAim = false;
-    } else if (autoShoot) {
+    } else if (RobotContainer.io.getOPLYDown()) {
+      shooterAngle = PassMap.get(Math.abs(PassDIstance));
+      launchMode = true;
+      ShootSpeed = PassSPedMap.get(Math.abs(PassDIstance));
+      autoAim = true;
+    }else if (autoShoot) {
        shooterAngle = shootMap.get(adjDistance);
       launchMode = true;
       ShootSpeed = speedMap.get(adjDistance);
       autoAim = true;
-    }else {
+    } else if(inputs.intakeLimit && !launchMode) {
       shooterAngle = -50;
+      launchMode = false; //prevents launch permision from being given when not in a shot position
+      ShootSpeed = 0.0 + ((5-MathUtil.clamp(adjDistance, 0, 5))*(2800/5));//speed the shooter up when within 5m of speaker. (b-MX)(stat version of MX+B because easier to think) ((furthesPointOfSpeed - Distance * (MaxSpeed/FuthestPointOfSpeed)))
+      autoAim = false;
+    }else {
+      shooterAngle = -50;//resting state
       launchMode = false;
       ShootSpeed = 0.0;
       autoAim = false;
     }
 
     boolean limitOff;
-    if(LaunchPermision() == 1 && fire && launchMode) {
+    if(LaunchPermision() == 1 && fire && launchMode) {//Indexer controlls
       sideSpeed = 0.9;
       FeedSpeed = 0.8;
       limitOff = true;
       IntakeSpeed = 0.0;
       oneLaunch.start();
-      if (oneLaunch.get() < 0.1) {
+      if (oneLaunch.get() < 0.1) {// when pressed for notVisualixer
         noteVisualizer.schedule();
       }
       
-    } else if (Amp && !fire) {
-      sideSpeed = -0.1;
+    } else if (Amp && !fire) { //Note prematurly feeds into shooter wheels without.
+      sideSpeed = -0.1; //spins side wheel slowly back to prevent droping into shooter wheels.
       limitOff = false;
-      FeedSpeed = 0.4;
+      FeedSpeed = 0.4; //honestly dont know (Best not to touch in that case)
       IntakeSpeed = 0.0;
-    } else if (intake && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
-      sideSpeed = -0.1;
+    } else if ((intake || RobotContainer.io.getDrRTrigger()) && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
+      sideSpeed = -0.1;//anti overfeed when intakeing
       limitOff = false;
-      FeedSpeed = 0.6;
+      FeedSpeed = 0.6; //huge controll over intake speed, but need to be slow enough the limit goes off
       IntakeSpeed = 0.8;
-    } else if (autoShoot && error < Units.degreesToRadians(3) && LaunchPermision() == 1) {
+    } else if (autoShoot && error < Units.degreesToRadians(3) && LaunchPermision() == 1) { //case for automatic shooting. Extra case for robot pointing was needed
       sideSpeed = 0.9;
       FeedSpeed = 0.8;
       limitOff = true;
@@ -207,22 +235,22 @@ public class Shooter {
     }
 
     double climber;
-    if (RobotContainer.io.getDrAbutton()) {
+    if (RobotContainer.io.getDrAbutton()) {//release permision, prevents premature movement
       climber = climb;
     } else {
       climber = 0;
     }
 
-    if(RobotContainer.io.getDpad() == 0) {
+    if(RobotContainer.io.getDpad() == 0) {//unjam stuff. sequencing is weird. Dpad Up, Down, Up, Hold Down until not is ejected.
       FeedSpeed = -1;
     } else if (RobotContainer.io.getDpad() == 180) {
       IntakeSpeed = -1;
     }
     
-    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climber);
+    io.setMotors(-ShootSpeed, -ShootSpeed, FeedSpeed, shooterAngle, IntakeSpeed, sideSpeed, limitOff, climber);//sends the run command to everything.
   }
 
-  public double LaunchPermision() {
+  public double LaunchPermision() {//launch permision, identifies, when shot parameters are reached. (returns a number, as it was originaly inteded to serve as a controller vibration input.)
     if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode && autoAim && DriverStation.isTeleop()) {
       return 1;
     }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 50 && ShootSpeed > getAvrgShootSpd() - 50 && getArmSpd() > -0.5 && getArmSpd() < 0.5&& launchMode) {
@@ -232,7 +260,7 @@ public class Shooter {
     }
   }
 
-  public double IntakeRumble() {
+  public double IntakeRumble() {//Identify when the controller rumble should fire
     if (inputs.intakeLimit && IntakeSpeed > 0) {
       return 1;
     } else {
@@ -241,7 +269,7 @@ public class Shooter {
   }
 
   public double lightRumble() {
-    if(inputs.intakeAmps > 27) {
+    if(inputs.intakeAmps > 27) { //Identify when a note is being touched by the intake.
       return 0.25;
     } else {
       return 0;

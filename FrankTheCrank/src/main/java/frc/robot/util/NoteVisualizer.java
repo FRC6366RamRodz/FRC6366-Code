@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class NoteVisualizer {
+  //visualizes the note, made by 6328, no clue.
   private static final Translation3d blueSpeaker = new Translation3d(0.025, 5.55, 2.1);
   private static final Translation3d redSpeaker = new Translation3d(16.517, 5.55, 2.1);
   public static Transform3d launcherTransform = new Transform3d(0.35, 0, 0.8, new Rotation3d(0.0, Units.degreesToRadians(-50.0), 0.0));

@@ -101,6 +101,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Voltage.PeakForwardVoltage = 12.0;
     driveConfig.Voltage.PeakReverseVoltage = -12.0;
+    //kV and Ks do nothing for FOCTorque out.
     driveConfig.Slot0.kV = 0.0; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
     driveConfig.Slot0.kS = 0.0;
     driveConfig.Slot0.kP = 2.0;

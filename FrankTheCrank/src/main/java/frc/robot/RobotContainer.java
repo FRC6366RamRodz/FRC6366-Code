@@ -69,7 +69,7 @@ public class RobotContainer {
   public static SoloCameraContainer FrontRightcam = new SoloCameraContainer("FrontRight", Constants.frontRightCamera, aprilTag);
   public static SoloCameraContainer BackRightcam = new SoloCameraContainer("BackRight", Constants.BackRightCamera, aprilTag);
   public static SoloCameraContainer BackLeftcam = new SoloCameraContainer("BackLeft", Constants.BackLeftCamera, aprilTag);
-  public static MultiCameraContainer cameras = new MultiCameraContainer(FrontLeftcam,FrontRightcam,BackRightcam,BackLeftcam); 
+  public static MultiCameraContainer cameras = new MultiCameraContainer(FrontLeftcam,FrontRightcam,BackRightcam,BackLeftcam); //create all solo cameras, then name them in the multi cam
   public Command Intake = new Intake();
   public Command shoot = new shoot();
   public Command autoLineShot = new AutoLineShot();
@@ -79,7 +79,7 @@ public class RobotContainer {
   public Command autoAim = new AutoAim(); 
   
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController controller = new CommandXboxController(0);//for command stuff.
 
   // Dashboard inputs
   public final LoggedDashboardChooser<Command> autoChooser;
@@ -131,7 +131,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
-    NamedCommands.registerCommand("intake", Intake);
+    NamedCommands.registerCommand("intake", Intake);//create command for path planner to see.
     NamedCommands.registerCommand("shoot", shoot);
     NamedCommands.registerCommand("autoLineShot", autoLineShot);
     NamedCommands.registerCommand("WingShot", wingShot);
@@ -139,10 +139,10 @@ public class RobotContainer {
     NamedCommands.registerCommand("StageShot", stageShot);
     NamedCommands.registerCommand("AutoAim", autoAim);
     // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser()); // create choosable dash value.
 
     // Set up feedforward characterization
-    autoChooser.addOption("Drive FF Characterization", new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    autoChooser.addOption("Drive FF Characterization", new FeedForwardCharacterization(drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity)); //add custom options.
     autoChooser.addOption("Wheel Radius Calibration",new WheelRadiusCharacterization(drive));
 
     // Configure the button bindings
@@ -157,24 +157,11 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> (-controller.getLeftY()),
-            () -> (-controller.getLeftX()),
-            () -> -controller.getRightX(),
-            controller.rightBumper(), controller.leftBumper()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    drive.setDefaultCommand( DriveCommands.joystickDrive( drive, () -> (-controller.getLeftY()), () -> (-controller.getLeftX()), () -> -controller.getRightX(), controller.rightBumper(), controller.leftBumper()));
     
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    
+    controller.b().onTrue(Commands.runOnce(() -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())), drive).ignoringDisable(true));
   }
 
   /**

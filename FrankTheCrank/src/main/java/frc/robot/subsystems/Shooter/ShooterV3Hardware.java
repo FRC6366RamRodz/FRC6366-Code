@@ -21,7 +21,7 @@ import com.revrobotics.SparkLimitSwitch;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-/** Shooter V3 is the V2 file with an extra intake roller and an LED controller */
+/** Shooter V3 is the V2 file with an extra intake roller and an LED controller (DCMP and on) */
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 public class ShooterV3Hardware implements ShooterIO {
 

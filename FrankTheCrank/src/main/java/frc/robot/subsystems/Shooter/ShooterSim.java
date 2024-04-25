@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 /** Add your docs here. */
 public class ShooterSim implements ShooterIO {
-  private SingleJointedArmSim shooterAngle =
-      new SingleJointedArmSim(DCMotor.getFalcon500(1), 200, 0.7480059831487, Units.inchesToMeters(21.729), Units.degreesToRadians(-50), Units.degreesToRadians(90), true, Units.degreesToRadians(-50));
+  //arm is based off anderson layout. currently a 135 to 1.
+  private SingleJointedArmSim shooterAngle = new SingleJointedArmSim(DCMotor.getFalcon500(1), 200, 0.7480059831487, Units.inchesToMeters(21.729), Units.degreesToRadians(-50), Units.degreesToRadians(90), true, Units.degreesToRadians(-50));
   private FlywheelSim intake = new FlywheelSim(DCMotor.getNEO(1), 5, 0.004);
   private FlywheelSim handler = new FlywheelSim(DCMotor.getNEO(1), 5, 0.04);
   private FlywheelSim feeder = new FlywheelSim(DCMotor.getNeo550(1), 15, 0.04);
@@ -36,7 +36,7 @@ public class ShooterSim implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    shooterAngle.update(0.02);
+    shooterAngle.update(0.02); //all sim hardware must be updated periodically
     intake.update(0.02);
     feeder.update(0.02);
     topShooter.update(0.02);

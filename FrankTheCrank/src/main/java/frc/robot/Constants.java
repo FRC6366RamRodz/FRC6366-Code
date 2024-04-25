@@ -30,7 +30,7 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.SIM;
+  public static final Mode currentMode = Mode.SIM;//Mode switch
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -47,7 +47,7 @@ public final class Constants {
       new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.0002));
       ;
 
-
+//Camera Positions.
   public static Transform3d frontLeftCamera = new Transform3d(0.4, 0.363, 0.33, new Rotation3d(Units.degreesToRadians(-32),Units.degreesToRadians(-37), 0));
   public static Transform3d frontRightCamera = new Transform3d(-0.4,0.4,0.33, new Rotation3d(Units.degreesToRadians(-18), Units.degreesToRadians(-37), 0));
   public static Transform3d BackLeftCamera = new Transform3d(-0.4,0.307,0.33, new Rotation3d(Units.degreesToRadians(-270), Units.degreesToRadians(-45), Units.degreesToRadians(180)));

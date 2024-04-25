@@ -20,7 +20,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 
-/** Add your docs here. */
+/** Original Alpha style hardware, as parts hadnt arived yet */
 public class ShooterV1Hardware implements ShooterIO {
   public TalonFX angleMotor = new TalonFX(5);
   public CANcoder angleEncoder = new CANcoder(5);

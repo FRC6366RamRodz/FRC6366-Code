@@ -22,7 +22,7 @@ import com.revrobotics.SparkLimitSwitch;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
-/** Add your docs here. */
+/** North charleston pre intake post shooter update. */
 public class ShooterV2Hardware implements ShooterIO {
 
   // F_ is falcon500s K_ is Kraken x60s, N_ is Neo1.1s, f_ is 550/flares.

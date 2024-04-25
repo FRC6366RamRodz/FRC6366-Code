@@ -205,7 +205,7 @@ public class ModuleXSCtreDevices implements ModuleIO {
   }
 
   @Override
-  public void setTurnPosition(double moduleAngle) {
+  public void setTurnPosition(double moduleAngle) {// dont question it. These are weird modules.
     double volts = turnMotorPID.calculate(cancoder.getAbsolutePosition().getValueAsDouble(), moduleAngle);
     turnTalon.set(TalonSRXControlMode.PercentOutput, volts/12);
   }

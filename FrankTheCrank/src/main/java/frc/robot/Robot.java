@@ -109,9 +109,9 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    RobotContainer.shooter.ShooterPeriodic();
+    RobotContainer.shooter.ShooterPeriodic();//timed style needs a periodic run here
 
-    Logger.recordOutput("BackLeftCamAlive", RobotContainer.BackLeftcam.isCameraConnected());
+    Logger.recordOutput("BackLeftCamAlive", RobotContainer.BackLeftcam.isCameraConnected());//camera logging.
     Logger.recordOutput("BackRightCamAlive", RobotContainer.BackRightcam.isCameraConnected());
     Logger.recordOutput("FrontRightCamAlive", RobotContainer.FrontRightcam.isCameraConnected());
     Logger.recordOutput("FrontLeftCamAlive", RobotContainer.FrontLeftcam.isCameraConnected());
@@ -121,7 +121,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-  
+
   }
 
   /** This function is called periodically when disabled. */
@@ -133,11 +133,11 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();//identify auton command to run
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
-      autonomousCommand.schedule();
+      autonomousCommand.schedule();//run auton command
     }
 
   }
@@ -146,7 +146,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {
 
-      RobotContainer.drive.checkFrontVision();
+      RobotContainer.drive.checkFrontVision();//Check vision pose.
 
 
   }
@@ -159,17 +159,18 @@ public class Robot extends LoggedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
     if (autonomousCommand != null) {
-      autonomousCommand.cancel();
+      autonomousCommand.cancel(); //stop the auton command
     }
 
-      autonomousCommand = AutoBuilder.buildAuto("DriveToAmp");
+      autonomousCommand = AutoBuilder.buildAuto("DriveToAmp"); //overide autonomous command for tele.
 
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYDown(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()));
+    //button binding for timed style controls
+    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYUp(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()));
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
     RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());
@@ -178,7 +179,7 @@ public class Robot extends LoggedRobot {
 
 
     
- 
+    //drive to amp stuff, needs a debounce to not loop.
     if (RobotContainer.io.DriveLTPressed() && isPressed.get() < 0.1) {
       isPressed.start();
       autonomousCommand.schedule();

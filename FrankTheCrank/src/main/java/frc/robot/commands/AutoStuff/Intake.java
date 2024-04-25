@@ -33,7 +33,7 @@ public class Intake extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (RobotContainer.shooter.IntakeRumble() == 1 || Constants.currentMode.equals(Constants.currentMode.SIM) ) {
+    if (RobotContainer.shooter.IntakeRumble() == 1 || Constants.currentMode.equals(Constants.currentMode.SIM) ) {//intake switch cant get hit it SIM, so skip this check.
       return true;
     }
     return false;

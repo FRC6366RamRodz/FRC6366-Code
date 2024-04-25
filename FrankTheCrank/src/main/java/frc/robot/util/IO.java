@@ -7,10 +7,10 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 
-/** Add your docs here. */
+/** Controller input for timed based systems. */
 public class IO {
-  public XboxController op = new XboxController(1);
-  public XboxController dr = new XboxController(0);
+  public XboxController op = new XboxController(1);//operator controller should be port 1
+  public XboxController dr = new XboxController(0);//driver controller should be port 0
 
   public IO() {}
 
@@ -54,12 +54,28 @@ public class IO {
     }
   }
 
+  public boolean getDrRTrigger() {
+    if (dr.getRightTriggerAxis() > 0.3) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public double getOpRightY() {
     return op.getRightY();
   }
 
   public boolean getOPLYDown() {
     if (op.getLeftY() > 0.5) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+    public boolean getOPLYUp() {
+    if (op.getLeftY() < -0.5) {
       return true;
     } else {
       return false;

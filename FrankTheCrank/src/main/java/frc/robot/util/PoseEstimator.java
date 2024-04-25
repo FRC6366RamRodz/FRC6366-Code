@@ -24,6 +24,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class PoseEstimator {
+  //Pose estimator, Vision doesnt work right. But can start at any angle so?
   private static final double historyLengthSecs = 0.5;
   private final Matrix<N3, N1> qStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
 
