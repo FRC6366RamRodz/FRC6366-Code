@@ -81,9 +81,9 @@ public class DriveNEO implements DriveIO {
     /*optional pigeon gyro
      * inputs.gyroYaw = Rotation2d.fromDegrees(pigeon.getYaw);
      */
+
     // odometry workaround may need the signs swapped
-    
-    inputs.gyroYaw = new Rotation2d(Units.rotationsToRadians((inputs.rightPositionMeter - inputs.leftPositionMeter) / (Units.inchesToMeters(23)*2 * Math.PI)));
+    inputs.gyroYaw = new Rotation2d(Units.rotationsToRadians((inputs.rightPositionMeter - inputs.leftPositionMeter) / (Drive.WheelBaseWidth*2 * Math.PI)));
   }
 
   @Override

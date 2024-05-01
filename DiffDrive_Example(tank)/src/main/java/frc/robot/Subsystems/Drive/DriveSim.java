@@ -5,8 +5,6 @@
 package frc.robot.Subsystems.Drive;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotGearing;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotMotor;
@@ -14,9 +12,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim.KitbotWheelSiz
 
 /** Add your docs here. */
 public class DriveSim implements DriveIO {
-  private DifferentialDrivetrainSim sim =
-      DifferentialDrivetrainSim.createKitbotSim(
-          KitbotMotor.kDoubleNEOPerSide, KitbotGearing.k12p75, KitbotWheelSize.kSixInch, null);
+  private DifferentialDrivetrainSim sim = DifferentialDrivetrainSim.createKitbotSim(KitbotMotor.kDoubleNEOPerSide, KitbotGearing.k12p75, KitbotWheelSize.kSixInch, null);
 
   private double leftAppliedVolts = 0.0;
   private double rightAppliedVolts = 0.0;
@@ -34,8 +30,9 @@ public class DriveSim implements DriveIO {
     inputs.rightAvgAmps = rightAppliedVolts;
     inputs.rightAvgVolts = sim.getRightCurrentDrawAmps();
 
-    inputs.gyroYaw = new Rotation2d(Units.rotationsToRadians((inputs.rightPositionMeter - inputs.leftPositionMeter) / (Units.inchesToMeters(28)*Math.PI)));
-    //inputs.gyroYaw = sim.getHeading();
+    //sim test stuff. 
+    //inputs.gyroYaw = new Rotation2d(Units.rotationsToRadians((inputs.rightPositionMeter - inputs.leftPositionMeter) / (Drive.WheelBaseWidth*2 * Math.PI)));
+    inputs.gyroYaw = sim.getHeading();
   }
 
   @Override

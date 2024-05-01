@@ -10,11 +10,17 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ArmIO {
   @AutoLog
   public static class ArmIOInputs{
-    public double VelocityRPM = 0.0;
-    public double accelerationRPM = 0.0;
-    public double Volts = 0.0;
-    public double Amps = 0.0;
-    public double Temp = 0.0;
+    public double UpperArmPosition = 0.0;
+    public double LowerArmPosition = 0.0;
+    public double UpperTemp = 0.0;
+    public double LowerTemp = 0.0;
+    public double UpperPIDError = 0.0;
+    public double LowerPIDError = 0.0;
+    public double IntakeLeftSpeed = 0.0;
+    public double IntakeRightSpeed = 0.0;
+    public boolean UpperBrake = true;
+    public boolean LowerBrake = true;
+    public boolean IntakeWrist = false;
   }
 
   public default void updateInputs(ArmIOInputs inputs) {}

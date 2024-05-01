@@ -21,13 +21,12 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 /** Add your docs here. */
 public class Drive implements Subsystem {
   public static final double WHEEL_RADIUS = Units.inchesToMeters(3.0);
+  public static final double WheelBaseWidth = Units.inchesToMeters(23);
   public static final double MotorKV = 473;
   public static final double GearRatio = 13;
 
