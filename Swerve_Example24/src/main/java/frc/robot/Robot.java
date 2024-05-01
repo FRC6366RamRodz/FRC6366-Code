@@ -13,11 +13,9 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.DriveCommands;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -109,7 +107,6 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    RobotContainer.shooter.ShooterPeriodic();//timed style needs a periodic run here
 
     Logger.recordOutput("BackLeftCamAlive", RobotContainer.BackLeftcam.isCameraConnected());//camera logging.
     Logger.recordOutput("BackRightCamAlive", RobotContainer.BackRightcam.isCameraConnected());
@@ -169,11 +166,6 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //button binding for timed style controls
-    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYUp(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()));
-    RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
-    RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
-    RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());
 
     RobotContainer.drive.checkFrontVision();
 
