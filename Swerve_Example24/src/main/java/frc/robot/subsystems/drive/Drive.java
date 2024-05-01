@@ -29,7 +29,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -37,35 +36,36 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.PoseEstimator.TimestampedVisionUpdate;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 //modified from 6328's 2023 example so that it supports talon FX motorControllers
 public class Drive extends SubsystemBase {
-  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.7);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(21.125);
+  private static final double MAX_LINEAR_SPEED = Units.feetToMeters(18.7); //Free Speed, not actual
+  private static final double TRACK_WIDTH_X = Units.inchesToMeters(21.125); //width from wheel to wheel, not frame
   private static final double TRACK_WIDTH_Y = Units.inchesToMeters(21.375);
-  public static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
-  private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  public static final double DRIVE_BASE_RADIUS = Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0); // done automatically
+  private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS; //done automatically
   private final GyroIO gyroIO;
-  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged(); //location of usable inputs from gyro
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
 
-  private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-  private Rotation2d lastGyroRotation = new Rotation2d();
+  private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations()); //math class for odometry
+  private Rotation2d lastGyroRotation = new Rotation2d(); //?
 
-  private frc.robot.util.PoseEstimator poseEstimator = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
+  private frc.robot.util.PoseEstimator combinedOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002)); //Real Odometry used for all math
+  private frc.robot.util.PoseEstimator visionOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002)); //Last detected Vision Pose
+  private frc.robot.util.PoseEstimator wheelOdometry = new frc.robot.util.PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002)); //Mechanical odometry (no Vision)
+
+  public  SwerveModulePosition[] wheelDeltas; //Location of all 4 modules.
 
   public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO, ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0);
+    modules[0] = new Module(flModuleIO, 0); //create an index for all 4 modules
     modules[1] = new Module(frModuleIO, 1);
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
@@ -75,16 +75,18 @@ public class Drive extends SubsystemBase {
     new HolonomicPathFollowerConfig(MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()), 
     () -> DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red, this);
 
-    Pathfinding.setPathfinder(new LocalADStarAK());
+    Pathfinding.setPathfinder(new LocalADStarAK());// Pathfind when not starting on an auto path, LocalADStarAK is the Akit compatible one.
+
+    PathPlannerLogging.setLogActivePathCallback((activePath) -> {Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));});//loging stuff
     
-    PathPlannerLogging.setLogActivePathCallback((activePath) -> {Logger.recordOutput("Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));});
-    
-    PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);});
+    PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);});//logging stuff
+     
   }
 
-  public void periodic() {
-    gyroIO.updateInputs(gyroInputs);
-    Logger.processInputs("Drive/Gyro", gyroInputs);
+
+  public void periodic() {//hapens the entire time robot is live
+    gyroIO.updateInputs(gyroInputs); //updates the logged values
+    Logger.processInputs("Drive/Gyro", gyroInputs); //records logged values
     for (var module : modules) {
       module.periodic();
     }
@@ -92,17 +94,17 @@ public class Drive extends SubsystemBase {
     // Stop moving when disabled
     if (DriverStation.isDisabled()) {
       for (var module : modules) {
-        module.stop();
+        module.stop();//stops motor output on disable
       }
     }
     // Log empty setpoint states when disabled
-    if (DriverStation.isDisabled()) {
+    if (DriverStation.isDisabled()) {//log module states even when disabled
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
     // Update odometry
-    SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
+    wheelDeltas = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
       wheelDeltas[i] = modules[i].getPositionDelta();
     }
@@ -115,9 +117,13 @@ public class Drive extends SubsystemBase {
       // with the change in angle since the last loop cycle.
       twist = new Twist2d(twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians()); lastGyroRotation = gyroInputs.yawPosition;
     }
-    poseEstimator.addDriveData(Timer.getFPGATimestamp(), twist);
+    combinedOdometry.addDriveData(Timer.getFPGATimestamp(), twist);
     // Apply the twist (change since last loop cycle) to the current pose
+    wheelOdometry.addDriveData(Timer.getFPGATimestamp(), twist);
+    
   }
+
+  
 
   /**
    * Runs the drive at the desired velocity.
@@ -126,9 +132,9 @@ public class Drive extends SubsystemBase {
    */
   public void runVelocity(ChassisSpeeds speeds) {
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02); //speeds that demands come from
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds); //translated demand to readable
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, MAX_LINEAR_SPEED); //normalizes the readable outputs
 
     // Send setpoints to modules
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -136,15 +142,17 @@ public class Drive extends SubsystemBase {
       // The module returns the optimized state, useful for logging
       optimizedSetpointStates[i] = modules[i].runSetpoint(setpointStates[i]);
     }
-
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+
+
   }
 
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());
+    
   }
 
   /**
@@ -162,28 +170,26 @@ public class Drive extends SubsystemBase {
 
   public void checkFrontVision() {
 
-    if (RobotContainer.frontCams.getTargetData() != null) {
-      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
-      PhotonPipelineResult result = RobotContainer.frontCams.getFilteredResult();
+    if (RobotContainer.cameras.getTargetData() != null) {
+      Optional<Pose2d> visionPose = RobotContainer.cameras.getEstimatedPose();
 
-      if (visionPose.isPresent()) {
-        List<TimestampedVisionUpdate> visionUpdates = new ArrayList<>();
-        visionUpdates.add(new TimestampedVisionUpdate(result.getTimestampSeconds(), visionPose.get(), VecBuilder.fill(0.2, 0.2, 0.4 * 10)));//stdx stdy stdRotation
-        poseEstimator.addVisionData(visionUpdates);
+      if (visionPose.isPresent()) {       
+        visionOdometry.resetPose(visionPose.get());//reports latest vision pose.
+        
+        combinedOdometry.resetPose(getPose().interpolate(new Pose2d(visionPose.get().getX(),visionPose.get().getY(), getRotation()), 0.18));//interpolates a position between vision pose and real pose @ stnd dev of 18%
       }
     }
   }
 
-
   /** Runs forwards at the commanded voltage. */
-  public void runCharacterizationVolts(double volts) {
+  public void runCharacterizationVolts(double volts) {//Neo stuff, no clue
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(volts);
     }
   }
 
   /** Returns the average drive velocity in radians/sec. */
-  public double getCharacterizationVelocity() {
+  public double getCharacterizationVelocity() {//returns output from characterization
     double driveVelocityAverage = 0.0;
     for (var module : modules) {
       driveVelocityAverage += module.getCharacterizationVelocity();
@@ -204,22 +210,33 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return poseEstimator.getLatestPose();
+    return combinedOdometry.getLatestPose();
+  }
+
+    @AutoLogOutput(key = "Odometry/RobotMech")
+  public Pose2d getMechanicalPose() {
+    return wheelOdometry.getLatestPose();
+  }
+
+    @AutoLogOutput(key = "Odometry/RobotVision")
+  public Pose2d getVisionPose() {
+    return visionOdometry.getLatestPose();
   }
 
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
-    return poseEstimator.getLatestPose().getRotation();
+    return combinedOdometry.getLatestPose().getRotation();
   }
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPose(pose);
+    combinedOdometry.resetPose(pose);
+    wheelOdometry.resetPose(pose);
   }
 
   /** Adds vision data to the pose esimation. */
   public void addVisionData(List<TimestampedVisionUpdate> visionData) {
-    poseEstimator.addVisionData(visionData);
+    combinedOdometry.addVisionData(visionData);
   }
 
   /** Returns the maximum linear speed in meters per sec. */
@@ -232,15 +249,6 @@ public class Drive extends SubsystemBase {
     return MAX_ANGULAR_SPEED;
   }
 
-  public void updateOdoWithVision() {
-    if (RobotContainer.frontCams.getTargetData() != null) {
-      Optional<Pose2d> visionPose = RobotContainer.frontCams.getEstimatedPose();
-
-      if (visionPose.isPresent()) {
-        poseEstimator.resetPose(visionPose.get());
-      }
-    }
-  }
 
     //for wheel clibration
   public double[] getDrivePosition() {

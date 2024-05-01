@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+//Made by 281 I dont know tweak values in get filtered result till it behave right
 public class SoloCameraContainer implements CameraContainer {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator estimator;
@@ -41,11 +42,12 @@ public class SoloCameraContainer implements CameraContainer {
     List<PhotonTrackedTarget> filteredTargets = new ArrayList<>();
 
     for (PhotonTrackedTarget target : result.getTargets()) {
-      if (target.getPoseAmbiguity() > 0.3)
+      if (target.getPoseAmbiguity() > 0.1)//max allowed ambiguity
         continue;
       if (Math
-          .abs(target.getBestCameraToTarget().getX()) > 3.0)
-        continue;
+        .abs(target.getBestCameraToTarget().getX()) > 5.5) //max tag distance.
+      continue;
+
 
       filteredTargets.add(target);
     }
@@ -93,5 +95,9 @@ public class SoloCameraContainer implements CameraContainer {
     List<EntechTargetData> data = new ArrayList<>();
     data.add(new EntechTargetData(targetIds, camera.getName()));
     return data;
+  }
+
+  public boolean isCameraConnected() {
+    return camera.isConnected();
   }
 }

@@ -19,7 +19,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -71,25 +71,25 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveTalon = new TalonFX(1, "Swerve");
         turnTalon = new TalonFX(11, "Swerve");
         cancoder = new CANcoder(1, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(1.824+ Math.PI); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(-1.358); // MUST BE CALIBRATED
         break;
       case 1: // fr
         driveTalon = new TalonFX(2, "Swerve");
         turnTalon = new TalonFX(12, "Swerve");
         cancoder = new CANcoder(2, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(0.821 + Math.PI); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(2.324+Math.PI); // MUST BE CALIBRATED
         break;
       case 2: // bl
         driveTalon = new TalonFX(3, "Swerve");
         turnTalon = new TalonFX(13, "Swerve");
         cancoder = new CANcoder(3, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(-0.779 + Math.PI); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(0.851); // MUST BE CALIBRATED
         break;
       case 3: // br
         driveTalon = new TalonFX(4, "Swerve");
         turnTalon = new TalonFX(14, "Swerve");
         cancoder = new CANcoder(4, "Swerve");
-        absoluteEncoderOffset = new Rotation2d(1.585 + Math.PI); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d(1.578+Math.PI); // MUST BE CALIBRATED
         break;
       default:
         throw new RuntimeException("Invalid module index");
@@ -97,30 +97,31 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     driveTalon.getConfigurator().apply(new TalonFXConfiguration());
     var driveConfig = new TalonFXConfiguration();
-    driveConfig.CurrentLimits.StatorCurrentLimit = 50.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.Voltage.PeakForwardVoltage = 12.0;
     driveConfig.Voltage.PeakReverseVoltage = -12.0;
-    driveConfig.Slot0.kV = 0.13; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
-    driveConfig.Slot0.kS = 0.2;
-    driveConfig.Slot0.kP = 0.1;
+    //kV and Ks do nothing for FOCTorque out.
+    driveConfig.Slot0.kV = 0.0; //0.12 means apply 12V for a Target Velocity of 100 RPS or 6000 RPM.
+    driveConfig.Slot0.kS = 0.0;
+    driveConfig.Slot0.kP = 2.0;
     driveConfig.Slot0.kI = 0.0;
     driveConfig.Slot0.kD = 0.0;
+    driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = 70;
+    driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = 70;
+    driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
     driveTalon.getConfigurator().apply(driveConfig);
     setDriveBrakeMode(true);
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 28.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 80.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Voltage.PeakForwardVoltage = 12.0;
     turnConfig.Voltage.PeakReverseVoltage = -12.0;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 35.0;
+    turnConfig.Slot0.kP = 80.0;
     turnConfig.Slot0.kI = 0.0;
-    turnConfig.Slot0.kD = 0.0;
-    turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = 30;
-    turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -30;
+    turnConfig.Slot0.kD = 0.1;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     turnConfig.Feedback.FeedbackRemoteSensorID = cancoder.getDeviceID();
@@ -130,6 +131,7 @@ public class ModuleIOTalonFX implements ModuleIO {
 
     var turnEncoder = new CANcoderConfiguration();
     turnEncoder.MagnetSensor.MagnetOffset = -absoluteEncoderOffset.getRotations();
+    
 
     cancoder.getConfigurator().apply(turnEncoder);
 
@@ -144,6 +146,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnAppliedVolts = turnTalon.getMotorVoltage();
     turnCurrent = turnTalon.getStatorCurrent();
 
+    turnAbsolutePosition.setUpdateFrequency(350);
     BaseStatusSignal.setUpdateFrequencyForAll(
         230.0, drivePosition, turnPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -151,7 +154,6 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveVelocity,
         driveAppliedVolts,
         driveCurrent,
-        turnAbsolutePosition,
         turnVelocity,
         turnAppliedVolts,
         turnCurrent);
@@ -201,13 +203,14 @@ public class ModuleIOTalonFX implements ModuleIO {
 
   @Override
   public void setDriveVelocity(double velocity) {
-    driveTalon.setControl(new VelocityVoltage(velocity).withSlot(0));
+    driveTalon.setControl(new VelocityTorqueCurrentFOC(velocity).withSlot(0));
   }
 
   @Override
   public void setTurnPosition(double moduleAngle) {
     
     turnTalon.setControl(new PositionVoltage(moduleAngle).withSlot(0).withOverrideBrakeDurNeutral(true));
+
   }
   @Override
   public void setTurnVoltage(double volts) {

@@ -45,8 +45,8 @@ import edu.wpi.first.math.util.Units;
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
 
- //modified from 6328's 2023 example so that it supports talon FX motorControllers
- //This is untested but should serve as a starting place for brushless drive, brushed steer modules.
+
+ //This is untested but should serve as a starting place for brushless drive, brushed steer, modules.
  //wiring looks like a tun of fun. Drive motors and encoder are on canivore. steer motor on regular can.
 public class ModuleXSCtreDevices implements ModuleIO {
   private final TalonFX driveTalon;
@@ -63,8 +63,8 @@ public class ModuleXSCtreDevices implements ModuleIO {
   private final StatusSignal<Double> turnVelocity;
 
   // Gear ratios for WCP Swerve XS X2 14t
-  private final double DRIVE_GEAR_RATIO = 4.71; //4.0
-  private final double TURN_GEAR_RATIO = 41.25; //13.37
+  private final double DRIVE_GEAR_RATIO = 4.71; 
+  private final double TURN_GEAR_RATIO = 41.25; 
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
@@ -205,7 +205,7 @@ public class ModuleXSCtreDevices implements ModuleIO {
   }
 
   @Override
-  public void setTurnPosition(double moduleAngle) {
+  public void setTurnPosition(double moduleAngle) {// dont question it. These are weird modules.
     double volts = turnMotorPID.calculate(cancoder.getAbsolutePosition().getValueAsDouble(), moduleAngle);
     turnTalon.set(TalonSRXControlMode.PercentOutput, volts/12);
   }

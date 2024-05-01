@@ -28,8 +28,8 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 public class ModuleIOSim implements ModuleIO {
   private static final double LOOP_PERIOD_SECS = 0.02;
 
-  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getKrakenX60(1), 5.60, 0.025);
-  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getFalcon500(1), 11.1428, 0.004);
+  private DCMotorSim driveSim = new DCMotorSim(DCMotor.getKrakenX60(1), 5.60, 0.055);//Sim variant of drive motors. JKG M^2 is an MOI unit.
+  private DCMotorSim turnSim = new DCMotorSim(DCMotor.getFalcon500(1), 11.1428, 0.0004);//Sim variant of steer motor.
 
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;
@@ -38,7 +38,7 @@ public class ModuleIOSim implements ModuleIO {
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
     driveSim.update(LOOP_PERIOD_SECS);
-    turnSim.update(LOOP_PERIOD_SECS);
+    turnSim.update(LOOP_PERIOD_SECS);//Sim Objects must be updated.
 
     inputs.drivePositionRad = driveSim.getAngularPositionRad();
     inputs.driveVelocityRadPerSec = driveSim.getAngularVelocityRadPerSec();
@@ -52,7 +52,7 @@ public class ModuleIOSim implements ModuleIO {
     inputs.turnAppliedVolts = turnAppliedVolts;
     inputs.turnCurrentAmps = new double[] {Math.abs(turnSim.getCurrentDrawAmps())};
 
-    inputs.isTalon = false;
+    inputs.isTalon = false;//no motor controller so should always be false
   }
 
   @Override

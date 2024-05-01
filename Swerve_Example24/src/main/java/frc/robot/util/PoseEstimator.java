@@ -15,6 +15,8 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +24,9 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 public class PoseEstimator {
-  private static final double historyLengthSecs = 0.2;
+  //Pose estimator, Vision doesnt work right. But can start at any angle so?
+  private static final double historyLengthSecs = 0.5;
+  private final Matrix<N3, N1> qStdDevs = new Matrix<>(Nat.N3(), Nat.N1());
 
   private Pose2d basePose = new Pose2d();
 
@@ -34,6 +38,10 @@ public class PoseEstimator {
   public PoseEstimator(Matrix<N3, N1> stateStdDevs) {
     for (int i = 0; i < 3; ++i) {
       q.set(i, 0, stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0));
+    }
+
+    for (int i = 0; i < 3; ++i) {
+      qStdDevs.set(i, 0, Math.pow(Constants.odometryStateStdDevs.get(i, 0), 2));
     }
   }
 
@@ -87,8 +95,7 @@ public class PoseEstimator {
         newVisionUpdates.add(visionUpdate);
         newVisionUpdates.sort(VisionUpdate.compareDescStdDev);
         updates.put(timestamp, new PoseUpdate(twist0, newVisionUpdates));
-        updates.put(
-            nextUpdate.getKey(), new PoseUpdate(twist1, nextUpdate.getValue().visionUpdates()));
+        updates.put(nextUpdate.getKey(), new PoseUpdate(twist1, nextUpdate.getValue().visionUpdates()));
       }
     }
 

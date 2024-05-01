@@ -54,28 +54,28 @@ public class ModuleIOSparkMax implements ModuleIO {
         driveSparkMax = new CANSparkMax(1, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(11, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(1);
-        absoluteEncoderOffset = new Rotation2d(2.88); // MUST BE CALIBRATED AND POSITIVE
+        absoluteEncoderOffset = new Rotation2d(2.88); // MUST BE CALIBRATED
         isDriveInverted = false;
         break;
       case 1://fr
         driveSparkMax = new CANSparkMax(2, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(12, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(2);
-        absoluteEncoderOffset = new Rotation2d(1.782); // MUST BE CALIBRATED AND POSITIVE
+        absoluteEncoderOffset = new Rotation2d(1.782); // MUST BE CALIBRATED 
         isDriveInverted = false;
         break;
       case 2://bl
         driveSparkMax = new CANSparkMax(4, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(14, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(3);
-        absoluteEncoderOffset = new Rotation2d(-0.873); // MUST BE CALIBRATED AND POSITIVE
+        absoluteEncoderOffset = new Rotation2d(-0.873); // MUST BE CALIBRATED
         isDriveInverted = false;
         break;
       case 3://br
         driveSparkMax = new CANSparkMax(3, MotorType.kBrushless);
         turnSparkMax = new CANSparkMax(13, MotorType.kBrushless);
         turnAbsoluteEncoder = new CANcoder(4);
-        absoluteEncoderOffset = new Rotation2d(0.436); // MUST BE CALIBRATED AND POSITIVE
+        absoluteEncoderOffset = new Rotation2d(0.436); // MUST BE CALIBRATED 
         isDriveInverted = false;
         break;
       default:

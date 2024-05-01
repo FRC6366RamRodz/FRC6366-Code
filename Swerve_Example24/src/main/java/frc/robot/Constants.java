@@ -13,8 +13,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -26,7 +30,7 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL;
+  public static final Mode currentMode = Mode.SIM;//Mode switch
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -39,6 +43,13 @@ public final class Constants {
     REPLAY
   }
 
-  public static Transform3d frontLeftCamera = new Transform3d(0.4, 0.083, 0.33, new Rotation3d(Units.degreesToRadians(-15),Units.degreesToRadians(-37), Units.degreesToRadians(23)));
-  public static Transform3d frontRightCamera = new Transform3d(0.4,-0.083,0.33, new Rotation3d(Units.degreesToRadians(165), Units.degreesToRadians(-37), Units.degreesToRadians(-23)));
+   public static final Matrix<N3, N1> odometryStateStdDevs =
+      new Matrix<>(VecBuilder.fill(0.003, 0.003, 0.0002));
+      ;
+
+//Camera Positions.
+  public static Transform3d frontLeftCamera = new Transform3d(0.4, 0.363, 0.33, new Rotation3d(Units.degreesToRadians(-32),Units.degreesToRadians(-37), 0));
+  public static Transform3d frontRightCamera = new Transform3d(-0.4,0.4,0.33, new Rotation3d(Units.degreesToRadians(-18), Units.degreesToRadians(-37), 0));
+  public static Transform3d BackLeftCamera = new Transform3d(-0.4,0.307,0.33, new Rotation3d(Units.degreesToRadians(-270), Units.degreesToRadians(-45), Units.degreesToRadians(180)));
+  public static Transform3d BackRightCamera = new Transform3d(-0.7,-0.0207,0.33, new Rotation3d(Units.degreesToRadians(-178), Units.degreesToRadians(-45), Units.degreesToRadians(0)));
 }

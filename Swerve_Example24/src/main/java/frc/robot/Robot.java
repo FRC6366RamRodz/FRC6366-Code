@@ -12,9 +12,12 @@
 // GNU General Public License for more details.
 
 package frc.robot;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DriveCommands;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -23,6 +26,8 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -33,6 +38,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private Timer isPressed = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -56,6 +62,7 @@ public class Robot extends LoggedRobot {
       default:
         Logger.recordMetadata("GitDirty", "Unknown");
         break;
+
     }
 
     // Set up data receivers & replay source
@@ -90,6 +97,7 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+
   }
 
   /** This function is called periodically during all modes. */
@@ -101,39 +109,46 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    RobotContainer.shooter.ShooterPeriodic();//timed style needs a periodic run here
+
+    Logger.recordOutput("BackLeftCamAlive", RobotContainer.BackLeftcam.isCameraConnected());//camera logging.
+    Logger.recordOutput("BackRightCamAlive", RobotContainer.BackRightcam.isCameraConnected());
+    Logger.recordOutput("FrontRightCamAlive", RobotContainer.FrontRightcam.isCameraConnected());
+    Logger.recordOutput("FrontLeftCamAlive", RobotContainer.FrontLeftcam.isCameraConnected());
 
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
+
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    //if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-    //  RobotContainer.drive.updateOdoWithVision();
-    //}
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();//identify auton command to run
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
-      autonomousCommand.schedule();
+      autonomousCommand.schedule();//run auton command
     }
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    //if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-    //  RobotContainer.drive.checkVisionMeasurements(false);
-    //}
+
+      RobotContainer.drive.checkFrontVision();//Check vision pose.
+
+
   }
 
   /** This function is called once when teleop is enabled. */
@@ -144,17 +159,37 @@ public class Robot extends LoggedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
     if (autonomousCommand != null) {
-      autonomousCommand.cancel();
+      autonomousCommand.cancel(); //stop the auton command
     }
-   // if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("tl").getDouble(0) != 0) {
-   //   RobotContainer.drive.updateOdoWithVision();
-   // }
+
+      autonomousCommand = AutoBuilder.buildAuto("DriveToAmp"); //overide autonomous command for tele.
+
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //button binding for timed style controls
+    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYUp(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()));
+    RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
+    RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
+    RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());
+
     RobotContainer.drive.checkFrontVision();
+
+
+    
+    //drive to amp stuff, needs a debounce to not loop.
+    if (RobotContainer.io.DriveLTPressed() && isPressed.get() < 0.1) {
+      isPressed.start();
+      autonomousCommand.schedule();
+    } else if (!RobotContainer.io.DriveLTPressed()) {
+      autonomousCommand.cancel();
+      isPressed.stop();
+      isPressed.reset();
+    }
+
+
   }
 
   /** This function is called once when test mode is enabled. */
