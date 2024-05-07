@@ -32,7 +32,7 @@ import java.util.function.DoubleSupplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  public static PIDController pid = new PIDController(1, 0, 0);
+  public static PIDController pid = new PIDController(0.8, 0, 0);
   
 
   private DriveCommands() {}
