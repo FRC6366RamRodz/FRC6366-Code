@@ -289,13 +289,13 @@ public class Shooter {
       FeedSpeed = 0.4; //honestly dont know (Best not to touch in that case)
       IntakeSpeed = 0.0;
     } else if ((intake || RobotContainer.io.getDrRTrigger()) && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
-      sideSpeed = -0.1;//anti overfeed when intakeing
+      sideSpeed = -0.2;//anti overfeed when intakeing
       limitOff = false;
       FeedSpeed = 0.6; //huge controll over intake speed, but need to be slow enough the limit goes off
       IntakeSpeed = 0.95;
-    } else if (autoShoot && error < Units.degreesToRadians(3) && LaunchPermision() == 1) { //case for automatic shooting. Extra case for robot pointing was needed
+    } else if (autoShoot && error < Units.degreesToRadians(7) && LaunchPermision() == 1) { //case for automatic shooting. Extra case for robot pointing was needed
       sideSpeed = 0.9;
-      FeedSpeed = 0.8;
+      FeedSpeed = 0.5;
       limitOff = true;
       IntakeSpeed = 0.0;
           oneLaunch.start();

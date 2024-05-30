@@ -170,7 +170,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     //button binding for timed style controls
-    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYUp(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()));
+    RobotContainer.shooter.advancedShoot(RobotContainer.io.getOpX(), RobotContainer.io.getOpRB(), RobotContainer.io.getOpRTrigger(), RobotContainer.io.getOPLB(), RobotContainer.io.getOpLTrigger(), RobotContainer.io.getOPB(), RobotContainer.io.getOpA(), RobotContainer.io.getOpY(), RobotContainer.io.getOpRightY(), RobotContainer.io.getOPLYUp(), RobotContainer.io.getDrLeftBumper(), Math.abs(DriveCommands.pid.getPositionError())  + Math.abs(DriveCommands.pid.getVelocityError()*0.5));
     RobotContainer.io.op.setRumble(RumbleType.kRightRumble, RobotContainer.shooter.LaunchPermision());
     RobotContainer.io.drRumble(RobotContainer.shooter.IntakeRumble());
     RobotContainer.io.drLightRumble(RobotContainer.shooter.lightRumble());

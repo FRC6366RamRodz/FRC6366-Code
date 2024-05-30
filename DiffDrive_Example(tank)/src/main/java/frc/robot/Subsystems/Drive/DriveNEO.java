@@ -42,8 +42,7 @@ public class DriveNEO implements DriveIO {
     LEFT_REAR.follow(LEFT_FRONT, false);
     RIGHT_REAR.follow(RIGHT_FRONT, false);
 
-    LEFT_FRONT.enableVoltageCompensation(
-        12.0); // minimizes the negative affect of running percent out and may make it superior to
+    LEFT_FRONT.enableVoltageCompensation(12.0); // minimizes the negative affect of running percent out and may make it superior to
     // encoder drive for handling.
     RIGHT_FRONT.enableVoltageCompensation(12.0);
     LEFT_FRONT.setSmartCurrentLimit(40); // set peak allowed current in amps

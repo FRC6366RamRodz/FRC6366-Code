@@ -120,7 +120,7 @@ public class ShooterV3Hardware implements ShooterIO {
     angleConfig.Slot0.kS = 0.55;//0.28
     angleConfig.Slot0.kG = 0.3;//0.4
     angleConfig.Slot0.kV = 0.0;
-    angleConfig.Slot0.kP = 130.0;//75
+    angleConfig.Slot0.kP = 200.0;//75
     angleConfig.Slot0.kI = 0.0;
     angleConfig.Slot0.kD = 0.0;//0,75
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
