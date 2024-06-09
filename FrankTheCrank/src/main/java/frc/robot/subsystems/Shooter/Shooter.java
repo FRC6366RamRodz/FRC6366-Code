@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -53,8 +54,12 @@ public class Shooter {
   private static final String Event = "Event";
   private double ManualAngle;
   private double ManualSpeed;
+ 
 
   private Command noteVisualizer = frc.robot.util.NoteVisualizer.shoot();
+  
+  private Pose2d oldpose = new Pose2d();
+  private Timer time = new Timer();
 
   public Shooter(ShooterIO io) {
     this.io = io;
@@ -72,7 +77,7 @@ public class Shooter {
     Logger.processInputs("Shooter", inputs);
     Logger.recordOutput("Angle", angle);
 
-    angle = new Pose3d(0.42, 0.08, 0.52, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
+    angle = new Pose3d(0.36, 0.09, 0.585, new Rotation3d(0, getAnlge().getRadians() + Units.degreesToRadians(50), 0));
 
     NoteVisualizer.setRobotPoseSupplier(() -> getPose()); //optional visualizer for testing.
     NoteVisualizer.launcherTransform =  new Transform3d(0.2, 0, 0.7, new Rotation3d(0.0, Units.degreesToRadians(getAnlge().getDegrees()-20), 0.0));//adjust origin point of notes here
@@ -102,6 +107,21 @@ public class Shooter {
     PassSPedMap.put(10.2, 2700.0);
 
     Optional<Alliance> ally = DriverStation.getAlliance();
+
+
+    //new swm stuff
+        
+    
+    time.start();
+    if (time.get() > 0.05) {
+      oldpose = getPose();
+
+      time.reset();
+    }
+
+    Translation2d poseDelta = new Translation2d(oldpose.getX() - getPose().getX(), oldpose.getY()-getPose().getY());
+    //end new swm stuff
+
     
     if (ally.get() == Alliance.Blue){
       x1 = 0; 
@@ -113,7 +133,7 @@ public class Shooter {
       offset = 0;
     }
     if (getPose() != null) {
-      distance = Math.sqrt((Math.pow(getPose().getX() - x1, 2)) + Math.pow(getPose().getY() - y1, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
+      distance = Math.sqrt((Math.pow((getPose().getX()+poseDelta.getX()) - x1, 2)) + Math.pow((getPose().getY()+poseDelta.getY()) - y1, 2)); //a^2 + b^2 = c^2 //x2 - x1 = a
     } else {
       distance = 0.0;
     }
@@ -131,7 +151,7 @@ public class Shooter {
     } else {
       PassDIstance = 0.0;
     }
-    
+
     
 /*  SWM stuff //doesnt work needs redone
     Timer time = new Timer();
@@ -213,10 +233,16 @@ public class Shooter {
           ShootSpeed = speedMap.get(adjDistance);
           autoAim = true;
           speaker = true;
+        } else if (!launchMode && DriverStation.isAutonomous()) {
+          shooterAngle = -50;
+          launchMode = false; //prevents launch permision from being given when not in a shot position
+          ShootSpeed = 2000 + adjDistance * 10;//speed the shooter up when within 5m of speaker.
+          autoAim = false;
+          speaker = false;
         } else if(inputs.intakeLimit && !launchMode) {
           shooterAngle = -50;
           launchMode = false; //prevents launch permision from being given when not in a shot position
-          ShootSpeed = 2800;//speed the shooter up when within 5m of speaker.
+          ShootSpeed = 2800;//speed the shooter up
           autoAim = false;
           speaker = false;
         }else {
@@ -341,7 +367,7 @@ public class Shooter {
   public double LaunchPermision() {//launch permision, identifies, when shot parameters are reached. (returns a number, as it was originaly inteded to serve as a controller vibration input.)
     if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode && autoAim && DriverStation.isTeleop()) {
       return 1;
-    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(1))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 50 && ShootSpeed > getAvrgShootSpd() - 50 && getArmSpd() > -0.5 && getArmSpd() < 0.5&& launchMode) {
+    }else if (shooterAngle < getAnlge().plus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && shooterAngle > getAnlge().minus(new Rotation2d(Units.degreesToRadians(2))).getDegrees() && ShootSpeed < getAvrgShootSpd() + 40 && ShootSpeed > getAvrgShootSpd() - 40 && launchMode) {
       return 1;
     } else {
       return 0;

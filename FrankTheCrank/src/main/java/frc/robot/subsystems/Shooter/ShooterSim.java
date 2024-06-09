@@ -27,8 +27,8 @@ public class ShooterSim implements ShooterIO {
 
   private PIDController topPID = new PIDController(0.01, 0, 0.0000);
   private PIDController bottomPID = new PIDController(0.01, 0, 0.0000);
-  private SimpleMotorFeedforward topFeed = new SimpleMotorFeedforward(0.010, 0.003976);
-  private SimpleMotorFeedforward bottomFeed = new SimpleMotorFeedforward(0.010, 0.003976);
+  private SimpleMotorFeedforward topFeed = new SimpleMotorFeedforward(0.010, 0.003876);
+  private SimpleMotorFeedforward bottomFeed = new SimpleMotorFeedforward(0.010, 0.003876);
 
   public ShooterSim() {
     anglePID.enableContinuousInput(-180, 180);
@@ -52,6 +52,8 @@ public class ShooterSim implements ShooterIO {
 
     inputs.anglePosition = Units.radiansToDegrees(shooterAngle.getAngleRads());
     inputs.angleVelocity = Units.radiansPerSecondToRotationsPerMinute(shooterAngle.getVelocityRadPerSec());
+
+    inputs.intakeLimit = true;
   }
 
   @Override
