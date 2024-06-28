@@ -28,7 +28,13 @@
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.4,
+      "rotationDegrees": -163.00411048264667,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [
     {
       "name": "New Constraints Zone",
@@ -90,9 +96,9 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "5.5Piece",
+  "folder": null,
   "previewStartingState": {
-    "rotation": -155.45236133074872,
+    "rotation": -156.08279442726263,
     "velocity": 0
   },
   "useDefaultConstraints": true

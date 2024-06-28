@@ -7,7 +7,7 @@ package frc.robot.subsystems.Shooter;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -117,15 +117,15 @@ public class ShooterV3Hardware implements ShooterIO {
     angleConfig.CurrentLimits.StatorCurrentLimit = 40;
     angleConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     angleConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    angleConfig.Slot0.kS = 0.55;//0.28
-    angleConfig.Slot0.kG = 0.3;//0.4
+    angleConfig.Slot0.kS = 0.;//0.28
+    angleConfig.Slot0.kG = 0.35;//0.4
     angleConfig.Slot0.kV = 0.0;
     angleConfig.Slot0.kP = 200.0;//75
     angleConfig.Slot0.kI = 0.0;
-    angleConfig.Slot0.kD = 0.0;//0,75
+    angleConfig.Slot0.kD = 11.0;//0,75
     angleConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     angleConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    angleConfig.MotionMagic.MotionMagicAcceleration = 100; // 80 rps cruise velocity
+    angleConfig.MotionMagic.MotionMagicAcceleration = 80; // 80 rps cruise velocity
     angleConfig.MotionMagic.MotionMagicCruiseVelocity = 90; // 160 rps/s acceleration (0.5 seconds)
     angleConfig.MotionMagic.MotionMagicJerk = 0; // 1600 rps/s^2 jerk (0.1 seconds)
     angleConfig.Feedback.SensorToMechanismRatio = 135;
@@ -182,7 +182,7 @@ public class ShooterV3Hardware implements ShooterIO {
     // Arm Calculations
     //double ArmVolts = AngleFeedForward.calculate(Units.degreesToRadians(anglePosition), 0) + MathUtil.clamp(AnglePID.calculate(absolutePosition.getValueAsDouble() * 360, anglePosition), -4, 12);
     //F_ArmMotor.setVoltage(ArmVolts);
-    F_ArmMotor.setControl(new MotionMagicVoltage(new Rotation2d(Units.degreesToRadians(anglePosition)).getRotations()).withSlot(0).withEnableFOC(true));
+    F_ArmMotor.setControl(new PositionVoltage(new Rotation2d(Units.degreesToRadians(anglePosition)).getRotations()).withSlot(0).withEnableFOC(true));
     
     if (F_ArmMotor.getPosition().getValueAsDouble() > new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).minus(new Rotation2d(Units.degreesToRadians(0.8))).getRotations() && F_ArmMotor.getPosition().getValueAsDouble() < new Rotation2d(Units.rotationsToRadians(ArmEncoder.getAbsolutePosition().getValueAsDouble())).plus(new Rotation2d(Units.degreesToRadians(0.8))).getRotations()) {
 

@@ -95,12 +95,16 @@ public class Shooter {
     shootMap.put(2.7, -11.5);//distance, followed by shot angle //stage
     shootMap.put(5.6495, 2.8);//distance, followed by shot angle //wing
     shootMap.put(3.7338, -4.0);//distance, followed by shot angle //wing
+    shootMap.put(4.8, 2.0);//distance, followed by shot angle //wing
+    shootMap.put(6.0, 4.0);//distance, followed by shot angle //wing
 
     //if shots are bouncing out lower the relevant shot speed
     speedMap.put(1.25, 2000.0);//distance, followed by shot speed //subwoof 
     speedMap.put(1.84, 2900.0);//distance, followed by shot speed //auto line
     speedMap.put(3.054, 4500.0);//distance, followed by shot speed //stage
-    speedMap.put(5.6495, 5000.0);//distance, followed by shot speed //wing
+    speedMap.put(4.8, 5000.0);//distance, followed by shot angle //wing
+    speedMap.put(5.6495, 5200.0);//distance, followed by shot speed //wing
+    speedMap.put(6.0, 5700.0);//distance, followed by shot angle //wing
 
     PassMap.put(10.2, -30.0);
 
@@ -319,7 +323,7 @@ public class Shooter {
       limitOff = false;
       FeedSpeed = 0.6; //huge controll over intake speed, but need to be slow enough the limit goes off
       IntakeSpeed = 0.95;
-    } else if (autoShoot && error < Units.degreesToRadians(7) && LaunchPermision() == 1) { //case for automatic shooting. Extra case for robot pointing was needed
+    } else if (autoShoot && error < Units.degreesToRadians(9) && LaunchPermision() == 1) { //case for automatic shooting. Extra case for robot pointing was needed
       sideSpeed = 0.9;
       FeedSpeed = 0.5;
       limitOff = true;
