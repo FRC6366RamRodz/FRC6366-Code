@@ -30,9 +30,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "ShootToCenterClearAmp"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "shootToCenterline"
+                }
+              }
+            ]
           }
         }
       ]
