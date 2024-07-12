@@ -3,41 +3,57 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.7326298288960215,
-        "y": 6.660724594176462
+        "x": 4.0,
+        "y": 5.892919966851469
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5722169626157434,
-        "y": 7.024545685455007
+        "x": 4.855480489315315,
+        "y": 6.434297939018414
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9342138684277366,
-        "y": 6.99655944766435
+        "x": 6.485626884297247,
+        "y": 7.109381814149609
       },
       "prevControl": {
-        "x": 1.849810697738995,
-        "y": 6.985053843731312
+        "x": 5.407564887889314,
+        "y": 7.14580282754177
       },
       "nextControl": {
-        "x": 3.63760131156626,
-        "y": 7.004022444408525
+        "x": 7.275529951726032,
+        "y": 7.082695899709447
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.08,
-        "y": 6.99655944766435
+        "x": 8.124572486944441,
+        "y": 5.71081489989067
       },
       "prevControl": {
-        "x": 3.76710244253121,
-        "y": 7.009528361915463
+        "x": 8.052864191110986,
+        "y": 6.384772268288358
+      },
+      "nextControl": {
+        "x": 8.2311655064223,
+        "y": 4.708990075274686
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.294779169246997,
+        "y": 2.4432401125736267
+      },
+      "prevControl": {
+        "x": 8.22121128304525,
+        "y": 3.1176124027563104
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,8 +62,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.95,
-      "rotationDegrees": -176.98389921712638,
+      "waypointRelativePos": 2.45,
+      "rotationDegrees": 88.21387019489393,
       "rotateFast": false
     }
   ],
@@ -55,7 +71,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.25,
+      "waypointRelativePos": 1.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -79,13 +95,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -162.92839551944954,
+    "rotation": 89.20427644726085,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "CenterRush",
   "previewStartingState": {
-    "rotation": -119.62374875117379,
+    "rotation": -175.33327153211934,
     "velocity": 0
   },
   "useDefaultConstraints": true

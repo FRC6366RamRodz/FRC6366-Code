@@ -1,0 +1,43 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3866850093948635,
+      "y": 5.579699251678894
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterToCenterSWM"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CenterToAmp2SWM"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp2ToShotSWM"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootToCenterClearAmp"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
