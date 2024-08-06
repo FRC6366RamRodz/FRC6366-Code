@@ -119,7 +119,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnConfig.Voltage.PeakForwardVoltage = 11.5;
     turnConfig.Voltage.PeakReverseVoltage = -11.5;
     // TUNE PID CONSTANTS
-    turnConfig.Slot0.kP = 140.0;
+    turnConfig.Slot0.kP = 100.0;
     turnConfig.Slot0.kI = 0.0;
     turnConfig.Slot0.kD = 0.1;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;

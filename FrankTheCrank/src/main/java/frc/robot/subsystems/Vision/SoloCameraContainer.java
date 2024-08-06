@@ -42,10 +42,10 @@ public class SoloCameraContainer implements CameraContainer {
     List<PhotonTrackedTarget> filteredTargets = new ArrayList<>();
 
     for (PhotonTrackedTarget target : result.getTargets()) {
-      if (target.getPoseAmbiguity() > 0.2)//max allowed ambiguity
+      if (target.getPoseAmbiguity() > 0.3)//max allowed ambiguity the more accurate position needs to be the lower the number
         continue;
       if (Math
-        .abs(target.getBestCameraToTarget().getX()) > 5.5) //max tag distance.
+        .abs(target.getBestCameraToTarget().getX()) > 8.0) //max tag distance in meters.
       continue;
 
 

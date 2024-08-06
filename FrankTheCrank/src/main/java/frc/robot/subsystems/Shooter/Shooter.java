@@ -94,17 +94,17 @@ public class Shooter {
     shootMap.put(1.84, -21.0);//distance, followed by shot angle //auto line
     shootMap.put(2.7, -11.5);//distance, followed by shot angle //stage
     shootMap.put(5.6495, 2.8);//distance, followed by shot angle //wing
-    shootMap.put(3.7338, -4.0);//distance, followed by shot angle //wing
-    shootMap.put(4.8, 2.0);//distance, followed by shot angle //wing
-    shootMap.put(6.0, 4.0);//distance, followed by shot angle //wing
+    shootMap.put(3.7338, -4.0);//distance, followed by shot angle //
+    shootMap.put(4.8, 2.0);//distance, followed by shot angle //
+    shootMap.put(6.0, 4.0);//distance, followed by shot angle //
 
     //if shots are bouncing out lower the relevant shot speed
     speedMap.put(1.25, 2000.0);//distance, followed by shot speed //subwoof 
     speedMap.put(1.84, 2900.0);//distance, followed by shot speed //auto line
     speedMap.put(3.054, 4500.0);//distance, followed by shot speed //stage
     speedMap.put(4.8, 5000.0);//distance, followed by shot angle //wing
-    speedMap.put(5.6495, 5200.0);//distance, followed by shot speed //wing
-    speedMap.put(6.0, 5700.0);//distance, followed by shot angle //wing
+    speedMap.put(5.6495, 5200.0);//distance, followed by shot speed //
+    speedMap.put(6.0, 5700.0);//distance, followed by shot angle //
 
     PassMap.put(10.2, -30.0);
 
@@ -208,9 +208,9 @@ public class Shooter {
           autoAim = false;
           speaker = true;
         } else if(Amp) {
-          shooterAngle = 35;
+          shooterAngle = 47;
           launchMode = true;
-          ShootSpeed = 1000;
+          ShootSpeed = 900;
           autoAim = false;
           speaker = false;
         } else if ((intake || RobotContainer.io.getDrRTrigger()) && !Subwoof && !AutoLine && !Stage && !Wing && !Amp && !SWM) {
@@ -319,9 +319,9 @@ public class Shooter {
       FeedSpeed = 0.4; //honestly dont know (Best not to touch in that case)
       IntakeSpeed = 0.0;
     } else if ((intake || RobotContainer.io.getDrRTrigger()) && getAnlge().getDegrees() > -51 && getAnlge().getDegrees() < -49) {
-      sideSpeed = -0.2;//anti overfeed when intakeing
+      sideSpeed = -0.7;//anti overfeed when intakeing
       limitOff = false;
-      FeedSpeed = 0.6; //huge controll over intake speed, but need to be slow enough the limit goes off
+      FeedSpeed = 0.95; //huge controll over intake speed, but need to be slow enough the limit goes off
       IntakeSpeed = 0.95;
     } else if (autoShoot && error < Units.degreesToRadians(9) && LaunchPermision() == 1) { //case for automatic shooting. Extra case for robot pointing was needed
       sideSpeed = 0.9;

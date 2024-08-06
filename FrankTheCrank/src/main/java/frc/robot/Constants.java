@@ -48,12 +48,8 @@ public final class Constants {
       ;
 
 //Camera Positions.
-  public static Transform3d frontLeftCamera = new Transform3d(0.4, 0.363, 0.33, new Rotation3d(Units.degreesToRadians(-32),Units.degreesToRadians(-37), 0));
-  public static Transform3d frontRightCamera = new Transform3d(-0.4,0.4,0.33, new Rotation3d(Units.degreesToRadians(-18), Units.degreesToRadians(-37), 0));
-  public static Transform3d BackLeftCamera = new Transform3d(-0.4,0.307,0.33, new Rotation3d(Units.degreesToRadians(-270), Units.degreesToRadians(-45), Units.degreesToRadians(180)));
-  public static Transform3d BackRightCamera = new Transform3d(-0.7,-0.0207,0.33, new Rotation3d(Units.degreesToRadians(-178), Units.degreesToRadians(-45), Units.degreesToRadians(0))); 
-  /*public static Transform3d frontLeftCamera = new Transform3d(0.1778, 0.33, 0.33, new Rotation3d(Units.degreesToRadians(-32),Units.degreesToRadians(-37), 0));
-  public static Transform3d frontRightCamera = new Transform3d(-0.1778,0.33,0.33, new Rotation3d(Units.degreesToRadians(-18), Units.degreesToRadians(-37), 0));
-  public static Transform3d BackLeftCamera = new Transform3d(0.291,0.33,-0.36, new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(45), Units.degreesToRadians(180-45)));
-  public static Transform3d BackRightCamera = new Transform3d(-0.291,-0.33,-0.36, new Rotation3d(0, Units.degreesToRadians(45), Units.degreesToRadians(180+45)));*/
+public static Transform3d frontLeftCamera = new Transform3d(0.35, 0.1325, 0.18, new Rotation3d(Units.degreesToRadians(-0),Units.degreesToRadians(-37), Units.degreesToRadians(-23)));
+public static Transform3d frontRightCamera = new Transform3d(0.35,-0.1325,0.18, new Rotation3d(Units.degreesToRadians(-180), Units.degreesToRadians(-37), Units.degreesToRadians(23)));
+public static Transform3d BackLeftCamera = new Transform3d(-0.4,0.2925,0.06, new Rotation3d(Units.degreesToRadians(-180), Units.degreesToRadians(-45), Units.degreesToRadians(225)));
+public static Transform3d BackRightCamera = new Transform3d(-0.4,-0.2925,0.06, new Rotation3d(Units.degreesToRadians(-0), Units.degreesToRadians(-45), Units.degreesToRadians(135)));
 }
